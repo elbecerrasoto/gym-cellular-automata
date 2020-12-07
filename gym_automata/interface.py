@@ -117,13 +117,8 @@ class CAEnv:
     
     # Data Spaces
     grid_space = None
-    modifier_space_state = None
+    modifier_state_space = None
     
     # RL Spaces
     observation_space = None # spaces.Tuple((grid_space, modifier_state_space))
     action_space = None
-    
-    def update(self, grid, action, modifier_state):
-        raise NotImplementedError
-
-
