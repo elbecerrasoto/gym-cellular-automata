@@ -1,15 +1,7 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Dec  5 12:55:59 2020
-
-@author: ebecerra
-"""
-
 import numpy as np
 from gym import spaces
 
-# -------- Data Classes --------
+# ---------------- Data Classes
 class Grid:
     """
     Doc
@@ -33,21 +25,28 @@ class Grid:
     def __repr__(self):
         return self.data.__repr__()
 
-class ModifierState:
+class State:
     """
     Doc
     """
-    def __init__(self, data=None, space=None):
-        self.modifier_state_space = space
-        if data is None:
-            self.data = data
-        elif self.modifier_state_space.contains(data):
-            self.data = data
+    def __init__(self, data=None, state_space=None):
+        if data is None and state_space is None:
+            self.data = None
+            self.state_space = None
+            print('State object initialized just for library consistency.')
+            print('Its data and state_space attributes are set to None.')
         else:
-            raise ValueError('Invalid modifier state data.')
+            try:
+                self.state_space = state_space
+                if self.state_space.contains(data):
+                    self.data = data
+                else:
+                    raise ValueError('Invalid data, it is not a member of the provided space.')
+            except AttributeError:
+                print('A Gym Space must be provided as a state_space')
 
-    def __getitem__(self, index):
-        return self.data[index]
+    def __call__(self):
+        return self.data
     
     def __str__(self):
         return self.data.__str__()
@@ -55,14 +54,16 @@ class ModifierState:
     def __repr__(self):
         return self.data.__repr__()
 
-# -------- Service Classes --------
+# ---------------- Service Classes
 class Automaton:
     """
     It operates over a grid,
     performing an update by following the Automaton rules and neighborhood.
     """
+    # Set these in ALL subclasses
+    grid_space = None
 
-    def update(self, grid, action=None, modifier_state=None):
+    def update(self, grid, action=None, state=None):
         """Operation over a grid.
         
         Args:
@@ -82,9 +83,11 @@ class Modifier:
     environment with the semantics for an Reinforcement Learning task.
     """
     # Set these in ALL subclasses
-    modifier_state = None
+    grid_space = None
+    action_space = None
+    state_space = None
 
-    def update(self, grid, action, modifier_state):
+    def update(self, grid, action, state):
         """Operation over a grid. It represents the control task
         to perform.
         
@@ -93,7 +96,6 @@ class Modifier:
             grid (object): a grid provided by the env
         Returns:
             grid (object): modified grid
-            modifier_state (object): current modifier state
         """
         raise NotImplementedError
 
@@ -109,7 +111,7 @@ class CAEnv:
     # Set these in ALL subclasses
     # Data
     grid = None
-    modifier_state = None
+    state = None
     
     # Services
     modifier = None
@@ -117,8 +119,8 @@ class CAEnv:
     
     # Data Spaces
     grid_space = None
-    modifier_state_space = None
+    state_space = None
     
     # RL Spaces
-    observation_space = None # spaces.Tuple((grid_space, modifier_state_space))
+    observation_space = None # spaces.Tuple((grid_space, state_space))
     action_space = None
