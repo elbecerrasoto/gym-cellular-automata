@@ -1,5 +1,5 @@
 # Custom ignores
-
+/gym_automata/interface_testing.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
