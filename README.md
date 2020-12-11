@@ -1,24 +1,51 @@
 # Gym Automata
 ---
 
-_Gym Automata_ is a collection of environments for Reinforcement Learning (RL), that follow the [OpenAI Gym API](https://gym.openai.com/docs).
+_Gym Automata_ is a collection of _Reinforcement Learning Environments_ (RLEs) that follow the [OpenAI Gym API](https://gym.openai.com/docs).
 
-The presented environments are based on [Cellular Automata](https://en.wikipedia.org/wiki/Cellular_automaton) (CA).
+The available RLEs are based on [Cellular Automata](https://en.wikipedia.org/wiki/Cellular_automaton) (CAs).
 
-A proper RL environment was defined by the addition of a _Modifier_ on top of the CA grid and CA dynamics.
+A proper RLE was defined by the addition of a _Modifier_ on top of a CA.
 
-The Modifier performs changes over the CA grid, according to the action taken by the _Agent_ hopefully driving the CA configuration to a desired goal.
+The _Modifier_ performs changes over the CA grid according to the action taken by the _Agent_ trying to drive the CA configuration to the desired goal.
 
 ## Gym Automata Interface
 
-All the environments were built by the interplay of two main classes.
-1. Automanton
-2. Modifier
+A _CA-based environment_ (CABE) can be thought of as a series of grid operations, those performed by the _Modifier_ and those performed by the _Automaton_. An upper layer controls the operation order and gives them the semantics of an RLE, such as _reward_ calculation and _termination_ verification.
 
-Both classes share the _update_ method. It operates over a CA grid. When the method is called by the automaton it calculates the next grid state following the automaton rules and neighborhood. When the method is called by the modifier some positions of the CA grid could changed accordingly to the environment semantics. For example a modifier operating over a CA that models epidemics would change grid cells from Suceptible or Infectious to Recovered, representing some intervention on the population. The interface of the _update_ method is (for the Automaton class action and state are set to None and are only there to maintain consistency.):
+This is accomplished by abstracting the operations into the OPERATOR objects and the upper layer into a WRAPPER object. The grid being transformed is codified into a DATA object. Some CABEs need to track the _Modifier_ state, which is codified into a _State_ object.
+
+The following objects are used to define a CABE:
++ DATA objects
+	1. Grid
+	2. State
++ OPERATOR objects
+	3. Automaton
+	4. Modifier
++ WRAPPER objects
+	5. CAEnv
+
+All the environments are built by the interplay of two _operator_ classes.
++ Automaton
++ Modifier
+
+The _operator_ objects can transform the grid (configuration) of a CA by the shared method _update_.
+
 ```python
-obj.update(grid, action, state)
+grid = operator.update(grid, action, state)
 ```
+
+The _Automaton_ objects change the grid of a CA by computing a _1_-step update per cell, following a local function (CA rules and neighborhood).
+
+The _Modifier_ objects change the grid at target cell positions accordingly to the taken _action_ and its _state_. The _Modifier_ represents the control task being carried on top of the CA.
+
+Those two operations over the grid are abstracted into the _update_ method. The _update_ method is a pure function, which explicitly needs to know the current state of the _Modifier_.
+
+The _update_ of an _Automaton_ does not depends on _action_ and _state_, nonetheless, those arguments are still provided to make it consistent across the library.
+
+## Minimal Example
+
+Check a [minimal example](gym_automata/envs/minimal_example_env.py).
 
 ## Installation
 1. Download and install 
