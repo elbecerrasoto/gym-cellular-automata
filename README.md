@@ -13,17 +13,17 @@ The _Modifier_ performs changes over the CA grid according to the action taken b
 
 A _CA-based environment_ (CABE) can be thought of as a series of grid operations, those performed by the _Modifier_ and those performed by the _Automaton_. An upper layer controls the operation order and gives them the semantics of an RLE, such as _reward_ calculation and _termination_ verification.
 
-This is accomplished by abstracting the operations into the OPERATOR objects and the upper layer into a WRAPPER object. The grid being transformed is codified into a DATA object. Some CABEs need to track the _Modifier_ state, which is codified into a _State_ object.
+This is accomplished by abstracting the operations into the _Operator_ objects and the upper layer into a _Wrapper_ object. The grid being transformed is codified into a _Data_ object. Some CABEs need to track the _Modifier_ state, which is codified into a _State_ object.
 
 The following objects are used to define a CABE:
-+ DATA objects
-	1. Grid
-	2. State
-+ OPERATOR objects
-	3. Automaton
-	4. Modifier
-+ WRAPPER objects
-	5. CAEnv
++ Data objects
+	+ Grid
+	+ State
++ Operator objects
+	+ Automaton
+	+ Modifier
++ Wrapper objects
+	+ CAEnv
 
 All the environments are built by the interplay of two _operator_ classes.
 + Automaton
