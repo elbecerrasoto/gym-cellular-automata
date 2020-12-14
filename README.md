@@ -11,6 +11,8 @@ The _Modifier_ performs changes over the CA grid according to the action taken b
 
 ## Gym Automata Interface
 
+![Interface](pics/gym_automata_diagram.svg)
+
 A _CA-based environment_ (CABE) can be thought of as a series of grid operations, those performed by the _Modifier_ and those performed by the _Automaton_. An upper layer controls the operation order and gives them the semantics of an RLE, such as _reward_ calculation and _termination_ verification.
 
 This is accomplished by abstracting the operations into the _Operator_ objects and the upper layer into a _Wrapper_ object. The grid being transformed is codified into a _Data_ object. Some CABEs need to track the _Modifier_ state, which is codified into a _State_ object.
@@ -43,10 +45,6 @@ Those two operations over the grid are abstracted into the _update_ method. The 
 
 The _update_ of an _Automaton_ does not depends on _action_ and _state_, nonetheless, those arguments are still provided to make it consistent across the library.
 
-## Minimal Example
-
-Check a [minimal example](gym_automata/envs/minimal_example_env.py).
-
 ## Installation
 1. Download and install 
 ```shell
@@ -58,3 +56,7 @@ pip install -e gym-automata
 import gym
 env = gym.make('gym_automata:minimal-example-v0')
 ```
+
+## Minimal Example
+
+Check a [minimal example](gym_automata/envs/minimal_example_env.py).
