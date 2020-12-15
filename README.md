@@ -21,7 +21,7 @@ In order to provide a consistent and general way of CABE generation, _Gym Automa
 + Organizer
 	+ CAEnv
 
-The _Operator_ objects transform the grid in a series of operations which sequence is defined in a _CAEnv_ object. The grid is stored in a _Data_ object. Additionally some CABEs need to track the _Modifier_ state, which is captured in a _MoState_ object.
+The _Operator_ objects transform the grid in a series of operations which sequence is defined in a _CAEnv_ object. The grid is stored in a _Data_ object. Additionally, some CABEs need to track the _Modifier's state_, which is captured in a _MoState_ object.
 
 The _Operator_ objects can transform the grid by the shared method _update_. The _Automaton_ objects change the grid of a CA by computing a _1_-step update per cell, following the CA local function. The _Modifier_ objects change the grid at target cell positions accordingly to the taken _action_ and the current value of its own state.
 
