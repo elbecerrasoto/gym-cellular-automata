@@ -1,5 +1,5 @@
 # Included Software and Images
-
+---
 ## General Information
 
 Gym Automata incorporates _Software_ and _Images_ assets from various external sources, each of which is covered by its own license and copyright notice.
