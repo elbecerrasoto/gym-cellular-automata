@@ -7,7 +7,7 @@ gym_automata_doc = \
     ----------------
     DATA objects
     1. Grid
-    2. State
+    2. MoState
     
     OPERATOR objects
     1. Automaton
@@ -15,7 +15,7 @@ gym_automata_doc = \
     operator.update(grid, action, state)
     returns: grid
     
-    WRAPPER objects
+    ORGANIZER objects
     1. CAEnv  
     """
     
@@ -71,9 +71,9 @@ class Grid:
     def __repr__(self):
         return self.data.__repr__()
 
-class State:
+class MoState:
     """DATA object gym_automata
-    State(data, state_space)
+    MoState(data, mostate_space)
     
     It represents the current state of the modifier.
     Used to store information need by
@@ -83,42 +83,41 @@ class State:
     When building your own CA environments usually this Class is used directly,
     without extra customization.
     
-    A State data object needs two pieces of information
-    1. data (object) state data to hold
-    2. space (gym space) space which the data belongs
+    A MoState data object needs two pieces of information
+    1. data
+    2. mostate_space (a Gym Space type)
     
-    Declare a space
+    Declare a mospace
     e.g. A discrete space from 0 to 7
-    from gym import spaces
-    state_space = spaces.Discrete(8)
+    mostate_space = spaces.Discrete(8)
     
-    State data must be explicitly provided
+    MoState data must be explicitly provided
     So let's create a random sample
-    state_data = state_space.sample()
+    mostate_data = mostate_space.sample()
     
-    Create a ModifierState data object
-    state = State(data=state_data, state_space=state_space)
+    Create a MoState data object
+    mostate = MoState(data=mostate_data, mostate_space=mostate_space)
     
     Access the data by its __call__() method
-    state()
+    mostate()
     """
     __doc__ += gym_automata_doc
 
-    def __init__(self, data=None, state_space=None):
-        if data is None and state_space is None:
+    def __init__(self, data=None, mostate_space=None):
+        if data is None and mostate_space is None:
             self.data = None
             self.state_space = None
-            print('State object initialized just for library consistency.')
+            print('MoState object initialized just for library consistency.')
             print('Its data and state_space attributes are set to None.')
         else:
             try:
-                self.state_space = state_space
-                if self.state_space.contains(data):
+                self.mostate_space = mostate_space
+                if self.mostate_space.contains(data):
                     self.data = data
                 else:
                     raise ValueError('Invalid data, it is not a member of the provided space.')
             except AttributeError:
-                print('A Gym Space must be provided as a state_space')
+                print('A Gym Space must be provided as a mostate_space')
 
     def __call__(self):
         return self.data
@@ -147,13 +146,13 @@ class Automaton:
     # Set these in ALL subclasses
     grid_space = None
 
-    def update(self, grid, action=None, state=None):
+    def update(self, grid, action=None, mostate=None):
         """Operation over a grid.
         
         Args:
             grid (grid): a grid provided by the environment
             action (object): It is not used, set to None for API internal consistency
-            state (state): It is not used, set to None for API internal consistency
+            mostate (mostate): It is not used, set to None for API internal consistency
         Returns:
             grid (grid): modified grid
         """
@@ -179,13 +178,13 @@ class Modifier:
     action_space = None
     state_space = None
 
-    def update(self, grid, action, state=None):
+    def update(self, grid, action, mostate=None):
         """Operation over a grid.
         
         Args:
             grid (grid): a grid provided by the environment
             action (object): an action provided by the agent
-            state (state): modifier state, if any
+            mostate (mostate): modifier state, if any
         Returns:
             grid (grid): modified grid
         """
@@ -205,7 +204,7 @@ class CAEnv:
     # Set these in ALL subclasses
     # Data
     grid = None
-    state = None
+    mostate = None
     
     # Services
     modifier = None
@@ -213,7 +212,7 @@ class CAEnv:
     
     # Data Spaces
     grid_space = None
-    state_space = None
+    mostate_space = None
     
     # RL Spaces
     observation_space = None # spaces.Tuple((grid_space, state_space))
