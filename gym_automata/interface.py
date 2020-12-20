@@ -1,145 +1,246 @@
 import numpy as np
 from gym import spaces
+from gym.utils import colorize
+import warnings
 
 gym_automata_doc = \
     """
     gym-automata API
     ----------------
-    DATA objects
-    1. Grid
-    2. MoState
+    DATA classes
+    1. Grid(data, shape, cell_states, cell_type)
+    2. MoState(data, mostate_space)
     
-    OPERATOR objects
+    OPERATOR classes
     1. Automaton
     2. Modifier
+    
     operator.update(grid, action, state)
     returns: grid
     
-    ORGANIZER objects
-    1. CAEnv  
+    ORGANIZER classes
+    1. CAEnv
     """
     
 # ---------------- Data Classes
 class Grid:
-    """DATA object gym_automata
-    Grid(shape, cell_states, data, cell_type)
-        
-    It represents the grid (spatial disposition of cells) of a Cellular Automaton.
-    Access the data as a numpy array.
+    """
+    DATA class gym_automata
+    Grid(data, shape, cell_states, cell_type)
     
-    When building your own CA environments usually this Class is used directly,
+    It represents the grid (spatial disposition of cells) of a Cellular Automaton.
+    It labels its `n` cell states from `0` to `n-1`.
+    
+    It can be initialized by providing an array-like data or shape & cell_states or both.
+    If only data is provided, shape and cell_states would be inferred from it.
+
+    Parameters
+    ----------
+    data : numeric array
+        n-dimensional array representing the state of a Cellular Automaton, usually 2-D.
+        It assumes that the `n` cell states are label from `0` to `n-1`.
+
+    shape : tuple
+        Shape of each array dimension, from outer most to inner most dimensions.
+    
+    cell_states : int
+        Number of different cell states.
+        If only data is provided it would be inferred as the max number on the data.
+    
+    cell_type : type, default=np.int32
+        Type of the data entries.
+
+    Attributes
+    ----------
+    data : numeric array
+    
+    shape : tuple
+    
+    cell_states : int
+    
+    cell_type : type
+    
+    grid_space : gym.spaces.Space
+        A gym space that the data belongs to. For a grid is defined as
+        `spaces.Box(low=0, high=self.cell_states-1, shape=self.shape, dtype=self.cell_type)`
+
+    Examples
+    --------
+    >>> # Grid of 8x8 with 2 cell states and random initialization
+    >>> grid = Grid(shape=(8,8), cell_states=2)
+    
+    >>> # Grid of 8x8 with 2 cell states and custom initialization
+    >>> import numpy as np
+    >>> grid_ones = Grid(data=np.ones((8,8)), shape=(8,8), cell_states=2))
+    
+    >>> # Shape and cell states can be inferred from the data
+    >>> grid_ones = Grid(np.ones((8,8)))
+    
+    See Also
+    --------
+    
+    Notes
+    -----
+    When building your own CA environments usually this class is used directly,
     without extra customization.
     
-    A Grid data object needs four pieces of information
-    1. shape (tuple) multidimensional shape, usually 2-D
-    2. cell_states (int) n number of cell states, they will be labeled from 0 to n-1
-    3. data (array like) optional, random sampled if not provided
-    4. cell_type (type) optional, default=np.int32
-    
-    e.g. grid of 8x8 with 2 cell states and random initialization
-    grid = Grid(shape=(8,8), cell_states=2)
-    
-    e.g. grid of 8x8 with 2 cell states and custom initialization
-    grid_ones = Grid(shape=(8,8), cell_states=2, data=np.ones((8,8)))
-    
-    Access the data as a numpy array
-    grid[:]
-    grid_ones[:]
-    
-    Check if both Grids lie on the same space
-    grid.grid_space.contains(grid_ones[:])
-    grid_ones.grid_space.contains(grid[:])
     """
     __doc__ += gym_automata_doc
 
-    def __init__(self, shape=None, cell_states=None, data=None, cell_type=np.int32):
-        assert not(shape is None or cell_states is None), 'shape and cell_states must be explicitly provided.'
-        self.grid_space = spaces.Box(low=0, high=cell_states-1, shape=shape, dtype=cell_type)
-        if data is None:
+    def __init__(self, data=None, shape=None, cell_states=None, cell_type=np.int32):
+        def infer_data_shape(data):
+            # Piggyback on numpy methods
+            data = np.array(data)
+            return data.shape
+        def infer_data_cell_states(data):   
+            data = np.array(data)
+            return int(data.max()) + 1
+
+        self.cell_type = cell_type
+        if data is None: # If not data, sample a grid
+            assert shape is not None and cell_states is not None, 'If no data is provided, shape and cell_states must be provided to generate random data.'
+            self.shape = shape
+            self.cell_states = cell_states
+            self.grid_space = spaces.Box(low=0, high=self.cell_states-1, shape=self.shape, dtype=self.cell_type)
+            # Generate random data
             self.data = self.grid_space.sample()
-        elif self.grid_space.contains(data):
-            self.data = data
         else:
-            raise ValueError('Invalid grid data.')
+            self.shape = infer_data_shape(data) if shape is None else tuple(shape)
+            self.cell_states = infer_data_cell_states(data) if cell_states is None else int(cell_states)
+            self.grid_space = spaces.Box(low=0, high=self.cell_states-1, shape=self.shape, dtype=self.cell_type)
+            # Check that the provided data is in the space
+            assert self.grid_space.contains(data), f'data does not belong to the space {self.grid_space}' 
+            self.data = data
 
     def __getitem__(self, index):
         return self.data[index]
     
-    def __str__(self):
-        return self.data.__str__()
-    
     def __repr__(self):
-        return self.data.__repr__()
+        return f"Grid({self.data}, shape={self.shape}, cell_states={self.cell_states})"
 
 class MoState:
-    """DATA object gym_automata
+    """
+    DATA class gym_automata
     MoState(data, mostate_space)
     
-    It represents the current state of the modifier.
-    Used to store information need by
-    the Modifier to update the grid and posibly by
-    the environment to calculate reward and termination.
+    It represents the current state of the Modifier.
+    Used to store information need by the Modifier to update the grid
+    and posibly by the environment to calculate reward and termination.
     
-    When building your own CA environments usually this Class is used directly,
+    It can be initialized by providing an array-like data or a tuple with array-like data and a gym.spaces.Space.
+    If only data is provided, the space would be inferred from the data.
+    Also it can be initialized by providing a gym.spaces.Space in which case a random sample from the space is taken.
+
+    Parameters
+    ----------
+    data : numeric array or tuple of numeric arrays 
+        n-dimensional array or tuple of arrays representing the state of the Modifier.
+    mostate_space : gym.spaces.Space
+        A Tuple space if a tuple is provided, a Box otherwise.
+        If only data is provided it is inferred to be, per entry:
+            `spaces.Box(-float('inf'), float('inf'), shape=data.shape)`
+
+    Attributes
+    ----------
+    data : numeric array or tuple of numeric arrays
+    mostate_space : gym.spaces.Space
+
+    Examples
+    --------
+    
+    See Also
+    --------
+    
+    Notes
+    -----
+    When building your own CA environments usually this class is used directly,
     without extra customization.
-    
-    A MoState data object needs two pieces of information
-    1. data
-    2. mostate_space (a Gym Space type)
-    
-    Declare a mospace
-    e.g. A discrete space from 0 to 7
-    mostate_space = spaces.Discrete(8)
-    
-    MoState data must be explicitly provided
-    So let's create a random sample
-    mostate_data = mostate_space.sample()
-    
-    Create a MoState data object
-    mostate = MoState(data=mostate_data, mostate_space=mostate_space)
-    
-    Access the data by its __call__() method
-    mostate()
+
     """
     __doc__ += gym_automata_doc
 
     def __init__(self, data=None, mostate_space=None):
+        def infer_data_space(data):
+            subspaces = []
+            if isinstance(data, tuple):
+                 for subdata in data:
+                     subdata = np.array(subdata)
+                     subspace = spaces.Box(-float('inf'), float('inf'), shape=subdata.shape)
+                     subspaces.append(subspace)
+                 return spaces.Tuple(subspaces)
+            else:
+                data = np.array(data)
+                return spaces.Box(-float('inf'), float('inf'), shape=data.shape)
+        
         if data is None and mostate_space is None:
             self.data = None
-            self.state_space = None
-            print('MoState object initialized just for library consistency.')
-            print('Its data and state_space attributes are set to None.')
+            self.mostate_space = None
+            msg = 'MoState object initialized just for gym-automata library consistency.\n\
+Its data and mostate_space attributes are set to `None`.'
+            warnings.warn(colorize(msg, 'yellow'), UserWarning)
+        elif mostate_space is not None and data is None:
+            assert isinstance(mostate_space, spaces.Space), f'mostate_space must be an instance of gym.spaces.Space and currently is a {type(self.mostate_space)}'
+            self.mostate_space = mostate_space
+            self.data = self.mostate_space.sample()
         else:
-            try:
-                self.mostate_space = mostate_space
-                if self.mostate_space.contains(data):
-                    self.data = data
-                else:
-                    raise ValueError('Invalid data, it is not a member of the provided space.')
-            except AttributeError:
-                print('A Gym Space must be provided as a mostate_space')
+            self.mostate_space = infer_data_space(data) if mostate_space is None else mostate_space
+            assert isinstance(self.mostate_space, spaces.Space), f'mostate_space must be an instance of gym.spaces.Space and currently is a {type(self.mostate_space)}'
+            assert self.mostate_space.contains(data), f'data does not belong to the space {self.mostate_space}'
+            self.data = data
 
-    def __call__(self):
-        return self.data
-    
-    def __str__(self):
-        return self.data.__str__()
-    
+    def __getitem__(self, index):
+        return self.data[index]
+        
     def __repr__(self):
-        return self.data.__repr__()
-
+        if self.data is None and self.mostate_space is None:
+            return "MoState(`None`, mostate_space=`None`)" 
+        else:
+            return f"MoState({self.data}, mostate_space={self.mostate_space})"    
+    
 # ---------------- Operator Classes
 class Automaton:
-    """OPERATOR object gym_automata
+    """
+    OPERATOR class gym_automata
     
     It operates over a grid,
     representing a 1-step computation of a Cellular Automaton.
     
-    When building your own CA environments this Class must be customized, usually by
-    inheritance, to build your own Cellular Automaton.
-
     Its main method update performs
     a 1-step update of the grid by following the Automaton rules and neighborhood.
+
+    Attributes
+    ----------
+    grid_space : gym.spaces.Space
+    
+    Methods
+    ----------
+    Automaton.update(grid, action=None, mostate=None)
+        Operation over a grid.
+        
+        Args:
+            grid : Grid
+                A grid provided by the environment.
+            action : numeric
+                It is not used, set to None for API internal consistency.
+            mostate : MoState
+                It is not used, set to None for API internal consistency.
+            
+        Returns:
+            grid : Grid
+                Modified grid
+
+    
+    Examples
+    --------
+    
+    See Also
+    --------
+    
+    Notes
+    -----
+    When building your own CA environments this class must be customized, usually by
+    inheritance, to build your own Cellular Automaton.
+
     """
     __doc__ += gym_automata_doc
 
@@ -147,36 +248,77 @@ class Automaton:
     grid_space = None
 
     def update(self, grid, action=None, mostate=None):
-        """Operation over a grid.
+        """   
+        Operation over a grid.
         
         Args:
-            grid (grid): a grid provided by the environment
-            action (object): It is not used, set to None for API internal consistency
-            mostate (mostate): It is not used, set to None for API internal consistency
+            grid : Grid
+                A grid provided by the environment.
+            action : numeric
+                It is not used, set to None for API internal consistency.
+            mostate : MoState
+                It is not used, set to None for API internal consistency.
+            
         Returns:
-            grid (grid): modified grid
+            grid : Grid
+                Modified grid
         """
         raise NotImplementedError
 
 class Modifier:
-    """OPERATOR object gym_automata
+    """
+    OPERATOR class gym_automata
     
     It operates over a grid,
     represeting some sort of control task over it.
     
-    When building your own CA environments this Class must be customized, usually by
+    Its main method is update, which receives a grid, and action and a modifier state
+    and returns a grid.
+
+    Attributes
+    ----------
+    grid_space : gym.spaces.Space
+    
+    action_space : gym.spaces.Space
+    
+    mostate_space : gym.spaces.Space
+    
+    Methods
+    ----------
+    Modifier.update(grid, action=None, mostate=None)
+        Operation over a grid.
+        
+        Args:
+            grid : Grid
+                A grid provided by the environment.
+            action : numeric
+                An action provided by the agent.
+            mostate : MoState
+                Modifier state, if any.
+            
+        Returns:
+            grid : Grid
+                Modified grid.
+    
+    Examples
+    --------
+    
+    See Also
+    --------
+    
+    Notes
+    -----
+    When building your own CA environments this class must be customized, usually by
     inheritance, to build your own Modifier, that controls the dynamics of a CA
     by changing its grid according to the taken action and its current state.
     
-    Its main method is update, which receives a grid, and action and a modifier state
-    and returns a grid.
     """
     __doc__ += gym_automata_doc
 
     # Set these in ALL subclasses
     grid_space = None
     action_space = None
-    state_space = None
+    mostate_space = None
 
     def update(self, grid, action, mostate=None):
         """Operation over a grid.
@@ -192,12 +334,51 @@ class Modifier:
 
 # ---------------- Wrapper Classes
 class CAEnv:
-    """WRAPPER object gym_automata
-    Wraps the data objects and the operator objects of gym-automata library into a
+    """
+    ORGANIZER class gym_automata
+    
+    Provides the logic layer for the operator objects and turns them into a
     coherent OpenAI Gym Environment.
     
-    When building your own CA environments this Class is usually inherited by your
-    final Environment Class, together with the Gym.Env Class.
+
+    
+    OPERATOR object gym_automata
+    
+    It operates over a grid,
+    represeting some sort of control task over it.
+    
+    Its main method is update, which receives a grid, and action and a modifier state
+    and returns a grid.
+
+    Attributes
+    ----------
+    grid : Grid
+    
+    mostate : MoState
+    
+    modifier : Modifier
+    
+    automaton : Automaton
+    
+    grid_space : gym.spaces.Space
+    
+    mostate_space : gym.spaces.Space
+    
+    observation_space : gym.spaces.Space
+    
+    action_space : gym.spaces.Space
+    
+    Examples
+    --------
+    
+    See Also
+    --------
+    
+    Notes
+    -----
+    When building your own CA environments this class is usually inherited by your
+    final Environment, together with gym.Env.
+    
     """
     __doc__ += gym_automata_doc
 

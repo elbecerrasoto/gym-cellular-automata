@@ -1,5 +1,4 @@
 # Custom ignores
-gym_automata/interface_testing.py
 tests/
 
 # Byte-compiled / optimized / DLL files

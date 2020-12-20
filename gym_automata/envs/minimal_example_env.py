@@ -1,55 +1,52 @@
 import gym
 from gym import spaces
-import numpy as np
-# Data Classes
+
+# Data classes
 from gym_automata.interface import Grid, MoState
-# Service Classes
-from gym_automata.interface import Automaton, Modifier, CAEnv
+# Operator classes
+from gym_automata.interface import Automaton, Modifier
+# Organizer classes
+from gym_automata.interface import CAEnv
 
 # ---------------- Initialize Data Objects
 
 # ---------------- Grid Object
-# A Grid data object needs four pieces of information
-# 1. data (optional, random sampled if not provided)
-# 2. shape (multidimensional shape, usually 2-D)
-# 3. cell_MoStates (n number of cell MoStates, they will be labeled from 0 to n-1)
-# 4. cell_type (optional, default=np.int32)
 
-# e.g. grid of 8x8 with 2 cell_states and random initialization
-grid = Grid(shape=(8,8), cell_states=2)
-
-# e.g. grid of 8x8 with 2 cell_states and custom initialization
-grid_ones = Grid(shape=(8,8), cell_states=2, data=np.ones((8,8)))
-
-# Access the data as a numpy array
-grid[:]
-grid_ones[:]
-
-# Check if both Grids lie on the same space
-grid.grid_space.contains(grid_ones[:])
-grid_ones.grid_space.contains(grid[:])
+# A 8x8 Cellular Automaton Grid, with 2 cell states and random data.
+grid = Grid(shape = (8,8), cell_states = 2)
+# Access the data
+# >>> grid.data
+# >>> grid[:]
 
 # ---------------- MoState Object
-# A MoState data object needs two pieces of information
-# 1. data
-# 2. mostate_space (a Gym Space type)
 
 # Declare a space
-# e.g. A discrete space from 0 to 7
-mostate_space = spaces.Discrete(8)
+# For example:s
+# Discrete with 8 elements, from 0 to 7
+mostate_space1 = spaces.Discrete(8)
+# Continuos from 0-360, maybe they are angle degrees
+mostate_space2 = spaces.Box(low=0, high=360, shape=tuple())
+# Unbounded range, maybe this space represents coordinates
+mostate_space3 = spaces.Box(low=float('-inf'), high=float('inf'), shape=(1,2))
 
-# MoState data must be explicitly provided
-# So let's create a random sample
-mostate_data = mostate_space.sample()
+# Sample using the sample method
+# >>> mostate_space3.sample()
+# Test membership by contains
+# >>> mostate_space1.contains(7)
+# >>> mostate_space1.contains(256)
 
-# Create a ModifierMoState data object
-mostate = MoState(data=mostate_data, mostate_space=mostate_space)
+# Combine spaces with Tuple, to get a new combined space
+tspaces = (mostate_space1, mostate_space2, mostate_space3)
+mostate_space = spaces.Tuple(tspaces)
 
-# Access the data by its __call__() method
-mostate()
+# MoState with random data
+mostate = MoState(mostate_space = mostate_space)
+# Access the data
+# >>> mostate.data
+# >>> mostate[:]
 
-# ---------------- Code Service Objects
-# Implement the Service Objects
+# ---------------- Code Operator Objects
+
 class MyCellularAutomaton(Automaton):
     def __init__(self, grid_space):
         self.grid_space = grid_space
@@ -63,20 +60,25 @@ class MyModifier(Modifier):
         self.action_space = action_space
         self.mostate_space = mostate_space
 
-    def update(self, grid, action, MoState):
+    def update(self, grid, action, mostate):
         return grid
 
 automaton = MyCellularAutomaton(grid.grid_space)
-automaton.update(grid)
 
-modifier = MyModifier(grid.grid_space, spaces.Discrete(9), spaces.Discrete(8))
-modifier.update(grid, modifier.action_space.sample(), modifier.mostate_space.sample())
+# Test update method
+# >>> automaton.update(grid)
 
-# ---------------- Code your happy Environment
-# Wrap the Automaton and Modifier into a coherent Gym Environment
-# The Environment performs operations over a grid calling the method update from the Service Objects.
-# After a series of grid operations
-# an Observation, a Reward, a Termination Signal and an Information are returned
+# Maybe going left or right
+action_space = spaces.Discrete(2)
+modifier = MyModifier(grid.grid_space, action_space, mostate.mostate_space)
+
+# Test update method
+action = modifier.action_space.sample()
+modifier.update(grid, action, mostate)
+
+# ---------------- Code your happy environment
+# Coordinate the Automaton and Modifier operations into a coherent Gym Environment
+
 class MinimalExampleEnv(CAEnv, gym.Env):
     metadata = {'render.modes': ['human']}
     
@@ -125,8 +127,9 @@ class MinimalExampleEnv(CAEnv, gym.Env):
     def close(self):
         print('Hasta la vista baby!')
 
-env = MinimalExampleEnv()
-env.step(env.action_space.sample())
-env.render()
-env.reset()
-env.close()
+# Test MinimalExampleEnv
+# >>> env = MinimalExampleEnv()
+# >>> env.step(env.action_space.sample())
+# >>> env.render()
+# >>> env.reset()
+# >>> env.close()
