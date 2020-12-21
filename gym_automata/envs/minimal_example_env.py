@@ -21,7 +21,7 @@ grid = Grid(shape = (8,8), cell_states = 2)
 # ---------------- MoState Object
 
 # Declare a space
-# For example:s
+# For example:
 # Discrete with 8 elements, from 0 to 7
 mostate_space1 = spaces.Discrete(8)
 # Continuos from 0-360, maybe they are angle degrees

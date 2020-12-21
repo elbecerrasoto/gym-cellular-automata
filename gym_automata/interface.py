@@ -47,7 +47,7 @@ class Grid:
         Number of different cell states.
         If only data is provided it would be inferred as the max number on the data.
     
-    cell_type : type, default=np.int32
+    cell_type : type, default=np.uint16
         Type of the data entries.
 
     Attributes
@@ -83,34 +83,43 @@ class Grid:
     -----
     When building your own CA environments usually this class is used directly,
     without extra customization.
-    
     """
     __doc__ += gym_automata_doc
 
-    def __init__(self, data=None, shape=None, cell_states=None, cell_type=np.int32):
+    def __init__(self, data=None, shape=None, cell_states=None, cell_type=np.uint16):
         def infer_data_shape(data):
-            # Piggyback on numpy methods
+            # Piggybacking on numpy methods
             data = np.array(data)
             return data.shape
         def infer_data_cell_states(data):   
             data = np.array(data)
+            # Infer the cell states to be the ceil of the max
             return int(data.max()) + 1
-
+        
         self.cell_type = cell_type
-        if data is None: # If not data, sample a grid
+        if data is None:
             assert shape is not None and cell_states is not None, 'If no data is provided, shape and cell_states must be provided to generate random data.'
             self.shape = shape
             self.cell_states = cell_states
             self.grid_space = spaces.Box(low=0, high=self.cell_states-1, shape=self.shape, dtype=self.cell_type)
-            # Generate random data
-            self.data = self.grid_space.sample()
+            self.data = None
         else:
             self.shape = infer_data_shape(data) if shape is None else tuple(shape)
             self.cell_states = infer_data_cell_states(data) if cell_states is None else int(cell_states)
             self.grid_space = spaces.Box(low=0, high=self.cell_states-1, shape=self.shape, dtype=self.cell_type)
-            # Check that the provided data is in the space
-            assert self.grid_space.contains(data), f'data does not belong to the space {self.grid_space}' 
             self.data = data
+
+    @property
+    def data(self):
+        return self._data
+    
+    @data.setter
+    def data(self, data):
+        if data is None: # If no data, sample a grid
+            self._data = self.grid_space.sample()
+        else:
+            assert self.grid_space.contains(data), f'data does not belong to the space {self.grid_space}'
+            self._data = data
 
     def __getitem__(self, index):
         return self.data[index]
@@ -155,45 +164,65 @@ class MoState:
     -----
     When building your own CA environments usually this class is used directly,
     without extra customization.
-
     """
     __doc__ += gym_automata_doc
 
     def __init__(self, data=None, mostate_space=None):
         def infer_data_space(data):
             subspaces = []
-            if isinstance(data, tuple):
+            if isinstance(data, tuple): # Assume it is a composition of several spaces.
                  for subdata in data:
                      subdata = np.array(subdata)
                      subspace = spaces.Box(-float('inf'), float('inf'), shape=subdata.shape)
                      subspaces.append(subspace)
                  return spaces.Tuple(subspaces)
-            else:
+            else: # Assume a single space.
                 data = np.array(data)
                 return spaces.Box(-float('inf'), float('inf'), shape=data.shape)
         
         if data is None and mostate_space is None:
-            self.data = None
             self.mostate_space = None
+            self.data = None
             msg = 'MoState object initialized just for gym-automata library consistency.\n\
 Its data and mostate_space attributes are set to `None`.'
             warnings.warn(colorize(msg, 'yellow'), UserWarning)
         elif mostate_space is not None and data is None:
-            assert isinstance(mostate_space, spaces.Space), f'mostate_space must be an instance of gym.spaces.Space and currently is a {type(self.mostate_space)}'
             self.mostate_space = mostate_space
             self.data = self.mostate_space.sample()
         else:
             self.mostate_space = infer_data_space(data) if mostate_space is None else mostate_space
-            assert isinstance(self.mostate_space, spaces.Space), f'mostate_space must be an instance of gym.spaces.Space and currently is a {type(self.mostate_space)}'
-            assert self.mostate_space.contains(data), f'data does not belong to the space {self.mostate_space}'
             self.data = data
+
+    @property
+    def data(self):
+        return self._data
+    
+    @data.setter
+    def data(self, data):
+        if data is None:
+            self._data = None
+        else:
+            assert self.mostate_space.contains(data), f'data does not belong to the space {self.mostate_space}'
+            self._data = data
+            
+    @property
+    def mostate_space(self):
+        return self._mostate_space
+
+    @mostate_space.setter    
+    def mostate_space(self, mostate_space):
+        if mostate_space is None:
+            self._mostate_space = None
+        else:
+            assert isinstance(mostate_space, spaces.Space), f'mostate_space must be an instance of gym.spaces.Space and currently is a {type(mostate_space)}'
+            self._mostate_space = mostate_space
 
     def __getitem__(self, index):
         return self.data[index]
         
     def __repr__(self):
         if self.data is None and self.mostate_space is None:
-            return "MoState(`None`, mostate_space=`None`)" 
+            return "MoState(None, mostate_space=None)" 
         else:
             return f"MoState({self.data}, mostate_space={self.mostate_space})"    
     
@@ -240,7 +269,6 @@ class Automaton:
     -----
     When building your own CA environments this class must be customized, usually by
     inheritance, to build your own Cellular Automaton.
-
     """
     __doc__ += gym_automata_doc
 
@@ -311,7 +339,6 @@ class Modifier:
     When building your own CA environments this class must be customized, usually by
     inheritance, to build your own Modifier, that controls the dynamics of a CA
     by changing its grid according to the taken action and its current state.
-    
     """
     __doc__ += gym_automata_doc
 
@@ -378,7 +405,6 @@ class CAEnv:
     -----
     When building your own CA environments this class is usually inherited by your
     final Environment, together with gym.Env.
-    
     """
     __doc__ += gym_automata_doc
 
