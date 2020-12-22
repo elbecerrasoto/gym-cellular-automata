@@ -125,7 +125,7 @@ class Grid:
         return self.data[index]
     
     def __repr__(self):
-        return f"Grid({self.data}, shape={self.shape}, cell_states={self.cell_states})"
+        return f"Grid(\n{self.data},\nshape={self.shape}, cell_states={self.cell_states})"
 
 class MoState:
     """
@@ -222,9 +222,9 @@ Its data and mostate_space attributes are set to `None`.'
         
     def __repr__(self):
         if self.data is None and self.mostate_space is None:
-            return "MoState(None, mostate_space=None)" 
+            return "MoState(\nNone, mostate_space=None)" 
         else:
-            return f"MoState({self.data}, mostate_space={self.mostate_space})"    
+            return f"MoState(\n{self.data},\nmostate_space={self.mostate_space})"    
     
 # ---------------- Operator Classes
 class Automaton:
