@@ -123,7 +123,11 @@ class Grid:
 
     def __getitem__(self, index):
         return self.data[index]
-    
+
+    def __setitem__(self, index, value):
+        self.data[index] = value
+        assert self.grid_space.contains(self.data), f'data does not belong to the space {self.grid_space}'
+
     def __repr__(self):
         return f"Grid(\n{self.data},\nshape={self.shape}, cell_states={self.cell_states})"
 
@@ -144,6 +148,7 @@ class MoState:
     ----------
     data : numeric array or tuple of numeric arrays 
         n-dimensional array or tuple of arrays representing the state of the Modifier.
+
     mostate_space : gym.spaces.Space
         A Tuple space if a tuple is provided, a Box otherwise.
         If only data is provided it is inferred to be, per entry:
@@ -152,6 +157,7 @@ class MoState:
     Attributes
     ----------
     data : numeric array or tuple of numeric arrays
+
     mostate_space : gym.spaces.Space
 
     Examples
@@ -219,7 +225,11 @@ Its data and mostate_space attributes are set to `None`.'
 
     def __getitem__(self, index):
         return self.data[index]
-        
+
+    def __setitem__(self, index, value):
+        self.data[index] = value
+        assert self.mostate_space.contains(self.data), f'data does not belong to the space {self.mostate_space}'
+
     def __repr__(self):
         if self.data is None and self.mostate_space is None:
             return "MoState(\nNone, mostate_space=None)" 
@@ -359,15 +369,13 @@ class Modifier:
         """
         raise NotImplementedError
 
-# ---------------- Wrapper Classes
+# ---------------- Organizer Classes
 class CAEnv:
     """
     ORGANIZER class gym_automata
     
     Provides the logic layer for the operator objects and turns them into a
     coherent OpenAI Gym Environment.
-    
-
     
     OPERATOR object gym_automata
     
@@ -422,5 +430,5 @@ class CAEnv:
     mostate_space = None
     
     # RL Spaces
-    observation_space = None # spaces.Tuple((grid_space, state_space))
+    observation_space = None
     action_space = None

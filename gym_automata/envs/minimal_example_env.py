@@ -14,9 +14,14 @@ from gym_automata.interface import CAEnv
 
 # A 8x8 Cellular Automaton Grid, with 2 cell states and random data.
 grid = Grid(shape = (8,8), cell_states = 2)
+
 # Access the data
 # >>> grid.data
 # >>> grid[:]
+
+# Write new data
+# >>> grid.data = new_data
+# >>> grid[:] = new_data
 
 # ---------------- MoState Object
 
@@ -41,9 +46,14 @@ mostate_space = spaces.Tuple(tspaces)
 
 # MoState with random data
 mostate = MoState(mostate_space = mostate_space)
+
 # Access the data
 # >>> mostate.data
 # >>> mostate[:]
+
+# Write new data
+# >>> mostate.data = new_data
+# >>> mostate[:] = new_data
 
 # ---------------- Code Operator Objects
 
@@ -52,6 +62,8 @@ class MyCellularAutomaton(Automaton):
         self.grid_space = grid_space
 
     def update(self, grid, action=None, mostate=None):
+        grid_data = grid.data.copy()
+        grid.data = grid_data
         return grid
 
 class MyModifier(Modifier):
@@ -61,6 +73,8 @@ class MyModifier(Modifier):
         self.mostate_space = mostate_space
 
     def update(self, grid, action, mostate):
+        grid_data = grid.data.copy()
+        grid.data = grid_data
         return grid
 
 automaton = MyCellularAutomaton(grid.grid_space)
