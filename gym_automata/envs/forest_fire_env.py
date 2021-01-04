@@ -61,22 +61,22 @@ class ForestFireCAEnv(CAEnv, gym.Env):
 
     def __init__(self):
         self.freeze = FREEZE
-        self.steps2CA = FREEZE
-
-        self.steps = 0
-        self.hits = 0
         
         # Data
-        self.grid = FF_GRID
-        self.mostate = FF_MOSTATE
+        self.initial_grid = FF_GRID
+        self.initial_mostate = FF_MOSTATE
 
-        self.n_row = self.grid.data.shape[0]
-        self.n_col = self.grid.data.shape[1]
+        self.n_row = FF_GRID.data.shape[0]
+        self.n_col = FF_GRID.data.shape[1]
 
         self.cell_symbols = CELL_SYMBOLS
         self.empty = CELL_SYMBOLS['empty']
         self.tree = CELL_SYMBOLS['tree']
         self.fire = CELL_SYMBOLS['empty']
+        
+        self.reward_per_empty = REWARD_PER_EMPTY
+        self.reward_per_tree = REWARD_PER_TREE
+        self.reward_per_fire = REWARD_PER_FIRE
         
         # Operators
         self.automaton = ForestFire(P_FIRE, P_FIRE, CELL_SYMBOLS, FF_GRID_SPACE)
@@ -106,11 +106,13 @@ class ForestFireCAEnv(CAEnv, gym.Env):
                 self.grid = self.modifier.update(self.grid, action, self.mostate)
                 self.steps2CA -= 1
                 
-                self.steps += 1
-                self.hits += modifier.hit
-                reward = 
-                info = {'steps': self.steps, 'hits': self.hits}
-                return obs, reward, done, info
+            self.steps += 1
+            self.hits += self.modifier.hit
+            info = {'steps': self.steps, 'hits': self.hits}
+            reward = self._calculate_reward()
+            obs = self.grid.data, self.mostate.data
+            
+            return obs, reward, done, info
         
         else:
             logger.warn(
@@ -119,78 +121,98 @@ class ForestFireCAEnv(CAEnv, gym.Env):
                     "should always call 'reset()' once you receive 'done = "
                     "True' -- any further steps are undefined behavior."
                 )
+            
+            return (self.grid.data, self.mostate.data), 0.0, True, {'steps': self.steps, 'hits': self.hits}
 
     def reset(self):
-        self.__init__()
+        # If random start, uncomment
+        # self.initial_grid.data = self.initial_grid.grid_space.sample()
+        # self.initial_mostate.data = self.initial_mostate.mostate_space.sample()
+        
+        self.grid = self.initial_grid
+        self.mostate = self.initial_mostate
+        
+        self.steps2CA = self.freeze
+
+        self.steps = 0
+        self.hits = 0
+        
+        obs = self.grid, self.mostate
+        reward = self._calculate_reward()
+        done = self._is_terminated()
+        info = {'steps': self.steps, 'hits': self.hits}
+        
+        return obs, reward, done, info
     
     def render(self, mode='human'):
         pass
 
     def close(self):
-        pass
+        print('Gracefully closing forest fire environment.')
     
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
     def _calculate_reward(self):
-        reward_per_empty = REWARD_PER_EMPTY
-        reward_per_tree = REWARD_PER_TREE
-        reward_per_fire = REWARD_PER_FIRE
-
         cell_types, counts = np.unique(self.grid.data, return_counts=True)
         cell_counts = defaultdict(int, zip(cell_types, counts))
 
-        weights = np.array([reward_per_empty, reward_per_tree, reward_per_fire])
+        weights = np.array([self.reward_per_empty, self.reward_per_tree, self.reward_per_fire])
         counts = np.array([cell_counts[self.empty], cell_counts[self.tree], cell_counts[self.fire]])
 
-        reward = np.dot(weights, counts)
-        return reward
+        return np.dot(weights, counts)
     
-    def _is_terminated(self):
+    def _is_terminated(self, mode='continuing'):
         return False
     
-    def _move_helicopter(self, action):  
-        def new_hpos(action):
-            
-            new_row = row if is_out_borders(action, pos='row')\
-                else row if action in {5}\
-                else row - 1 if action in {1, 2, 3}\
-                else row + 1 if action in [7, 8, 9]
-            
-            new_col = col if is_out_borders(action, pos='col')\
-                else col if action in {5}\
-                else col - 1 if action in {1, 4, 7}\
-                else col + 1 if action in {3, 6, 9}\
-            
-            return np.array([new_row, new_col])
+    def _move_helicopter(self, action):
+        row = self.mostate.data[0]
+        col = self.mostate.data[1]
         
-        def is_out_borders(self, action, pos):    
+        def is_out_borders(action, pos):    
             if pos == 'row':
                 # Check Up movement
-                if action in {1, 2, 3} and self.pos_row == 0:
+                if action in {1, 2, 3} and row == 0:
                     out_of_border = True
                 # Check Down movement
-                elif action in {7, 8, 9} and self.pos_row == self.n_row-1:
+                elif action in {7, 8, 9} and row == self.n_row-1:
                     out_of_border = True
                 else:
                     out_of_border = False
             
             elif pos == 'col':
                 # Check Left movement
-                if action in {1, 4, 7} and self.pos_col == 0:
+                if action in {1, 4, 7} and col == 0:
                     out_of_border = True
                 # Check Right movement
-                elif action in {3, 6, 9} and self.pos_col == self.n_col-1:
+                elif action in {3, 6, 9} and col == self.n_col-1:
                     out_of_border = True
                 else:
                     out_of_border = False
             else:
                 raise ValueError('invalid argument: pos = "row" | "col"')            
-            
             return out_of_border
         
-        return new_hpos(action)
+        def new_hpos(action, row, col):
+            assert self.action_space.contains(action), f'action: {action} does not belong to {self.action_space}'
+            
+            new_row = row if is_out_borders(action, pos='row')\
+                else row if action in {5}\
+                else row - 1 if action in {1, 2, 3}\
+                else row + 1 if action in {7, 8, 9}\
+                else None
+            
+            new_col = col if is_out_borders(action, pos='col')\
+                else col if action in {5}\
+                else col - 1 if action in {1, 4, 7}\
+                else col + 1 if action in {3, 6, 9}\
+                else None
+            
+            assert not(new_row is None or new_col is None), 'fatal error: `hpos` cannot be `None`.'
+            return np.array([new_row, new_col])
+        
+        return new_hpos(action, row, col)
 
 # ---------------- Operator Objects
 
