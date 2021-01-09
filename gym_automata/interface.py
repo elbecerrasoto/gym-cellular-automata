@@ -16,7 +16,7 @@ gym_automata_doc = \
     2. Modifier
     3. Organizer
     
-    operator.update(grid : Grid, action, most : State, orst : State)
+    operator.update(grid : Grid, action, aust : State, most : State, orst : State)
     returns: Grid
     """
 
@@ -251,37 +251,36 @@ class Automaton:
         Grid Space.
     
     action_space : gym.spaces.Space
-        Action Space. It is not used,
-        set to `None` for API internal consistency.
+        Action Space.
+        
+    aust_space : gym.spaces.Space
+        Automaton Space.
         
     most_space : gym.spaces.Space
-        Modifier State Space. It is not used,
-        set to `None` for API internal consistency.
+        It is not used, set to `None` for API internal consistency.
     
     orst_space : gym.spaces.Space
-        Organizer State Space. It is not used,
-        set to `None` for API internal consistency.
-    
+        It is not used, set to `None` for API internal consistency.
+                
     Methods
     ----------
-    Modifier.update(grid, action, most=None, orst=None)
     Operation over a grid. Main method of gym_automata.
+    
+    Args:
+        grid : Grid
+            A grid provided by the environment.
+        action : object
+            An action provided by the agent.
+        aust : State
+            An automaton state, if any, provided by the environment.
+        most : State
+            It is not used, set to `None` for API internal consistency.
+        orst : State
+            It is not used, set to `None` for API internal consistency.
         
-        Args:
-            grid : Grid
-                A grid provided by the environment.
-            action : numeric
-                Action. It is not used,
-                set to `None` for API internal consistency.
-            most : State
-                Modifier State. It is not used,
-                set to `None` for API internal consistency.
-            orst : State
-                Organizer State. It is not used,
-                set to `None` for API internal consistency.
-        Returns:
-            grid : Grid
-                1-step updated grid by the CA rules.
+    Returns:
+        grid : Grid
+            A 1-step updated grid by the CA rules.
     
     Examples
     --------
@@ -297,31 +296,32 @@ class Automaton:
 
     # Set these in ALL subclasses
     grid_space = None
-    
-    # Not used, set to `None` for API internal consistency
     action_space = None
+    aust = None
+
+    # Not used, set to `None` for API internal consistency
     most_space = None
     orst_space = None
 
-    def update(self, grid, action=None, most=None, orst=None):
+    def update(self, grid, action, aust=None, most=None, orst=None):
         """
         Operation over a grid. Main method of gym_automata.
+        
+        Args:
+            grid : Grid
+                A grid provided by the environment.
+            action : object
+                An action provided by the agent.
+            aust : State
+                An automaton state, if any, provided by the environment.
+            most : State
+                It is not used, set to `None` for API internal consistency.
+            orst : State
+                It is not used, set to `None` for API internal consistency.
             
-            Args:
-                grid : Grid
-                    A grid provided by the environment.
-                action : numeric
-                    Action. It is not used,
-                    set to `None` for API internal consistency.
-                most : State
-                    Modifier State. It is not used,
-                    set to `None` for API internal consistency.
-                orst : State
-                    Organizer State. It is not used,
-                    set to `None` for API internal consistency.
-            Returns:
-                grid : Grid
-                    1-step updated grid by the CA rules.
+        Returns:
+            grid : Grid
+                A 1-step updated grid by the CA rules.
         """
         raise NotImplementedError
 
@@ -343,32 +343,34 @@ class Modifier:
     action_space : gym.spaces.Space
         Action Space.
         
+    aust_space : gym.spaces.Space
+        It is not used, set to `None` for API internal consistency.
+        
     most_space : gym.spaces.Space
         Modifier State Space.
     
     orst_space : gym.spaces.Space
-        Organizer State Space. It is not used,
-        set to `None` for API internal consistency.
+        It is not used, set to `None` for API internal consistency.
     
     Methods
     ----------
-    Modifier.update(grid, action, most=None, orst=None)
-        Operation over a grid. Main method of gym_automata.
+    Operation over a grid. Main method of gym_automata.
+    
+    Args:
+        grid : Grid
+            A grid provided by the environment.
+        action : object
+            An action provided by the agent.
+        aust : State
+            It is not used, set to `None` for API internal consistency.
+        most : State
+            A modifier state, if any, provided by the environment.
+        orst : State
+            It is not used, set to `None` for API internal consistency.
         
-        Args:
-            grid : Grid
-                A grid provided by the environment.
-            action : numeric
-                An action provided by the agent.
-            most : State
-                Modifier State, if any.
-            orst : State
-                Organizer State. It is not used,
-                set to `None` for API internal consistency.
-            
-        Returns:
-            grid : Grid
-                Modified grid.
+    Returns:
+        grid : Grid
+            Modified grid, with exchanged cells.
     
     Examples
     --------
@@ -388,27 +390,28 @@ class Modifier:
     most_space = None
     
     # Not used, set to `None` for API internal consistency
+    aust_space = None
     orst_space = None
 
-    def update(self, grid, action, most=None, orst=None):
+    def update(self, grid, action, aust=None, most=None, orst=None):
         """
-        Modifier.update(grid, action, most=None, orst=None)
         Operation over a grid. Main method of gym_automata.
         
         Args:
             grid : Grid
                 A grid provided by the environment.
-            action : numeric
+            action : object
                 An action provided by the agent.
+            aust : State
+                It is not used, set to `None` for API internal consistency.
             most : State
-                Modifier State, if any.
+                A modifier state, if any, provided by the environment.
             orst : State
-                Organizer State. It is not used,
-                set to `None` for API internal consistency.
+                It is not used, set to `None` for API internal consistency.
             
         Returns:
             grid : Grid
-                Modified grid.
+                Modified grid, with exchanged cells. 
         """
         raise NotImplementedError
 
@@ -422,14 +425,19 @@ class Organizer:
     Attributes
     ----------
     automaton : Automaton
+        An operator that computes CA rules.
     
     modifier : Modifier
+        An operator that exchange cells.
     
     grid_space : gym.spaces.Space
         Grid Space.
     
     action_space : gym.spaces.Space
         Action Space.
+        
+    aust_space : gym.spaces.Space
+        Automaton State Space.
         
     most_space : gym.spaces.Space
         Modifier State Space.
@@ -439,22 +447,23 @@ class Organizer:
     
     Methods
     ----------
-    Modifier.update(grid, action, most=None, orst=None)
-        Operation over a grid. Main method of gym_automata.
+    Operation over a grid. Main method of gym_automata.
+    
+    Args:
+        grid : Grid
+            A grid provided by the environment.
+        action : object
+            An action provided by the agent.
+        aust : State
+            Automaton State, if any, provided by the environment.
+        most : State
+            Modifier State, if any, provided by the environment. 
+        orst : State
+            Organizer State, if any, provided by the environment.
         
-        Args:
-            grid : Grid
-                A grid provided by the environment.
-            action : numeric
-                An action provided by the agent.
-            most : State
-                Modifier State, if any.
-            orst : State
-                Organizer State, if any.
-            
-        Returns:
-            grid : Grid
-                Modified grid.
+    Returns:
+        grid : Grid
+            A new grid produced by a series of automaton and modifier updates.
     
     Examples
     --------
@@ -474,5 +483,28 @@ class Organizer:
     
     grid_space = None
     action_space = None
+    aust_space = None
     most_space = None
     orst_space = None
+    
+    def update(self, grid, action, aust=None, most=None, orst=None):
+        """
+        Operation over a grid. Main method of gym_automata.
+        
+        Args:
+            grid : Grid
+                A grid provided by the environment.
+            action : object
+                An action provided by the agent.
+            aust : State
+                Automaton State, if any, provided by the environment.
+            most : State
+                Modifier State, if any, provided by the environment. 
+            orst : State
+                Organizer State, if any, provided by the environment.
+            
+        Returns:
+            grid : Grid
+                A new grid produced by a series of automaton and modifier updates.
+        """
+        raise NotImplementedError
