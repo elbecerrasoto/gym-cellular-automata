@@ -9,20 +9,19 @@ gym_automata_doc = \
     ----------------
     DATA classes
     1. Grid(data, shape, cell_states, cell_type)
-    2. MoState(data, mostate_space)
+    2. State(data, state_space)
     
     OPERATOR classes
     1. Automaton
     2. Modifier
+    3. Organizer
     
-    operator.update(grid, action, state)
-    returns: grid
-    
-    ORGANIZER classes
-    1. CAEnv
+    operator.update(grid : Grid, action, most : State, orst : State)
+    returns: Grid
     """
-    
+
 # ---------------- Data Classes
+
 class Grid:
     """
     DATA class gym_automata
@@ -81,8 +80,7 @@ class Grid:
     
     Notes
     -----
-    When building your own CA environments usually this class is used directly,
-    without extra customization.
+    When building your own CA environments usually this class is used directly.
     """
     __doc__ += gym_automata_doc
 
@@ -131,13 +129,13 @@ class Grid:
     def __repr__(self):
         return f"Grid(\n{self.data},\nshape={self.shape}, cell_states={self.cell_states})"
 
-class MoState:
+class State:
     """
     DATA class gym_automata
-    MoState(data, mostate_space)
+    State(data, state_space)
     
-    It represents the current state of the Modifier.
-    Used to store information need by the Modifier to update the grid
+    It represents the current state of the Modifier or the Organizer.
+    Used to store information need by them to update the grid
     and posibly by the environment to calculate reward and termination.
     
     It can be initialized by providing an array-like data or a tuple with array-like data and a gym.spaces.Space.
@@ -149,7 +147,7 @@ class MoState:
     data : numeric array or tuple of numeric arrays 
         n-dimensional array or tuple of arrays representing the state of the Modifier.
 
-    mostate_space : gym.spaces.Space
+    state_space : gym.spaces.Space
         A Tuple space if a tuple is provided, a Box otherwise.
         If only data is provided it is inferred to be, per entry:
             `spaces.Box(-float('inf'), float('inf'), shape=data.shape)`
@@ -158,7 +156,7 @@ class MoState:
     ----------
     data : numeric array or tuple of numeric arrays
 
-    mostate_space : gym.spaces.Space
+    state_space : gym.spaces.Space
 
     Examples
     --------
@@ -168,12 +166,11 @@ class MoState:
     
     Notes
     -----
-    When building your own CA environments usually this class is used directly,
-    without extra customization.
+    When building your own CA environments usually this class is used directly.
     """
     __doc__ += gym_automata_doc
 
-    def __init__(self, data=None, mostate_space=None):
+    def __init__(self, data=None, state_space=None):
         def infer_data_space(data):
             subspaces = []
             if isinstance(data, tuple): # Assume it is a composition of several spaces.
@@ -186,17 +183,17 @@ class MoState:
                 data = np.array(data)
                 return spaces.Box(-float('inf'), float('inf'), shape=data.shape)
         
-        if data is None and mostate_space is None:
-            self.mostate_space = None
+        if data is None and state_space is None:
+            self.state_space = None
             self.data = None
-            msg = 'MoState object initialized just for gym-automata library consistency.\n\
-Its data and mostate_space attributes are set to `None`.'
+            msg = 'State object initialized just for gym-automata library consistency.\n\
+Its data and state_space attributes are set to `None`.'
             warnings.warn(colorize(msg, 'yellow'), UserWarning)
-        elif mostate_space is not None and data is None:
-            self.mostate_space = mostate_space
-            self.data = self.mostate_space.sample()
+        elif state_space is not None and data is None:
+            self.state_space = state_space
+            self.data = self.state_space.sample()
         else:
-            self.mostate_space = infer_data_space(data) if mostate_space is None else mostate_space
+            self.state_space = infer_data_space(data) if state_space is None else state_space
             self.data = data
 
     @property
@@ -208,35 +205,36 @@ Its data and mostate_space attributes are set to `None`.'
         if data is None:
             self._data = None
         else:
-            assert self.mostate_space.contains(data), f'data does not belong to the space {self.mostate_space}'
+            assert self.state_space.contains(data), f'data does not belong to the space {self.state_space}'
             self._data = data
             
     @property
-    def mostate_space(self):
-        return self._mostate_space
+    def state_space(self):
+        return self._state_space
 
-    @mostate_space.setter    
-    def mostate_space(self, mostate_space):
-        if mostate_space is None:
-            self._mostate_space = None
+    @state_space.setter    
+    def state_space(self, state_space):
+        if state_space is None:
+            self._state_space = None
         else:
-            assert isinstance(mostate_space, spaces.Space), f'mostate_space must be an instance of gym.spaces.Space and currently is a {type(mostate_space)}'
-            self._mostate_space = mostate_space
+            assert isinstance(state_space, spaces.Space), f'state_space must be an instance of gym.spaces.Space and currently is a {type(state_space)}'
+            self._state_space = state_space
 
     def __getitem__(self, index):
         return self.data[index]
 
     def __setitem__(self, index, value):
         self.data[index] = value
-        assert self.mostate_space.contains(self.data), f'data does not belong to the space {self.mostate_space}'
+        assert self.state_space.contains(self.data), f'data does not belong to the space {self.state_space}'
 
     def __repr__(self):
-        if self.data is None and self.mostate_space is None:
-            return "MoState(\nNone, mostate_space=None)" 
+        if self.data is None and self.state_space is None:
+            return "State(\nNone, state_space=None)" 
         else:
-            return f"MoState(\n{self.data},\nmostate_space={self.mostate_space})"    
-    
+            return f"State(\n{self.data},\nstate_space={self.state_space})"    
+  
 # ---------------- Operator Classes
+
 class Automaton:
     """
     OPERATOR class gym_automata
@@ -245,29 +243,45 @@ class Automaton:
     representing a 1-step computation of a Cellular Automaton.
     
     Its main method update performs
-    a 1-step update of the grid by following the Automaton rules and neighborhood.
+    a 1-step update of a given grid by the following of the Automaton rules.
 
     Attributes
     ----------
     grid_space : gym.spaces.Space
+        Grid Space.
+    
+    action_space : gym.spaces.Space
+        Action Space. It is not used,
+        set to `None` for API internal consistency.
+        
+    most_space : gym.spaces.Space
+        Modifier State Space. It is not used,
+        set to `None` for API internal consistency.
+    
+    orst_space : gym.spaces.Space
+        Organizer State Space. It is not used,
+        set to `None` for API internal consistency.
     
     Methods
     ----------
-    Automaton.update(grid, action=None, mostate=None)
-        Operation over a grid.
+    Modifier.update(grid, action, most=None, orst=None)
+    Operation over a grid. Main method of gym_automata.
         
         Args:
             grid : Grid
                 A grid provided by the environment.
             action : numeric
-                It is not used, set to None for API internal consistency.
-            mostate : MoState
-                It is not used, set to None for API internal consistency.
-            
+                Action. It is not used,
+                set to `None` for API internal consistency.
+            most : State
+                Modifier State. It is not used,
+                set to `None` for API internal consistency.
+            orst : State
+                Organizer State. It is not used,
+                set to `None` for API internal consistency.
         Returns:
             grid : Grid
-                Modified grid
-
+                1-step updated grid by the CA rules.
     
     Examples
     --------
@@ -277,29 +291,37 @@ class Automaton:
     
     Notes
     -----
-    When building your own CA environments this class must be customized, usually by
-    inheritance, to build your own Cellular Automaton.
+    Customize this class when building your own CA environments.
     """
     __doc__ += gym_automata_doc
 
     # Set these in ALL subclasses
     grid_space = None
+    
+    # Not used, set to `None` for API internal consistency
+    action_space = None
+    most_space = None
+    orst_space = None
 
-    def update(self, grid, action=None, mostate=None):
-        """   
-        Operation over a grid.
-        
-        Args:
-            grid : Grid
-                A grid provided by the environment.
-            action : numeric
-                It is not used, set to None for API internal consistency.
-            mostate : MoState
-                It is not used, set to None for API internal consistency.
+    def update(self, grid, action=None, most=None, orst=None):
+        """
+        Operation over a grid. Main method of gym_automata.
             
-        Returns:
-            grid : Grid
-                Modified grid
+            Args:
+                grid : Grid
+                    A grid provided by the environment.
+                action : numeric
+                    Action. It is not used,
+                    set to `None` for API internal consistency.
+                most : State
+                    Modifier State. It is not used,
+                    set to `None` for API internal consistency.
+                orst : State
+                    Organizer State. It is not used,
+                    set to `None` for API internal consistency.
+            Returns:
+                grid : Grid
+                    1-step updated grid by the CA rules.
         """
         raise NotImplementedError
 
@@ -316,23 +338,33 @@ class Modifier:
     Attributes
     ----------
     grid_space : gym.spaces.Space
+        Grid Space.
     
     action_space : gym.spaces.Space
+        Action Space.
+        
+    most_space : gym.spaces.Space
+        Modifier State Space.
     
-    mostate_space : gym.spaces.Space
+    orst_space : gym.spaces.Space
+        Organizer State Space. It is not used,
+        set to `None` for API internal consistency.
     
     Methods
     ----------
-    Modifier.update(grid, action=None, mostate=None)
-        Operation over a grid.
+    Modifier.update(grid, action, most=None, orst=None)
+        Operation over a grid. Main method of gym_automata.
         
         Args:
             grid : Grid
                 A grid provided by the environment.
             action : numeric
                 An action provided by the agent.
-            mostate : MoState
-                Modifier state, if any.
+            most : State
+                Modifier State, if any.
+            orst : State
+                Organizer State. It is not used,
+                set to `None` for API internal consistency.
             
         Returns:
             grid : Grid
@@ -346,62 +378,83 @@ class Modifier:
     
     Notes
     -----
-    When building your own CA environments this class must be customized, usually by
-    inheritance, to build your own Modifier, that controls the dynamics of a CA
-    by changing its grid according to the taken action and its current state.
+    Customize this class when building your own CA environments.
     """
     __doc__ += gym_automata_doc
 
     # Set these in ALL subclasses
     grid_space = None
     action_space = None
-    mostate_space = None
+    most_space = None
+    
+    # Not used, set to `None` for API internal consistency
+    orst_space = None
 
-    def update(self, grid, action, mostate=None):
-        """Operation over a grid.
+    def update(self, grid, action, most=None, orst=None):
+        """
+        Modifier.update(grid, action, most=None, orst=None)
+        Operation over a grid. Main method of gym_automata.
         
         Args:
-            grid (grid): a grid provided by the environment
-            action (object): an action provided by the agent
-            mostate (mostate): modifier state, if any
+            grid : Grid
+                A grid provided by the environment.
+            action : numeric
+                An action provided by the agent.
+            most : State
+                Modifier State, if any.
+            orst : State
+                Organizer State. It is not used,
+                set to `None` for API internal consistency.
+            
         Returns:
-            grid (grid): modified grid
+            grid : Grid
+                Modified grid.
         """
         raise NotImplementedError
 
-# ---------------- Organizer Classes
-class CAEnv:
+class Organizer:
     """
-    ORGANIZER class gym_automata
+    OPERATOR class gym_automata
     
-    Provides the logic layer for the operator objects and turns them into a
+    Provides the logic and the operation order of Automaton and Modifier updates.
     coherent OpenAI Gym Environment.
-    
-    OPERATOR object gym_automata
-    
-    It operates over a grid,
-    represeting some sort of control task over it.
-    
-    Its main method is update, which receives a grid, and action and a modifier state
-    and returns a grid.
 
     Attributes
     ----------
-    grid : Grid
-    
-    mostate : MoState
+    automaton : Automaton
     
     modifier : Modifier
     
-    automaton : Automaton
-    
     grid_space : gym.spaces.Space
-    
-    mostate_space : gym.spaces.Space
-    
-    observation_space : gym.spaces.Space
+        Grid Space.
     
     action_space : gym.spaces.Space
+        Action Space.
+        
+    most_space : gym.spaces.Space
+        Modifier State Space.
+    
+    orst_space : gym.spaces.Space
+        Organizer State Space.    
+    
+    Methods
+    ----------
+    Modifier.update(grid, action, most=None, orst=None)
+        Operation over a grid. Main method of gym_automata.
+        
+        Args:
+            grid : Grid
+                A grid provided by the environment.
+            action : numeric
+                An action provided by the agent.
+            most : State
+                Modifier State, if any.
+            orst : State
+                Organizer State, if any.
+            
+        Returns:
+            grid : Grid
+                Modified grid.
     
     Examples
     --------
@@ -411,24 +464,15 @@ class CAEnv:
     
     Notes
     -----
-    When building your own CA environments this class is usually inherited by your
-    final Environment, together with gym.Env.
+    Customize this class when building your own CA environments.
     """
     __doc__ += gym_automata_doc
 
     # Set these in ALL subclasses
-    # Data
-    grid = None
-    mostate = None
-    
-    # Services
-    modifier = None
     automaton = None
+    modifier = None
     
-    # Data Spaces
     grid_space = None
-    mostate_space = None
-    
-    # RL Spaces
-    observation_space = None
     action_space = None
+    most_space = None
+    orst_space = None

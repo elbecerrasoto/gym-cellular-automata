@@ -5,9 +5,8 @@ import gym
 from gym import spaces, logger
 from gym.utils import seeding
 
-from gym_automata.interface import Grid, MoState
-from gym_automata.interface import Automaton, Modifier
-from gym_automata.interface import CAEnv
+from gym_automata.interface import Grid, State
+from gym_automata.interface import Automaton, Modifier, Organizer
 
 # ---------------- Globals
 
@@ -38,13 +37,20 @@ REWARD_PER_FIRE = -1.0
 def init_FF_grid(row, col, cell_states = 3):
     return Grid(shape = (row, col), cell_states = cell_states)
 
-def init_FF_mostate(row, col, freeze):
+def init_FF_most(row, col):
     # Position of Helicopter
     hpos_space = spaces.MultiDiscrete([row, col])
-    return MoState(mostate_space = hpos_space)
+    return State(state_space = hpos_space)
 
+def init_FF_orst(freeze):
+    # Freeze counter
+    freeze_space = spaces.Discrete(freeze)
+    return State(state_space = freeze_space)
+    
+    
 FF_GRID = init_FF_grid(ROW, COL, CELL_STATES)
-FF_MOSTATE = init_FF_mostate(ROW, COL, FREEZE)
+FF_MO_DATA = init_FF_mostate(ROW, COL, FREEZE)
+FF_M
 
 # ---------------- Spaces
 
@@ -56,7 +62,7 @@ FF_OBSERVATION_SPACE = spaces.Tuple((FF_GRID_SPACE, FF_MOSTATE_SPACE))
 
 # ---------------- Env
 
-class ForestFireCAEnv(CAEnv, gym.Env):
+class ForestFireCAEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
     def __init__(self):
@@ -163,7 +169,7 @@ class ForestFireCAEnv(CAEnv, gym.Env):
 
         return np.dot(weights, counts)
     
-    def _is_terminated(self, mode='continuing'):
+    def _is_done(self, mode='continuing'):
         return False
     
     def _move_helicopter(self, action):
@@ -216,7 +222,7 @@ class ForestFireCAEnv(CAEnv, gym.Env):
 
 # ---------------- Operator Objects
 
-class ForestFire(Automaton):
+class ForestFireAutomaton(Automaton):
     
     def __init__(self, p_fire, p_tree, cell_symbols, grid_space):
         self.p_fire = p_fire
@@ -225,7 +231,7 @@ class ForestFire(Automaton):
         
         self.grid_space = grid_space
     
-    def update(self, grid, action=None, mostate=None):
+    def update(self, grid, action=None, most=None, orst=None):
         new_data = grid.data.copy()
         
         empty = self.cell_symbols['empty']
@@ -310,22 +316,48 @@ class ForestFire(Automaton):
 
         return up_left, up_center, up_right, middle_left, middle, middle_right, down_left, down_center, down_right
 
-class Helicopter(Modifier):
-
-    def __init__(self, effects, grid_space, mostate_space, action_space):
+class ForestFireModifier(Modifier):
+    hit = False    
+    
+    def __init__(self, effects, grid_space, action_space, most_space):
         self.effects = effects
         
         # Spaces
         self.grid_space = grid_space
-        self.mostate_space = mostate_space
         self.action_space = action_space
+        self.most_space = most_space
 
-    def update(self, grid, action, mostate):
-        row, col = mostate.data
+    def update(self, grid, action, most, orst=None):
+        row, col = most.data
         self.hit = False
         # Exchange of cells if applicable (usually `fire` to `empty`).
         for symbol in self.effects:
             if grid[row, col] == symbol:
                 grid[row, col] = self.effects[symbol]
                 self.hit = True
+        return grid
+    
+class ForestFireOrganizer(Organizer):
+    
+    def __init__(self, automata, modifier, grid_space, action_space, most_space, orst_space):
+        
+        # Operators
+        self.automata = automata
+        self.modifier = modifier
+        
+        # Spaces
+        self.grid_space = grid_space
+        self.action_space = action_space
+        self.most_space = most_space
+        self.orst_space = orst_space
+    
+    def update(self, grid, action, most, orst):
+        if orst.data == 0:
+            
+            grid = self.automaton.update(grid, action=None, most=None, orst=None)            
+            grid = self.modifier.update(grid, action, most, orst=None)
+            
+        else:
+            grid = self.modifier.update(grid, action, most, orst=None)
+        
         return grid
