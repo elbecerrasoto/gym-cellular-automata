@@ -20,6 +20,13 @@ gym_automata_doc = \
     returns: Grid
     """
 
+# ---------------- Base Classes
+
+class Operator:
+    
+    def update(self, grid, action, state):
+        raise NotImplementedError
+
 # ---------------- Data Classes
 
 class Grid:
