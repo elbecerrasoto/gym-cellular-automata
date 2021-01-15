@@ -72,8 +72,8 @@ class Grid:
         
         self.cell_type = cell_type
         
-        assert cell_states is not None, 'A number of possible cell_states must be provided'.
-        assert cell_states > 0, 'cell_states must be a positive integer'.
+        assert cell_states is not None, 'A number of possible cell_states must be provided.'
+        assert cell_states > 0, 'cell_states must be a positive integer.'
         
         self.cell_states = int(cell_states)
         

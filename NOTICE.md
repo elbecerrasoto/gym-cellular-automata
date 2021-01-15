@@ -28,6 +28,3 @@ permission notices, disclaimers, and copyright statements.
 + Source/Download: [World](https://thenounproject.com/search/?q=world&i=2801283)
 + License: [Creative Commons Attribution 3.0 International](https://creativecommons.org/licenses/by/3.0/)
 + Changes: Recolored to pink, embedded into a diagram.
-
-## Software
-None.
