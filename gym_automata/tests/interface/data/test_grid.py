@@ -21,7 +21,7 @@ def test_Grid_API_specifications(grid = Grid(data = DATA,
     assert hasattr(grid, '__getitem__'),'Must support indexing'
     assert hasattr(grid, '__setitem__'), 'Must support index assignation'
     with pytest.raises(Exception):
-        Grid() # Cannot be initialized with defaults
+        Grid() # Cannot be initialized from defaults
     with pytest.raises(Exception):
         Grid(data = DATA, shape = SHAPE) # Cell States are necessary 
 

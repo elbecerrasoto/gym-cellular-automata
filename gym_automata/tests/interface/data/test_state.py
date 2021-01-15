@@ -13,7 +13,7 @@ def test_State_API_specifications(state = State(data = DATA,
                                                 state_space = STATE_SPACE)):
     assert hasattr(state, 'data')
     assert isinstance(state.state_space, spaces.Space)
-    # Defaults are None and raise Warning
+    # Default initialization must raise an UserWarning and set everything to None 
     with pytest.warns(UserWarning):
         state_obj_defaults = State()
     assert state_obj_defaults.data is None
