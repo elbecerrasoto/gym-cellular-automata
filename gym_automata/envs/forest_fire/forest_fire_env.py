@@ -5,8 +5,8 @@ import gym
 from gym import spaces, logger
 from gym.utils import seeding
 
-from gym_automata.interface import Grid, State
-from gym_automata.interface import Automaton, Modifier, Organizer
+from gym_automata.interface.data import Grid, State
+from gym_automata.interface.operators import Automaton, Exchanger, Synchronizer
 
 # ---------------- Globals
 
@@ -224,14 +224,16 @@ class ForestFireCAEnv(gym.Env):
 
 class ForestFireAutomaton(Automaton):
     
-    def __init__(self, p_fire, p_tree, cell_symbols, grid_space):
+    def __init__(self, p_fire, p_tree, cell_symbols, grid_space, action, action, space):
         self.p_fire = p_fire
         self.p_tree = p_tree
         self.cell_symbols = cell_symbols   
         
         self.grid_space = grid_space
+        self.action_space = action_space
+        self.state_space = state_space
     
-    def update(self, grid, action=None, most=None, orst=None):
+    def update(self, grid, action, state):
         new_data = grid.data.copy()
         
         empty = self.cell_symbols['empty']

@@ -1,4 +1,5 @@
-from gym_automata.interface.operators.exchanger import Exchanger
+from gym_automata.interface.operators import Exchanger
+
 from gym_automata.tests.interface.operators.test_operator import test_Operator_API_specifications
 
 test_Operator_API_specifications(Exchanger())

@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 from gym import spaces
 
-from gym_automata.interface.data.state import State
+from gym_automata.interface.data import State
  
 SHAPE = (8, 8)
 DATA = np.random.normal(size=SHAPE)
