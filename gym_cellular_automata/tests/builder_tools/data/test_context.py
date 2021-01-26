@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 from gym import spaces
 
-from gym_automata.builder_tools.data import Context
+from gym_cellular_automata.builder_tools.data import Context
  
 SHAPE = (8, 8)
 DATA = np.random.normal(size=SHAPE)
