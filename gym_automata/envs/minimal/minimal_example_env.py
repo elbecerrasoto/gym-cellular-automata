@@ -1,149 +1,88 @@
+import numpy as np
+
 import gym
 from gym import spaces
+from gym.utils import seeding
 
-# Data classes
-from gym_automata.interface import Grid, MoState
-# Operator classes
-from gym_automata.interface import Automaton, Modifier
-# Organizer classes
-from gym_automata.interface import CAEnv
+from gym_automata.interface.data import Grid, State
+from .minimal_synchronizer import MinimalCAEnvSynchronizer
 
-# ---------------- Initialize Data Objects
-
-# ---------------- Grid Object
-
-# A 8x8 Cellular Automaton Grid, with 2 cell states and random data.
-grid = Grid(shape = (8,8), cell_states = 2)
-
-# Access the data
-# >>> grid.data
-# >>> grid[:]
-
-# Write new data
-# >>> grid.data = new_data
-# >>> grid[:] = new_data
-
-# ---------------- MoState Object
-
-# Declare a space
-# For example:
-# Discrete with 8 elements, from 0 to 7
-mostate_space1 = spaces.Discrete(8)
-# Continuos from 0-360, maybe they are angle degrees
-mostate_space2 = spaces.Box(low=0, high=360, shape=tuple())
-# Unbounded range, maybe this space represents coordinates
-mostate_space3 = spaces.Box(low=float('-inf'), high=float('inf'), shape=(1,2))
-
-# Sample using the sample method
-# >>> mostate_space3.sample()
-# Test membership by contains
-# >>> mostate_space1.contains(7)
-# >>> mostate_space1.contains(256)
-
-# Combine spaces with Tuple, to get a new combined space
-tspaces = (mostate_space1, mostate_space2, mostate_space3)
-mostate_space = spaces.Tuple(tspaces)
-
-# MoState with random data
-mostate = MoState(mostate_space = mostate_space)
-
-# Access the data
-# >>> mostate.data
-# >>> mostate[:]
-
-# Write new data
-# >>> mostate.data = new_data
-# >>> mostate[:] = new_data
-
-# ---------------- Code Operator Objects
-
-class MyCellularAutomaton(Automaton):
-    def __init__(self, grid_space):
-        self.grid_space = grid_space
-
-    def update(self, grid, action=None, mostate=None):
-        grid_data = grid.data.copy()
-        grid.data = grid_data
-        return grid
-
-class MyModifier(Modifier):
-    def __init__(self, grid_space, action_space, mostate_space):
-        self.grid_space = grid_space
-        self.action_space = action_space
-        self.mostate_space = mostate_space
-
-    def update(self, grid, action, mostate):
-        grid_data = grid.data.copy()
-        grid.data = grid_data
-        return grid
-
-automaton = MyCellularAutomaton(grid.grid_space)
-
-# Test update method
-# >>> automaton.update(grid)
-
-# Maybe going left or right
-action_space = spaces.Discrete(2)
-modifier = MyModifier(grid.grid_space, action_space, mostate.mostate_space)
-
-# Test update method
-action = modifier.action_space.sample()
-modifier.update(grid, action, mostate)
-
-# ---------------- Code your happy environment
-# Coordinate the Automaton and Modifier operations into a coherent Gym Environment
-
-class MinimalExampleEnv(CAEnv, gym.Env):
+class MinimalCAEnv(gym.Env):
     metadata = {'render.modes': ['human']}
-    
+
     def __init__(self):
-        # Data
-        self.grid = grid
-        self.mostate = mostate
+		
+        self.CELL_STATES = CELL_STATES
+
+        self.synchronizer = SYNCHRONIZER
         
-        # Services
-        self.automaton = automaton
-        self.modifier = modifier
+        self.grid_space = SYNCHRONIZER.grid_space
 
-        # Data Spaces
-        self.grid_space = grid.grid_space
-        self.mostate_space = mostate.mostate_space
-      
-        # RL Spaces
-        self.action_space = modifier.action_space
-        if isinstance(modifier.mostate_space, spaces.Space):
-            self.observation_space = spaces.Tuple((grid.grid_space, modifier.mostate_space))
-        else:
-            self.observation_space = grid.grid_space
+        self.action_space = SYNCHRONIZER.action_space
+        self.observation_space = spaces.Tuple(SYNCHRONIZER.grid_space, SYNCHRONIZER.state_space)
+        self.initial_obs_space = self.observation_space
 
-    def step(self, action):
-        # Call any number of updates over the grid
-        # syntax: grid_operator.update(grid, action, MoState)
-        # As many times as you want, with any logic whatsoever      
-        def grid_operations(grid, action, mostate):
-            grid = self.modifier.update(grid, action, mostate)
-            grid = self.automaton.update(grid, action=None, mostate=None)
-            return grid
-        self.grid = grid_operations(self.grid, action, self.mostate)
-        # Just don't forget to return an Observation, a Reward, a Termination, and an Info
-        obs = self.observation_space.sample()
-        reward = 0.0
-        done = False
-        info = {}
-        return obs, reward, done, info
-              
+        self.current_grid = None
+        self.current_sync_state = None
+
     def reset(self):
-        print('Tic, tac, big bang!')
+        obs = self.initial_obs_space.sample()
+        grid_data = obs[0]
+        sync_data = obs[1]
+        self.current_grid = Grid(data=grid_data, cell_states=self.CELL_STATES)
+        self.current_sync_state = State(data=sync_data, state_space=self.synchronizer.state_space)
+        
+        # For a MDP
+        # If not change signature to something like f(obs, env_state)
+        # Or directly extract it from the object state (self)
+	 	reward = _award(obs) 
+		done = _is_done(obs)
+		
+        info = _report()
+		
+        return obs, reward, done, info 
+    
+    def step(self, action):
+        done = self._is_done()
+        if not done:
+            self.current_grid = self.synchronizer(self.current_grid, action, current_sync_state)
+            self.current_sync_state = self._track_sync_state()
+
+            obs = (current_grid.data, current_sync_state)
+            reward = self._award(obs)
+            info = self._report()
+
+            return (self.current_grid.data, self.current.data), 0.0, done, info
+
+        else:
+            logger.warn(
+                    "You are calling 'step()' even though this "
+                    "environment has already returned done = True. You "
+                    "should always call 'reset()' once you receive 'done = "
+                    "True' -- any further steps are undefined behavior."
+                )
+            
+            return (self.current_grid.data, self.current_sync_state.data), 0.0, True, {}
+
     
     def render(self, mode='human'):
-        print('For educational purposes only.')
+        print('Nothing to see here!')
     
     def close(self):
         print('Hasta la vista baby!')
+    
+    def seed(self, seed=None):
+        self.np_random, seed = seeding.np_random(seed)
+        return [seed]
+    
+    def _award(self, obs): # For a MDP
+        return 1.0
+    
+    def _is_done(self): # For a MDP the calling could be explicit
+        return np.random.choice((True, False))
+    
+    def _report(self):
+        return {}
 
-# Test MinimalExampleEnv
-# >>> env = MinimalExampleEnv()
-# >>> env.step(env.action_space.sample())
-# >>> env.render()
-# >>> env.reset()
-# >>> env.close()
+    def _track_sync_state(self):
+        return self.synchronizer.state_space.sample()

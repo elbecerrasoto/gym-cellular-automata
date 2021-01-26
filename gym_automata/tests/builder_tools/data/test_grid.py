@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 from gym import spaces
 
-from gym_automata.interface.data.grid import Grid
+from gym_automata.builder_tools.data import Grid
 
 SHAPE = (2, 2)
 CELL_STATES = 2
@@ -21,7 +21,7 @@ def test_Grid_API_specifications(grid = Grid(data = DATA,
     assert hasattr(grid, '__getitem__'),'Must support indexing'
     assert hasattr(grid, '__setitem__'), 'Must support index assignation'
     with pytest.raises(Exception):
-        Grid() # Cannot be initialized with defaults
+        Grid() # Cannot be initialized from defaults
     with pytest.raises(Exception):
         Grid(data = DATA, shape = SHAPE) # Cell States are necessary 
 
