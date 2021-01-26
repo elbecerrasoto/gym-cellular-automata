@@ -1,6 +1,6 @@
 from .operator import Operator
 
-class Exchanger(Operator):
+class Modifier(Operator):
 
     is_composition = False
     suboperators = tuple()
@@ -8,9 +8,9 @@ class Exchanger(Operator):
     # Set these in ALL subclasses
     grid_space = None
     action_space = None
-    state_space = None
+    context_space = None
     
     effects = None
 
-    def update(self, grid, action, state):
+    def update(self, grid, action, context):
         raise NotImplementedError

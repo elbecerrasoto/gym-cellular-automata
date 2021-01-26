@@ -3,10 +3,10 @@ from gym import spaces
 from gym.utils import colorize
 import warnings
 
-class State:
+class Context:
     """
     DATA class gym_automata
-    State(data, state_space)
+    State(data, context_space)
     
     It represents the current state of the Modifier or the Organizer.
     Used to store information need by them to update the grid
@@ -21,7 +21,7 @@ class State:
     data : numeric array or tuple of numeric arrays 
         n-dimensional array or tuple of arrays representing the state of the Modifier.
 
-    state_space : gym.spaces.Space
+    context_space : gym.spaces.Space
         A Tuple space if a tuple is provided, a Box otherwise.
         If only data is provided it is inferred to be, per entry:
             `spaces.Box(-float('inf'), float('inf'), shape=data.shape)`
@@ -30,7 +30,7 @@ class State:
     ----------
     data : numeric array or tuple of numeric arrays
 
-    state_space : gym.spaces.Space
+    context_space : gym.spaces.Space
 
     Examples
     --------
@@ -43,7 +43,7 @@ class State:
     When building your own CA environments usually this class is used directly.
     """
 
-    def __init__(self, data=None, state_space=None):
+    def __init__(self, data=None, context_space=None):
         
         def infer_data_space(data):
             subspaces = []
@@ -59,16 +59,16 @@ class State:
                 data = np.array(data)
                 return spaces.Box(-float('inf'), float('inf'), shape=data.shape)
         
-        if data is None and state_space is None:
-            self.state_space = None # Raises a warning
+        if data is None and context_space is None:
+            self.context_space = None # Raises a warning
             self.data = None
         
-        elif state_space is not None and data is None:
-            self.state_space = state_space
-            self.data = self.state_space.sample()
+        elif context_space is not None and data is None:
+            self.context_space = context_space
+            self.data = self.context_space.sample()
         
         else:
-            self.state_space = infer_data_space(data) if state_space is None else state_space
+            self.context_space = infer_data_space(data) if context_space is None else context_space
             self.data = data
 
     @property
@@ -78,36 +78,36 @@ class State:
     @data.setter
     def data(self, data):
         if data is None:
-            assert self.state_space is None, f'data cannot be None while existing a space {self.state_space}'
+            assert self.context_space is None, f'data cannot be None while existing a space {self.context_space}'
             self._data = None
         else:
-            assert self.state_space.contains(data), f'data does not belong to the space {self.state_space}'
+            assert self.context_space.contains(data), f'data does not belong to the space {self.context_space}'
             self._data = data
             
     @property
-    def state_space(self):
-        return self._state_space
+    def context_space(self):
+        return self._context_space
 
-    @state_space.setter    
-    def state_space(self, state_space):
-        if state_space is None:
+    @context_space.setter    
+    def context_space(self, context_space):
+        if context_space is None:
             msg = 'State object initialized just for gym-automata library consistency.\n\
-Its data and state_space attributes are set to None.'
+Its data and context_space attributes are set to None.'
             warnings.warn(colorize(msg, 'yellow'), UserWarning)
-            self._state_space = None
+            self._context_space = None
         else:
-            assert isinstance(state_space, spaces.Space), f'state_space must be an instance of gym.spaces.Space and currently is a {type(state_space)}'
-            self._state_space = state_space
+            assert isinstance(context_space, spaces.Space), f'context_space must be an instance of gym.spaces.Space and currently is a {type(context_space)}'
+            self._context_space = context_space
 
     def __getitem__(self, index):
         return self.data[index]
 
     def __setitem__(self, index, value):
         self.data[index] = value
-        assert self.state_space.contains(self.data), f'data does not belong to the space {self.state_space}'
+        assert self.context_space.contains(self.data), f'data does not belong to the space {self.context_space}'
 
     def __repr__(self):
-        if self.data is None and self.state_space is None:
-            return "State(\nNone, state_space=None)" 
+        if self.data is None and self.context_space is None:
+            return "State(\nNone, context_space=None)" 
         else:
-            return f"State(\n{self.data},\nstate_space={self.state_space})"
+            return f"State(\n{self.data},\ncontext_space={self.context_space})"
