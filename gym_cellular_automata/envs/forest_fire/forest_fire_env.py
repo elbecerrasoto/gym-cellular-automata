@@ -91,7 +91,7 @@ class ForestFireCAEnv(gym.Env):
         # Spaces
         # Data Spaces
         self.grid_space = FF_GRID_SPACE
-        self.mostate_space = FF_MOSTATE_SPACE    
+        self.mostate_space = FF_MOSTATE_SPACE
         # RL Spaces
         self.observation_space = FF_OBSERVATION_SPACE
         self.action_space = FF_ACTION_SPACE
