@@ -10,3 +10,6 @@ class Operator:
     
     def update(self, grid, action, context):
         raise NotImplementedError
+
+    def __call__(self, *args, **kwargs):
+        return self.update(*args, **kwargs)
