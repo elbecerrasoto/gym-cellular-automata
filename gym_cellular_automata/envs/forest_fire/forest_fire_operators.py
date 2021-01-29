@@ -1,112 +1,60 @@
 import numpy as np
-from collections import namedtuple
 from gym import spaces
 
 from gym_cellular_automata.builder_tools.operators import CellularAutomaton, Modifier, Coordinator
-
-def are_neighbors_a_boundary(grid, pos):
-    """
-    Check if the neighbors of target position are a boundary.
-    Return a tuple of Bools informing which neighbor is a boundary.
-    It checks the up, down, left, and right neighbors.
-    """
-    row, col = pos 
-    n_row, n_col = grid.data.shape
-    
-    up_offset, down_offset = row + np.array([-1, 1])
-    left_offset, right_offset = col + np.array([-1, 1])
-
-    up = up_offset >= 0
-    down = down_offset <= n_row-1
-    left = left_offset >= 0
-    right = right_offset <= n_col-1
-    
-    LegalBounds = namedtuple('Bounds', ['up', 'down', 'left', 'right'])
-    return LegalBounds(up, down, left, right)
+from gym_cellular_automata.utils.neighbors import neighborhood_at, are_neighbors_a_boundary
 
 # ------------ Forest Fire Cellular Automaton
 
+CELL_SYMBOLS = {
+    'empty': 0,
+    'tree': 1,
+    'fire': 2
+    }
+
 class ForestFireCellularAutomaton(CellularAutomaton):
+    empty = CELL_SYMBOLS['empty']
+    tree = CELL_SYMBOLS['tree']
+    fire = CELL_SYMBOLS['fire']
     
-    def __init__(self, cell_symbols, grid_space):
-        self.cell_symbols = cell_symbols   
+    def __init__(self, grid_space):
         
         self.grid_space = grid_space
         self.action_space = None
-        self.context_space = spaces.Box
+        self.context_space = spaces.Box(0.0, 1.0, shape=(2,))
 
     def update(self, grid, action, context):
         new_data = grid.data.copy() # For the sequential update of a CA
         p_fire, p_tree = context.data
         
-        empty = self.cell_symbols['empty']
-        tree = self.cell_symbols['tree']
-        fire = self.cell_symbols['fire']
-
-        def is_fire_around(grid, pos):
-            row, col = pos
-            
-            fire_around = False
-            for neightbor in self._neighborhood(grid, pos):
-                if neightbor == fire:
-                    fire_around = True
-                    break
-            return fire_around
-    
         for row, cells in enumerate(grid.data):
             for col, cell in enumerate(cells):
                 
-                if cell == tree and is_fire_around(grid, pos=(row, col)):
-                    # Burn tree to the ground
-                    new_data[row][col] = fire
+                neighbors = neighborhood_at(grid, pos=(row, col), invariant=self.empty)
                 
-                elif cell == tree:
+                if cell == self.tree and self.fire in neighbors:
+                    # Burn tree to the ground
+                    new_data[row][col] = self.fire
+                
+                elif cell == self.tree:
                     # Sample for lightning strike
                     strike = np.random.choice([True, False], 1, p=[p_fire, 1-p_fire])[0]
-                    new_data[row][col] = fire if strike else cell
+                    new_data[row][col] = self.fire if strike else cell
                 
-                elif cell == empty:
+                elif cell == self.empty:
                     # Sample to grow a tree
                     growth = np.random.choice([True, False], 1, p=[p_tree, 1-p_tree])[0]
-                    new_data[row][col] = tree if growth else cell
+                    new_data[row][col] = self.tree if growth else cell
                 
-                elif cell == fire:
+                elif cell == self.fire:
                     # Consume fire
-                    new_data[row][col] = empty
+                    new_data[row][col] = self.empty
                 
                 else:
                     continue
         
         grid.data = new_data                
         return grid, context
-
-    def _neighborhood(self, grid, pos):
-        """
-        Calculates the Moore's neighborgood of cell at target position `pos`.
-        The boundary conditions are invariant and set to `empty`.
-        Returns a tuple with the values of the nighborhood cells in the following
-        order: up_left, up_center, up_right,
-                middle_left, middle, middle_right,
-                down_left, down_center, down_right
-        """        
-        invariant = self.cell_symbols['empty']
-        row, col = pos
-
-        legality = are_neighbors_a_boundary(grid, pos)   
-
-        up_left = grid[row-1, col-1] if legality.up and legality.left else invariant
-        up_center = grid[row-1, col] if legality.up else invariant       
-        up_right = grid[row-1, col+1] if legality.up and legality.right else invariant
-
-        middle_left = grid[row, col-1] if legality.left else invariant
-        middle = grid[row, col]
-        middle_right = grid[row, col+1] if legality.right else invariant
-        
-        down_left = grid[row+1, col-1] if legality.down and legality.left else invariant
-        down_center = grid[row+1, col] if legality.down else invariant
-        down_right = grid[row+1, col+1] if legality.down and legality.right else invariant
-
-        return up_left, up_center, up_right, middle_left, middle, middle_right, down_left, down_center, down_right
 
 # ------------ Forest Fire Modifier
 
@@ -178,8 +126,6 @@ class ForestFireCoordinator(Coordinator):
                                            self.pos_space,
                                            self.steps_without_CA_space))
         
-
-    
     def update(self, grid, action, context):
         CA_params, pos, steps2CA = context
         
