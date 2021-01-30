@@ -1,6 +1,8 @@
 import numpy as np
 from gym import spaces
 
+from gym_cellular_automata.builder_tools.data import Grid
+
 from gym_cellular_automata.builder_tools.operators import CellularAutomaton, Modifier, Coordinator
 from gym_cellular_automata.utils.neighbors import neighborhood_at, are_neighbors_a_boundary
 
@@ -24,7 +26,8 @@ class ForestFireCellularAutomaton(CellularAutomaton):
         self.context_space = spaces.Box(0.0, 1.0, shape=(2,))
 
     def update(self, grid, action, context):
-        new_data = grid.data.copy() # For the sequential update of a CA
+        # For the sequential update of a CA
+        new_grid = Grid(grid.data.copy(), cell_states=3)
         p_fire, p_tree = context.data
         
         for row, cells in enumerate(grid.data):
@@ -34,27 +37,26 @@ class ForestFireCellularAutomaton(CellularAutomaton):
                 
                 if cell == self.tree and self.fire in neighbors:
                     # Burn tree to the ground
-                    new_data[row][col] = self.fire
+                    new_grid[row][col] = self.fire
                 
                 elif cell == self.tree:
                     # Sample for lightning strike
                     strike = np.random.choice([True, False], 1, p=[p_fire, 1-p_fire])[0]
-                    new_data[row][col] = self.fire if strike else cell
+                    new_grid[row][col] = self.fire if strike else cell
                 
                 elif cell == self.empty:
                     # Sample to grow a tree
                     growth = np.random.choice([True, False], 1, p=[p_tree, 1-p_tree])[0]
-                    new_data[row][col] = self.tree if growth else cell
+                    new_grid[row][col] = self.tree if growth else cell
                 
                 elif cell == self.fire:
                     # Consume fire
-                    new_data[row][col] = self.empty
+                    new_grid[row][col] = self.empty
                 
                 else:
                     continue
-        
-        grid.data = new_data                
-        return grid, context
+                   
+        return new_grid, context
 
 # ------------ Forest Fire Modifier
 
