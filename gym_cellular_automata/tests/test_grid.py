@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 from gym import spaces
 
-from gym_cellular_automata.builder_tools.data import Grid
+from gym_cellular_automata import Grid
 
 SHAPE = (2, 2)
 CELL_STATES = 2

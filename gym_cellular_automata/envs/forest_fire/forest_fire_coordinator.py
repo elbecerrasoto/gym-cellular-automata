@@ -1,10 +1,9 @@
 import numpy as np
 from gym import spaces
 
-from gym_cellular_automata.builder_tools.data import Grid
+from gym_cellular_automata import Grid
 
-from gym_cellular_automata.builder_tools.operators import CellularAutomaton, Modifier, Coordinator
-from gym_cellular_automata.utils.neighbors import neighborhood_at, are_neighbors_a_boundary
+from gym_cellular_automata.operators import CellularAutomaton, Modifier, Coordinator
 
 # ------------ Forest Fire Cellular Automaton
 

@@ -1,5 +1,5 @@
-from gym_cellular_automata.builder_tools.operators import CellularAutomaton
-from gym_cellular_automata.tests.builder_tools.operators.test_operator import test_Operator_API_specifications
+from gym_cellular_automata.operators import CellularAutomaton
+from gym_cellular_automata.tests.operators.test_operator import test_Operator_API_specifications
 
 test_Operator_API_specifications(CellularAutomaton())
 

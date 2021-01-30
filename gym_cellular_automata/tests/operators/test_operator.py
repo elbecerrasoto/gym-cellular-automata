@@ -1,7 +1,7 @@
 import inspect
 from gym import spaces
 
-from gym_cellular_automata.builder_tools.operators import Operator
+from gym_cellular_automata.operators import Operator
 
 def test_Operator_API_specifications(operator = Operator()):    
     assert isinstance(operator, Operator)    

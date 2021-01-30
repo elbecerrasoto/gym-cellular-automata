@@ -1,12 +1,12 @@
 import numpy as np
 from gym import spaces
 
-from gym_cellular_automata.builder_tools.data import Grid
+from gym_cellular_automata import Grid
 from gym_cellular_automata.utils.neighbors import neighborhood_at
-from gym_cellular_automata.envs.forest_fire.forest_fire_operators import ForestFireCellularAutomaton
+from gym_cellular_automata.envs.forest_fire.forest_fire_cellular_automaton import ForestFireCellularAutomaton
 
-from gym_cellular_automata.tests.builder_tools.operators.test_operator import test_Operator_API_specifications
-from gym_cellular_automata.tests.builder_tools.operators.test_cellular_automaton import test_CellularAutomaton_API_specifications
+from gym_cellular_automata.tests.operators.test_operator import test_Operator_API_specifications
+from gym_cellular_automata.tests.operators.test_cellular_automaton import test_CellularAutomaton_API_specifications
 
 EMPTY = 0
 TREE = 1
