@@ -65,7 +65,7 @@ class Grid:
     def __init__(self, data=None, cell_states=None, shape=None, cell_type=np.uint16):
         
         def infer_data_shape(data):
-            return tuple(data.shape)
+            return np.array(data).shape
         
         def generate_grid_space(cell_states, shape, cell_type):
             return spaces.Box(low=0, high=cell_states-1, shape=shape, dtype=cell_type)

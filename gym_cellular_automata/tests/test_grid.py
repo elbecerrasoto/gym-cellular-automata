@@ -6,8 +6,8 @@ from gym import spaces
 from gym_cellular_automata import Grid
 
 SHAPE = (2, 2)
-CELL_STATES = 2
-DATA = np.eye(2, 2, dtype=np.uint16)
+CELL_STATES = 4
+DATA = [[0,1], [2,3]]
 
 def test_Grid_API_specifications(grid = Grid(data = DATA,
                                              cell_states = CELL_STATES,
@@ -24,12 +24,3 @@ def test_Grid_API_specifications(grid = Grid(data = DATA,
         Grid() # Cannot be initialized from defaults
     with pytest.raises(Exception):
         Grid(data = DATA, shape = SHAPE) # Cell States are necessary 
-
-# def test_Grid_functionality_with_edge_cases():
-#     pass
-
-# def test_Grid_functionality_with_constant_data():
-#     pass
-
-# def test_Grid_functionality_with_random_data():
-#     pass
