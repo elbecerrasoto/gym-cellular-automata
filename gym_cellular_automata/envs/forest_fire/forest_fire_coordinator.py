@@ -1,53 +1,45 @@
-import numpy as np
 from gym import spaces
-
-from gym_cellular_automata import Grid
-
-from gym_cellular_automata.operators import CellularAutomaton, Modifier, Coordinator
-
-# ------------ Forest Fire Cellular Automaton
-
-CELL_SYMBOLS = {
-    'empty': 0,
-    'tree': 1,
-    'fire': 2
-    }
+from gym_cellular_automata.operators import Coordinator
 
 class ForestFireCoordinator(Coordinator):
     
-    def __init__(self, cellular_automaton, modifier, steps_without_CA):
+    def __init__(self, cellular_automaton, modifier, freeze_CA,
+                 grid_space=None, action_space=None, context_space=None):
         
         self.suboperators = cellular_automaton, modifier
-        self.cellular_automaton = cellular_automaton
-        self.modifier = modifier
+        self.cellular_automaton, self.modifier = cellular_automaton, modifier
         
-        self.steps_without_CA = steps_without_CA
-        self.steps_without_CA_space = spaces.Discrete(steps_without_CA + 1)
+        self.freeze_CA = freeze_CA
+        self.freeze_CA_space = spaces.Discrete(freeze_CA + 1)  
         
-        self.grid_space = cellular_automaton.grid_space
+        if grid_space is None:
+            self.grid_space = cellular_automaton.grid_space
         
-        self.action_space = modifier.action_space
-        
-        self.CA_params_space = cellular_automaton.context_space 
-        self.pos_space = modifier.context_space
-        self.context_space = spaces.Tuple((self.CA_params_space,
-                                           self.pos_space,
-                                           self.steps_without_CA_space))
-        
-    def update(self, grid, action, context):
-        CA_params, pos, steps2CA = context
-        
-        if steps2CA == 0:
+        if action_space is None:
+            self.action_space = modifier.action_space
             
-                grid, _ = self.cellular_automaton(grid, action, CA_params)
-                grid, new_pos = self.modifier(grid, action, pos)
-                
-                steps2CA = self.steps_without_CA
+        if context_space is None:
+            CA_params_space = self.cellular_automaton.context_space
+            pos_space = self.modifier.context_space
+            self.context_space = spaces.Tuple((CA_params_space,
+                                               pos_space,
+                                               self.freeze_CA_space))
+
+    def update(self, grid, action, context):
+        CA_params, pos, steps_until_CA = context
+ 
+        if steps_until_CA == 0:
+
+            grid, _ = self.cellular_automaton(grid, action, CA_params)
+            grid, new_pos = self.modifier(grid, action, pos)
+            
+            steps_until_CA = self.freeze_CA
             
         else:
             
             grid, new_pos = self.modifier(grid, action, pos)
-            self.steps2CA -= 1
+            
+            steps_until_CA -= 1
         
-        context = CA_params, new_pos, steps2CA
+        context = CA_params, new_pos, steps_until_CA
         return grid, context

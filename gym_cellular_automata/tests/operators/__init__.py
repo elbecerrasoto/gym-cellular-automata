@@ -1,0 +1,4 @@
+from .test_operator import test_Operator_API_specifications
+from .test_cellular_automaton import test_CellularAutomaton_API_specifications
+from .test_modifier import test_Modifier_API_specifications
+from .test_coordinator import test_Coordinator_API_specifications

@@ -102,6 +102,9 @@ class Grid:
             assert self.grid_space.contains(data), f'data does not belong to the space {self.grid_space}'
             self._data = data
 
+    def copy(self):
+        return self.data.copy()
+
     def __getitem__(self, index):
         return self.data[index]
 

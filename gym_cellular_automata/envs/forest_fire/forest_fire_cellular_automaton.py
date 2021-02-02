@@ -1,5 +1,4 @@
 import numpy as np
-from collections import namedtuple
 from gym import spaces
 
 from gym_cellular_automata import Grid
@@ -15,8 +14,6 @@ CELL_SYMBOLS = {
     'tree': 1,
     'fire': 2
     }
-
-UpdateSpaces = namedtuple('UpdateSpaces', ['grid_space', 'action_space', 'context_space'])
 
 class ForestFireCellularAutomaton(CellularAutomaton):
     empty = CELL_SYMBOLS['empty']
@@ -34,10 +31,11 @@ class ForestFireCellularAutomaton(CellularAutomaton):
 
     def update(self, grid, action, context):
         # A copy is needed for the sequential update of a CA
-        new_grid = Grid(grid.data.copy(), cell_states=3)
-        p_fire, p_tree = context.data
+        new_grid = Grid(grid.copy(), cell_states=3)
+        print(f'CA context {context}')
+        p_fire, p_tree = context
         
-        for row, cells in enumerate(grid.data):
+        for row, cells in enumerate(grid):
             for col, cell in enumerate(cells):
                 
                 neighbors = neighborhood_at(grid, pos=(row, col), invariant=self.empty)
