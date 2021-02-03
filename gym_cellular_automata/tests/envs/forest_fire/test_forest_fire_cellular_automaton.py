@@ -1,65 +1,77 @@
-import numpy as np
 from gym import spaces
 
 from gym_cellular_automata import Grid
 from gym_cellular_automata.utils.neighbors import neighborhood_at
-from gym_cellular_automata.envs.forest_fire.forest_fire_cellular_automaton import ForestFireCellularAutomaton
+from gym_cellular_automata.envs.forest_fire import ForestFireCellularAutomaton
 
-from gym_cellular_automata.tests.operators.test_operator import test_Operator_API_specifications
-from gym_cellular_automata.tests.operators.test_cellular_automaton import test_CellularAutomaton_API_specifications
-
-EMPTY = 0
-TREE = 1
-FIRE = 2
-
-CELL_STATES = 3
-
-T_STEPS = 64
+# Steps to check CA rules
+T_STEPS = 32
+# Cells checked per step
 TESTS_PER_STEP = 8
 
-ROW = 5
-COL = 5
+CONFIG_FILE = 'gym_cellular_automata/envs/forest_fire/forest_fire_config.yaml'
 
-grid = Grid(shape = (ROW, COL), cell_states = CELL_STATES)
-forest_fire_CA = ForestFireCellularAutomaton(grid.grid_space)
+def get_config_dict(file):
+    import yaml
+    yaml_file = open(file, 'r')
+    yaml_content = yaml.load(yaml_file, Loader=yaml.SafeLoader)
+    return yaml_content
 
-test_Operator_API_specifications(forest_fire_CA)
-test_CellularAutomaton_API_specifications(forest_fire_CA)
+CONFIG = get_config_dict(CONFIG_FILE)
 
-def test_ForestFireCellularAutomaton_cell_symbols_specifications(forest_fire_CA = forest_fire_CA):
-    assert forest_fire_CA.empty == EMPTY
-    assert forest_fire_CA.tree == TREE
-    assert forest_fire_CA.fire == FIRE
+EMPTY = CONFIG['cell_symbols']['empty']
+TREE = CONFIG['cell_symbols']['tree']
+FIRE = CONFIG['cell_symbols']['fire']
+
+CELL_STATES = CONFIG['cell_states']
+
+ROW = CONFIG['grid_shape']['n_row']
+COL = CONFIG['grid_shape']['n_col']
+
+P_FIRE = CONFIG['ca_params']['p_fire']
+P_TREE = CONFIG['ca_params']['p_tree']
+
+def test_API():
+    ca_operator = ForestFireCellularAutomaton()
+
+    from gym_cellular_automata.tests.operators import test_Operator_API_specifications
+    from gym_cellular_automata.tests.operators import test_CellularAutomaton_API_specifications
+    test_Operator_API_specifications(ca_operator)
+    test_CellularAutomaton_API_specifications(ca_operator)     
+
+def test_forest_fire_cell_symbols():
+    ca_operator = ForestFireCellularAutomaton()
     
-TREE_CIRCLE = np.array([[1,1,1],
-                        [1,2,1],
-                        [1,1,1]])
-
-tree_circle = Grid(data=TREE_CIRCLE, cell_states=3)
-
-def test_CellularAutomaton_grid_update_tree_circle(grid = tree_circle):
-    assert grid[1,1] == FIRE, '0th Ring Update'
+    assert ca_operator.empty == EMPTY
+    assert ca_operator.tree == TREE
+    assert ca_operator.fire == FIRE
     
-    forest_fire_CA = ForestFireCellularAutomaton(grid.grid_space)
+def test_forest_fire_update_on_tree_ring():
+    ca_operator = ForestFireCellularAutomaton()
     
-    context = forest_fire_CA.context_space.sample()
-    grid, _ = forest_fire_CA(grid, None, context)
+    TREE_RING = Grid([[1,1,1],
+                      [1,2,1],
+                      [1,1,1]], cell_states=CELL_STATES)
+    grid = TREE_RING
+    
+    ca_params = P_FIRE, P_TREE
+    
+    grid, _ = ca_operator(grid, None, ca_params)
     
     assert grid[1,1] == EMPTY, '1st Ring Update'
-    assert grid[0,0] == FIRE, '1st Ring Update'
-    assert grid[0,2] == FIRE, '1st Ring Update'
-    assert grid[1,0] == FIRE, '1st Ring Update'
-    assert grid[1,2] == FIRE, '1st Ring Update'
+    assert grid[0,0] == FIRE,  '1st Ring Update'
+    assert grid[0,2] == FIRE,  '1st Ring Update'
+    assert grid[1,0] == FIRE,  '1st Ring Update'
+    assert grid[1,2] == FIRE,  '1st Ring Update'
     
-    context = forest_fire_CA.context_space.sample()
-    grid, _ = forest_fire_CA(grid, None, context)
+    grid, _ = ca_operator(grid, None, ca_params)
     
     assert grid[0,0] == EMPTY, '2nd Ring Update'
     assert grid[0,2] == EMPTY, '2nd Ring Update'
     assert grid[1,0] == EMPTY, '2nd Ring Update'
     assert grid[1,2] == EMPTY, '1nd Ring Update'
     
-def assert_forest_fire_update_at(grid, new_grid, row, col):
+def assert_forest_fire_update_at_position_row_col(grid, new_grid, row, col):
     log_error = f'\n row: {row}' + \
                 f'\n col: {col}' + \
                 f'\n\n grid: {grid}' + \
@@ -93,26 +105,22 @@ def assert_forest_fire_update_at(grid, new_grid, row, col):
         # A FIRE never turns into a FIRE.
         assert new_cell_value != FIRE, 'Lingering Fire' + log_error
 
-def test_CellularAutomaton_grid_update_general():
-    grid = Grid(shape=(ROW, COL), cell_states=CELL_STATES)
+def test_forest_fire_update():
+    ca_operator = ForestFireCellularAutomaton()
     
+    grid = Grid(shape=(ROW, COL), cell_states=CELL_STATES)    
     pos_space = spaces.MultiDiscrete([ROW, COL])
-    forest_fire_CA = ForestFireCellularAutomaton(grid.grid_space)
     
     for step in range(T_STEPS):
+        ca_params = ca_operator.context_space.sample()
         
-        forest_fire_params = forest_fire_CA.context_space.sample()
+        new_grid, _ = ca_operator(grid, None, ca_params)
         
-        new_grid, _ = forest_fire_CA.update(grid,
-                                     action = None,
-                                     context = forest_fire_params)
-        
-        assert not grid is new_grid, 'Same object'
+        assert grid is not new_grid, 'ca_operator is returning the same grid object'
         
         for test in range(TESTS_PER_STEP):
-            pos = pos_space.sample()
-            row, col = pos
+            row, col = pos_space.sample()
 
-            assert_forest_fire_update_at(grid, new_grid, row, col)
+            assert_forest_fire_update_at_position_row_col(grid, new_grid, row, col)
             
         grid = new_grid

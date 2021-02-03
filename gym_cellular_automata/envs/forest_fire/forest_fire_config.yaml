@@ -9,7 +9,7 @@ cell_symbols:
   tree:  1
   fire:  2
 
-params_ca:
+ca_params:
   p_fire: 0.033
   p_tree: 0.333
 

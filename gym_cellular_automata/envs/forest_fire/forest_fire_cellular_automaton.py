@@ -1,4 +1,3 @@
-import yaml
 import numpy as np
 from gym import spaces
 
@@ -7,17 +6,22 @@ from gym_cellular_automata import Grid
 from gym_cellular_automata.operators import CellularAutomaton
 from gym_cellular_automata.utils.neighbors import neighborhood_at
 
+CONFIG_FILE = 'gym_cellular_automata/envs/forest_fire/forest_fire_config.yaml'
+
+def get_config_dict(file):
+    import yaml
+    yaml_file = open(file, 'r')
+    yaml_content = yaml.load(yaml_file, Loader=yaml.SafeLoader)
+    return yaml_content
+
+CONFIG = get_config_dict(CONFIG_FILE)
+
 # ------------ Forest Fire Cellular Automaton
 
-yaml_file = open('gym_cellular_automata/envs/forest_fire/forest_fire_config.yaml', 'r')
-yaml_content = yaml.load(yaml_file, Loader=yaml.SafeLoader)
-
-CELL_SYMBOLS = yaml_content['cell_symbols']
-
 class ForestFireCellularAutomaton(CellularAutomaton):
-    empty = CELL_SYMBOLS['empty']
-    tree = CELL_SYMBOLS['tree']
-    fire = CELL_SYMBOLS['fire']
+    empty = CONFIG['cell_symbols']['empty']
+    tree = CONFIG['cell_symbols']['tree']
+    fire = CONFIG['cell_symbols']['fire']
     
     def __init__(self, grid_space=None, action_space=None, context_space=None):
         
@@ -31,7 +35,6 @@ class ForestFireCellularAutomaton(CellularAutomaton):
     def update(self, grid, action, context):
         # A copy is needed for the sequential update of a CA
         new_grid = Grid(grid.copy(), cell_states=3)
-        print(f'CA context {context}')
         p_fire, p_tree = context
         
         for row, cells in enumerate(grid):
