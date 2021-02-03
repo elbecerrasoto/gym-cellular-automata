@@ -1,3 +1,4 @@
+import yaml
 import numpy as np
 from gym import spaces
 
@@ -8,12 +9,10 @@ from gym_cellular_automata.utils.neighbors import neighborhood_at
 
 # ------------ Forest Fire Cellular Automaton
 
-# Move to YAML
-CELL_SYMBOLS = {
-    'empty': 0,
-    'tree': 1,
-    'fire': 2
-    }
+yaml_file = open('gym_cellular_automata/envs/forest_fire/forest_fire_config.yaml', 'r')
+yaml_content = yaml.load(yaml_file, Loader=yaml.SafeLoader)
+
+CELL_SYMBOLS = yaml_content['cell_symbols']
 
 class ForestFireCellularAutomaton(CellularAutomaton):
     empty = CELL_SYMBOLS['empty']

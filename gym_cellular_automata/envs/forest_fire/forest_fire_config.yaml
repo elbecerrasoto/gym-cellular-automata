@@ -1,0 +1,30 @@
+cell_states: 3
+
+grid_shape:
+  n_row: 5
+  n_col: 5
+
+cell_symbols:
+  empty: 0
+  tree:  1
+  fire:  2
+
+params_ca:
+  p_fire: 0.033
+  p_tree: 0.333
+
+effects:
+  0: 2
+
+actions:
+  up_left:       1
+  up_center:     2
+  up_right:      3
+  middle_left:   4
+  middle_center: 5
+  middle_right:  6
+  down_left:     7
+  down_center:   8
+  down_right:    9
+
+freeze_ca: 2
