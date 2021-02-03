@@ -13,8 +13,11 @@ ca_params:
   p_fire: 0.033
   p_tree: 0.333
 
+# Modifier's effects
+# Exchange from FIRE to EMPTY
+# The fire is being extinguish 
 effects:
-  0: 2
+  2: 0
 
 actions:
   up_left:       1
@@ -27,4 +30,5 @@ actions:
   down_center:   8
   down_right:    9
 
+# Steps that the Cellular Automaton remains idle.
 freeze_ca: 2

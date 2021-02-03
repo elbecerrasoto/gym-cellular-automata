@@ -20,8 +20,8 @@ def get_config_dict(file):
 CONFIG = get_config_dict(CONFIG_FILE)
 
 EMPTY = CONFIG['cell_symbols']['empty']
-TREE = CONFIG['cell_symbols']['tree']
-FIRE = CONFIG['cell_symbols']['fire']
+TREE  = CONFIG['cell_symbols']['tree']
+FIRE  = CONFIG['cell_symbols']['fire']
 
 CELL_STATES = CONFIG['cell_states']
 

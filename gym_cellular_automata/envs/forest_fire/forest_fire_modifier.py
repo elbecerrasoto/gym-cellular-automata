@@ -35,7 +35,9 @@ class ForestFireModifier(Operator):
 
     def _move(self, grid, action, pos):
         action = np.array(action)
-        assert self.action_space.contains(action), f'action: {action} does not belong to {self.action_space}'
+        
+        if not self.action_space.contains(action):
+            raise ValueError(f'action: {action} does not belong to {self.action_space}')
         
         row, col = pos
 
