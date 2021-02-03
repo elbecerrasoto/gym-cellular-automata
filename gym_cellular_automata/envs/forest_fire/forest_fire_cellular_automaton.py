@@ -3,7 +3,7 @@ from gym import spaces
 
 from gym_cellular_automata import Grid
 
-from gym_cellular_automata.operators import CellularAutomaton
+from gym_cellular_automata import Operator
 from gym_cellular_automata.utils.neighbors import neighborhood_at
 
 CONFIG_FILE = 'gym_cellular_automata/envs/forest_fire/forest_fire_config.yaml'
@@ -18,7 +18,7 @@ CONFIG = get_config_dict(CONFIG_FILE)
 
 # ------------ Forest Fire Cellular Automaton
 
-class ForestFireCellularAutomaton(CellularAutomaton):
+class ForestFireCellularAutomaton(Operator):
     empty = CONFIG['cell_symbols']['empty']
     tree = CONFIG['cell_symbols']['tree']
     fire = CONFIG['cell_symbols']['fire']

@@ -1,4 +1,5 @@
-from gym_cellular_automata.grid import Grid
+from .grid import Grid
+from .operator import Operator
 
 # from gym.envs.registration import register
 
@@ -7,4 +8,4 @@ from gym_cellular_automata.grid import Grid
 #     entry_point='gym_automata.envs:MinimalExampleEnv',
 # )
 
-# __all__ = ['Grid']
+# __all__ = ['Grid', 'Operator']

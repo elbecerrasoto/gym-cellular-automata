@@ -1,12 +1,12 @@
 import numpy as np
 from gym import spaces
 
-from gym_cellular_automata.operators import Modifier
+from gym_cellular_automata import Operator
 from gym_cellular_automata.utils.neighbors import are_my_neighbors_a_boundary
 
 # ------------ Forest Fire Cellular Automaton
 
-class ForestFireModifier(Modifier):
+class ForestFireModifier(Operator):
     hit = False    
     
     def __init__(self, effects, grid_space=None, action_space=None, context_space=None):

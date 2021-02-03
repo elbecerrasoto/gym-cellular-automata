@@ -3,7 +3,7 @@ import numpy as np
 
 from gym_cellular_automata import Grid
 
-from gym_cellular_automata.tests.operators import test_Coordinator_API_specifications
+from gym_cellular_automata.tests import test_Operator_API_specifications
 
 from gym_cellular_automata.envs.forest_fire import ForestFireCellularAutomaton
 from gym_cellular_automata.envs.forest_fire import ForestFireModifier
@@ -64,7 +64,7 @@ forest_fire_coordinator = ForestFireCoordinator(forest_fire_cellular_automaton,
                                                 freeze_CA=2,
                       grid_space=None, action_space=None, context_space=None)
 
-test_Coordinator_API_specifications(forest_fire_coordinator)
+test_Operator_API_specifications(forest_fire_coordinator)
 
 
 FREEZE_CA_SPACE = forest_fire_coordinator.freeze_CA_space

@@ -1,14 +1,11 @@
 import pytest
 import numpy as np
-from gym import spaces
 
 from gym_cellular_automata import Grid
 
-from gym_cellular_automata.envs.forest_fire.forest_fire_modifier import ForestFireModifier
+from gym_cellular_automata.envs.forest_fire import ForestFireModifier
 
-from gym_cellular_automata.tests.operators.test_operator import test_Operator_API_specifications
-from gym_cellular_automata.tests.operators.test_modifier import test_Modifier_API_specifications
-
+from gym_cellular_automata.tests import test_Operator_API_specifications
 
 EMPTY = 0
 TREE = 1
@@ -21,7 +18,6 @@ EFFECTS = {2: 0}
 forest_fire_modifier = ForestFireModifier(EFFECTS)
 
 test_Operator_API_specifications(forest_fire_modifier)
-test_Modifier_API_specifications(forest_fire_modifier)
 
 TEST_GRID = [[2,2,2],
              [2,2,2],

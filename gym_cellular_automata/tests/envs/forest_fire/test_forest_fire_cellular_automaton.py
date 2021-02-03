@@ -34,10 +34,8 @@ P_TREE = CONFIG['ca_params']['p_tree']
 def test_API():
     ca_operator = ForestFireCellularAutomaton()
 
-    from gym_cellular_automata.tests.operators import test_Operator_API_specifications
-    from gym_cellular_automata.tests.operators import test_CellularAutomaton_API_specifications
+    from gym_cellular_automata.tests import test_Operator_API_specifications
     test_Operator_API_specifications(ca_operator)
-    test_CellularAutomaton_API_specifications(ca_operator)     
 
 def test_forest_fire_cell_symbols():
     ca_operator = ForestFireCellularAutomaton()

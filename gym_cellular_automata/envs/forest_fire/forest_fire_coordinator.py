@@ -1,7 +1,7 @@
 from gym import spaces
-from gym_cellular_automata.operators import Coordinator
+from gym_cellular_automata import Operator
 
-class ForestFireCoordinator(Coordinator):
+class ForestFireCoordinator(Operator):
     
     def __init__(self, cellular_automaton, modifier, freeze_CA,
                  grid_space=None, action_space=None, context_space=None):
