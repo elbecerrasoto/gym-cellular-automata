@@ -3,111 +3,126 @@ import numpy as np
 
 from gym_cellular_automata import Grid
 
-from gym_cellular_automata.tests import test_Operator_API_specifications
-
 from gym_cellular_automata.envs.forest_fire import ForestFireCellularAutomaton
 from gym_cellular_automata.envs.forest_fire import ForestFireModifier
 from gym_cellular_automata.envs.forest_fire import ForestFireCoordinator
 
-EMPTY = 0
-TREE = 1
-FIRE = 2
+CONFIG_FILE = 'gym_cellular_automata/envs/forest_fire/forest_fire_config.yaml'
 
-ROW = 3
-COL = 3
+def get_config_dict(file):
+    import yaml
+    yaml_file = open(file, 'r')
+    yaml_content = yaml.load(yaml_file, Loader=yaml.SafeLoader)
+    return yaml_content
 
-action_up_left = np.array(1)
-action_up_center = np.array(2)
-action_up_right = np.array(3)
+CONFIG = get_config_dict(CONFIG_FILE)
 
-action_middle_left = np.array(4)
-action_middle_center = np.array(5)
-action_middle_right = np.array(6)
+EMPTY = CONFIG['cell_symbols']['empty']
+TREE  = CONFIG['cell_symbols']['tree']
+FIRE  = CONFIG['cell_symbols']['fire']
 
-action_down_left = np.array(7)
-action_down_center = np.array(8)
-action_down_right = np.array(9)
+CELL_STATES = CONFIG['cell_states']
 
-ACTIONS = (action_up_left, action_up_center, action_up_right,
-           action_middle_left, action_middle_center, action_middle_right,
-           action_down_left, action_down_center, action_down_right)
+ROW = CONFIG['grid_shape']['n_row']
+COL = CONFIG['grid_shape']['n_row']
 
+ACTIONS = CONFIG['actions']
 
-# The coordinator makes the assertions
-# the other needs do not necessarily need the shit
+EFFECTS = CONFIG['effects']
 
-# Coordinator take the spaces from the inferior operations
-# Or uses the supplied values
+FREEZE_CA = CONFIG['freeze_ca']
 
-# The coordinator must have the asserts
-# Delay making the decision
-
-grid = Grid(cell_states=3, shape=(ROW, COL))
-EFFECTS = {FIRE: EMPTY}
-
-GRID_SPACE = spaces.Box(0, 2, shape=(ROW, COL), dtype=np.uint16)
+CA_PARAMS_SPACE = ForestFireCellularAutomaton().context_space
+GRID_SPACE = Grid(cell_states=CELL_STATES, shape=(ROW, COL)).grid_space
 POS_SPACE = spaces.MultiDiscrete([ROW, COL])
-ACTION_SPACE = spaces.Box(1, 9, shape=tuple())
 
+ACTION_SPACE = spaces.Box(1, 9, shape=tuple(), dtype=np.uint8)
 
-forest_fire_cellular_automaton = \
-    ForestFireCellularAutomaton(grid_space = GRID_SPACE,
-                                action_space = ACTION_SPACE)
-forest_fire_modifier = \
-    ForestFireModifier(EFFECTS,
-                       grid_space = GRID_SPACE,
-                       action_space = ACTION_SPACE,
-                       context_space = POS_SPACE)
+def instantiate_cellular_automaton():
+    return ForestFireCellularAutomaton(grid_space    = GRID_SPACE,
+                                       action_space  = ACTION_SPACE,
+                                       context_space = CA_PARAMS_SPACE)
 
-forest_fire_coordinator = ForestFireCoordinator(forest_fire_cellular_automaton,
-                                                forest_fire_modifier,
-                                                freeze_CA=2,
-                      grid_space=None, action_space=None, context_space=None)
+def instantiate_modifier():
+    return ForestFireModifier(EFFECTS,
+                              grid_space    = GRID_SPACE,
+                              action_space  = ACTION_SPACE,
+                              context_space = POS_SPACE)
 
-test_Operator_API_specifications(forest_fire_coordinator)
+def instantiate_coordinator():
+    cellular_automaton = instantiate_cellular_automaton()
+    modifier = instantiate_modifier()
+    
+    return ForestFireCoordinator(cellular_automaton,
+                                 modifier,
+                                 freeze_CA = FREEZE_CA)
 
+def test_API(
+                operator = instantiate_coordinator()
+            ):
+    from gym_cellular_automata.tests import test_Operator_API_specifications
+    test_Operator_API_specifications(operator)
 
-FREEZE_CA_SPACE = forest_fire_coordinator.freeze_CA_space
+def sample_coordinator_input():
+    coordinator = instantiate_coordinator()
+    
+    grid = coordinator.grid_space.sample()
+    action = coordinator.action_space.sample()
+    context = coordinator.context_space.sample()
+    
+    return grid, action, context
 
+def test_coordinator_output():
+    coordinator = instantiate_coordinator()
+    grid, action, context = sample_coordinator_input()
+    
+    new_grid, new_context = coordinator(grid, action, context)
+    
+    # Grid still does not completly behave as a numpy ndarray
+    # new_grid[:] vs. just new_grid
+    assert GRID_SPACE.contains(new_grid[:])
+    assert coordinator.context_space.contains(new_context)
 
-# To test
-# action does nothing
-# Returns grid, return pos, freeze
-# At 0 is updated
+# At 0 is updated       
 # At 0 is replineshed
 
-PARAMS_SPACE = forest_fire_cellular_automaton.context_space
-PARAMS_SPACE
-
-
-def test_ForestFireCoordinator_update_output():
-    grid = GRID_SPACE.sample()
-    action = ACTION_SPACE.sample()
-    context = forest_fire_coordinator.context_space.sample()
+def test_coordinator_freeze_ca_decrease_logic():
+    coordinator = instantiate_coordinator()
+    max_freeze = coordinator.freeze_CA
     
-    new_grid, new_context = forest_fire_coordinator(grid, action, context)
+    grid, action, context = sample_coordinator_input()
     
-    # still does not behaves as a numpy array
-    assert GRID_SPACE.contains(new_grid[:])
-    assert forest_fire_coordinator.context_space.contains(new_context)
-
-def test_ForestFireCoordinator_until_ca_does_not_depends_on_action():
+    freeze_ca = context[2]
     
-    grid = GRID_SPACE.sample()
-    params = PARAMS_SPACE.sample()
-    pos = POS_SPACE.sample()
-    # freeze_ca = np.array(1) ERROR why?
-    freeze_ca = 1
+    new_grid, new_context = coordinator(grid, action, context)
     
-    # context = params, pos, np.array(freeze_ca) ERROR why?
-    context = params, pos, freeze_ca
-
-    for action in ACTIONS:
-        print(f'freeze_ca: {freeze_ca}')
-        new_grid, new_context = forest_fire_coordinator(grid, action, context)
-        new_params, new_pos, new_freeze_ca = new_context
-        print(f'freeze_ca: {freeze_ca}')
+    new_freeze_ca = new_context[2]
+    
+    if freeze_ca != 0:
         assert new_freeze_ca == freeze_ca - 1
+    else:
+        assert new_freeze_ca == max_freeze      
 
-def test_ForestFireCoordinator_steps_until_CA_logic():
+def test_coordinator_freeze_ca_alternation_logic():
     pass
+
+def test_coordinator_freeze_ca_does_not_depend_on_action():
+    coordinator = instantiate_coordinator()
+    grid, action, context = sample_coordinator_input()
+
+    ca_params = CA_PARAMS_SPACE.sample()
+    pos       = POS_SPACE.sample()
+    freeze_ca = 1
+
+    context = ca_params, pos, freeze_ca
+    
+    assert coordinator.context_space.contains(context)
+    
+    for key in ACTIONS:
+        action = ACTIONS[key]
+
+        new_grid, new_context = coordinator(grid, action, context)
+
+        new_params, new_pos, new_freeze_ca = new_context
+
+        assert new_freeze_ca == freeze_ca - 1

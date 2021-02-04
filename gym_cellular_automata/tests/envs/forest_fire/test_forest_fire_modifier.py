@@ -19,8 +19,8 @@ def get_config_dict(file):
 CONFIG = get_config_dict(CONFIG_FILE)
 
 EMPTY = CONFIG['cell_symbols']['empty']
-TREE = CONFIG['cell_symbols']['tree']
-FIRE = CONFIG['cell_symbols']['fire']
+TREE  = CONFIG['cell_symbols']['tree']
+FIRE  = CONFIG['cell_symbols']['fire']
 
 CELL_STATES = CONFIG['cell_states']
 
@@ -38,13 +38,11 @@ ACTION_DOWN_LEFT = CONFIG['actions']['down_left']
 ACTION_DOWN_CENTER = CONFIG['actions']['down_center']
 ACTION_DOWN_RIGHT = CONFIG['actions']['down_right']
 
-type(ACTION_DOWN_CENTER)
-
-def test_API():
-    ca_operator = ForestFireModifier(EFFECTS)
-
+def test_API(
+                operator = ForestFireModifier(EFFECTS)
+            ):
     from gym_cellular_automata.tests import test_Operator_API_specifications
-    test_Operator_API_specifications(ca_operator)
+    test_Operator_API_specifications(operator)
 
 def test_forest_fire_helicopter_movement():
     grid = Grid(TEST_GRID, cell_states=CELL_STATES)

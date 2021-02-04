@@ -13,20 +13,25 @@ class ForestFireCoordinator(Operator):
         self.freeze_CA_space = spaces.Discrete(freeze_CA + 1)  
         
         if grid_space is None:
+            assert cellular_automaton.grid_space is not None, 'grid_space could not be inferred' 
             self.grid_space = cellular_automaton.grid_space
         
         if action_space is None:
+            assert modifier.action_space is not None, 'action_space could not be inferred'
             self.action_space = modifier.action_space
             
         if context_space is None:
-            CA_params_space = self.cellular_automaton.context_space
-            pos_space = self.modifier.context_space
+            assert cellular_automaton.context_space is not None, 'context_space could not be inferred'
+            assert modifier.context_space is not None, 'context_space could not be inferred'
+            CA_params_space = cellular_automaton.context_space
+            pos_space = modifier.context_space
             self.context_space = spaces.Tuple((CA_params_space,
                                                pos_space,
                                                self.freeze_CA_space))
 
     def update(self, grid, action, context):
         CA_params, pos, steps_until_CA = context
+        steps_until_CA = int(steps_until_CA)
  
         if steps_until_CA == 0:
 

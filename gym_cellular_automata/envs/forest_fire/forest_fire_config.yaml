@@ -13,9 +13,8 @@ ca_params:
   p_fire: 0.033
   p_tree: 0.333
 
-# Modifier's effects
-# Exchange from FIRE to EMPTY
-# The fire is being extinguish 
+# The Modifier's effects:
+# Exchanging a FIRE cell to EMPTY.
 effects:
   2: 0
 

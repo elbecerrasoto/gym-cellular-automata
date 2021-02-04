@@ -31,11 +31,11 @@ COL = CONFIG['grid_shape']['n_col']
 P_FIRE = CONFIG['ca_params']['p_fire']
 P_TREE = CONFIG['ca_params']['p_tree']
 
-def test_API():
-    ca_operator = ForestFireCellularAutomaton()
-
+def test_API(
+                operator = ForestFireCellularAutomaton()
+            ):
     from gym_cellular_automata.tests import test_Operator_API_specifications
-    test_Operator_API_specifications(ca_operator)
+    test_Operator_API_specifications(operator)
 
 def test_forest_fire_cell_symbols():
     ca_operator = ForestFireCellularAutomaton()
@@ -67,7 +67,7 @@ def test_forest_fire_update_on_tree_ring():
     assert grid[0,0] == EMPTY, '2nd Ring Update'
     assert grid[0,2] == EMPTY, '2nd Ring Update'
     assert grid[1,0] == EMPTY, '2nd Ring Update'
-    assert grid[1,2] == EMPTY, '1nd Ring Update'
+    assert grid[1,2] == EMPTY, '2nd Ring Update'
     
 def assert_forest_fire_update_at_position_row_col(grid, new_grid, row, col):
     log_error = f'\n row: {row}' + \
