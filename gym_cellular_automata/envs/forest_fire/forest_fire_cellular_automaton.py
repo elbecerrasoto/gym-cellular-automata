@@ -2,7 +2,6 @@ import numpy as np
 from gym import spaces
 
 from gym_cellular_automata import Grid
-
 from gym_cellular_automata import Operator
 from gym_cellular_automata.utils.neighbors import neighborhood_at
 
@@ -19,6 +18,8 @@ CONFIG = get_config_dict(CONFIG_FILE)
 # ------------ Forest Fire Cellular Automaton
 
 class ForestFireCellularAutomaton(Operator):
+    is_composition = False
+    
     empty = CONFIG['cell_symbols']['empty']
     tree = CONFIG['cell_symbols']['tree']
     fire = CONFIG['cell_symbols']['fire']

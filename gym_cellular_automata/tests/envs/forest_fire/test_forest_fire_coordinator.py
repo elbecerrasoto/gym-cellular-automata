@@ -1,3 +1,4 @@
+from collections import Counter
 from gym import spaces
 import numpy as np
 
@@ -26,11 +27,9 @@ CELL_STATES = CONFIG['cell_states']
 ROW = CONFIG['grid_shape']['n_row']
 COL = CONFIG['grid_shape']['n_row']
 
-ACTIONS = CONFIG['actions']
-
 EFFECTS = CONFIG['effects']
 
-FREEZE_CA = CONFIG['freeze_ca']
+MAX_FREEZE = CONFIG['max_freeze']
 
 CA_PARAMS_SPACE = ForestFireCellularAutomaton().context_space
 GRID_SPACE = Grid(cell_states=CELL_STATES, shape=(ROW, COL)).grid_space
@@ -55,13 +54,7 @@ def instantiate_coordinator():
     
     return ForestFireCoordinator(cellular_automaton,
                                  modifier,
-                                 freeze_CA = FREEZE_CA)
-
-def test_API(
-                operator = instantiate_coordinator()
-            ):
-    from gym_cellular_automata.tests import test_Operator_API_specifications
-    test_Operator_API_specifications(operator)
+                                 max_freeze = MAX_FREEZE)
 
 def sample_coordinator_input():
     coordinator = instantiate_coordinator()
@@ -71,6 +64,21 @@ def sample_coordinator_input():
     context = coordinator.context_space.sample()
     
     return grid, action, context
+
+def context_with_custom_freeze(custom = 1):
+    ca_params = CA_PARAMS_SPACE.sample()
+    pos       = POS_SPACE.sample()
+    freeze = custom
+    
+    return ca_params, pos, freeze
+
+# ------------ Tests
+
+def test_API(
+                operator = instantiate_coordinator()
+            ):
+    from gym_cellular_automata.tests import test_Operator_API_specifications
+    test_Operator_API_specifications(operator)
 
 def test_coordinator_output():
     coordinator = instantiate_coordinator()
@@ -83,46 +91,37 @@ def test_coordinator_output():
     assert GRID_SPACE.contains(new_grid[:])
     assert coordinator.context_space.contains(new_context)
 
-# At 0 is updated       
-# At 0 is replineshed
-
-def test_coordinator_freeze_ca_decrease_logic():
+def test_coordinator_with_only_modifier():
     coordinator = instantiate_coordinator()
-    max_freeze = coordinator.freeze_CA
     
     grid, action, context = sample_coordinator_input()
     
-    freeze_ca = context[2]
+    context = context_with_custom_freeze(1) 
+    ca_params, pos, freeze = context
     
     new_grid, new_context = coordinator(grid, action, context)
+    _, _, new_freeze  = new_context
     
-    new_freeze_ca = new_context[2]
+    assert freeze - 1 == new_freeze
+
+    which_cells_changed = np.not_equal(grid[:], new_grid[:]).flatten().tolist()
+    how_many_changed = Counter(which_cells_changed)
     
-    if freeze_ca != 0:
-        assert new_freeze_ca == freeze_ca - 1
-    else:
-        assert new_freeze_ca == max_freeze      
+    # At most 1 cell is changed    
+    assert how_many_changed[True] <= 1
 
-def test_coordinator_freeze_ca_alternation_logic():
-    pass
-
-def test_coordinator_freeze_ca_does_not_depend_on_action():
+def test_coordinator_update_with_cellular_automaton_and_modifier():
     coordinator = instantiate_coordinator()
+    max_freeze = coordinator.max_freeze
     grid, action, context = sample_coordinator_input()
 
-    ca_params = CA_PARAMS_SPACE.sample()
-    pos       = POS_SPACE.sample()
-    freeze_ca = 1
-
-    context = ca_params, pos, freeze_ca
+    context = context_with_custom_freeze(0) 
     
-    assert coordinator.context_space.contains(context)
-    
-    for key in ACTIONS:
-        action = ACTIONS[key]
+    new_grid, new_context = coordinator(grid, action, context)    
+    new_freeze = new_context[2]
 
-        new_grid, new_context = coordinator(grid, action, context)
-
-        new_params, new_pos, new_freeze_ca = new_context
-
-        assert new_freeze_ca == freeze_ca - 1
+    assert new_freeze == max_freeze
+    # Testing the output grid is still needed it.
+    # The update breaks the CA logic
+    # specifically on the fire propagation rule
+    # or does nothing

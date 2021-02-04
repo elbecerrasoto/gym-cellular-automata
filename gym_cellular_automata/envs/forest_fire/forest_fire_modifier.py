@@ -4,11 +4,12 @@ from gym import spaces
 from gym_cellular_automata import Operator
 from gym_cellular_automata.utils.neighbors import are_my_neighbors_a_boundary
 
-# ------------ Forest Fire Cellular Automaton
+# ------------ Forest Fire Modifier
 
 class ForestFireModifier(Operator):
-    hit = False    
-    
+    is_composition = False
+    hit = False
+
     def __init__(self, effects, grid_space=None, action_space=None, context_space=None):
         
         self.effects = effects
@@ -25,9 +26,11 @@ class ForestFireModifier(Operator):
         row, col = new_pos
         
         self.hit = False
-        # Exchange of cells if applicable (usually `fire` to `empty`).
+        
+        # If applicable, cell state changes from FIRE to EMPTY.
         for symbol in self.effects:
-            if grid[row, col] == symbol:
+            
+            if grid[row, col] == symbol:      
                 grid[row, col] = self.effects[symbol]
                 self.hit = True
 

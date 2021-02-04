@@ -30,4 +30,4 @@ actions:
   down_right:    9
 
 # Steps that the Cellular Automaton remains idle.
-freeze_ca: 2
+max_freeze: 2
