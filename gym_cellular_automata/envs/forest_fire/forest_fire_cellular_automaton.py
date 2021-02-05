@@ -5,15 +5,8 @@ from gym_cellular_automata import Grid
 from gym_cellular_automata import Operator
 from gym_cellular_automata.utils.neighbors import neighborhood_at
 
-CONFIG_FILE = 'gym_cellular_automata/envs/forest_fire/forest_fire_config.yaml'
-
-def get_config_dict(file):
-    import yaml
-    yaml_file = open(file, 'r')
-    yaml_content = yaml.load(yaml_file, Loader=yaml.SafeLoader)
-    return yaml_content
-
-CONFIG = get_config_dict(CONFIG_FILE)
+from gym_cellular_automata.utils.config import get_forest_fire_config_dict
+CONFIG = get_forest_fire_config_dict()
 
 # ------------ Forest Fire Cellular Automaton
 

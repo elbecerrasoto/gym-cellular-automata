@@ -1,3 +1,4 @@
 from .forest_fire_cellular_automaton import ForestFireCellularAutomaton
 from .forest_fire_modifier import ForestFireModifier
 from .forest_fire_coordinator import ForestFireCoordinator
+from .forest_fire_env import ForestFireEnv

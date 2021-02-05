@@ -9,11 +9,11 @@ SHAPE = (2, 2)
 CELL_STATES = 4
 DATA = [[0,1], [2,3]]
 
-def test_Grid_API_specifications():
-    grid = Grid(data = DATA,
-                cell_states = CELL_STATES,
-                shape = SHAPE)
-    
+def test_Grid_API_specifications(
+                                    grid = Grid(data        = DATA,
+                                                cell_states = CELL_STATES,
+                                                shape       = SHAPE)
+                                ): 
     # Strong typing of grid attributes
     assert isinstance(grid.data, np.ndarray)
     assert isinstance(grid.shape, tuple)
