@@ -31,3 +31,8 @@ actions:
 
 # Steps that the Cellular Automaton remains idle.
 max_freeze: 2
+
+rewards:
+  per_empty: 0.0
+  per_tree: 1.0
+  per_fire: -1.0

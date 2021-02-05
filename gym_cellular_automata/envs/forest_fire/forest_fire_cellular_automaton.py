@@ -12,11 +12,11 @@ CONFIG = get_forest_fire_config_dict()
 
 class ForestFireCellularAutomaton(Operator):
     is_composition = False
-    
+
     empty = CONFIG['cell_symbols']['empty']
     tree = CONFIG['cell_symbols']['tree']
     fire = CONFIG['cell_symbols']['fire']
-    
+
     def __init__(self, grid_space=None, action_space=None, context_space=None):
         
         if context_space is None:
