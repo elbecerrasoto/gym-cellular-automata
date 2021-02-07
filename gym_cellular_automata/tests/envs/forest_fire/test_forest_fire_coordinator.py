@@ -77,9 +77,7 @@ def test_coordinator_output():
     
     new_grid, new_context = coordinator(grid, action, context)
     
-    # Grid still does not completly behave as a numpy ndarray
-    # new_grid[:] vs. just new_grid
-    assert GRID_SPACE.contains(new_grid[:])
+    assert GRID_SPACE.contains(new_grid)
     assert coordinator.context_space.contains(new_context)
 
 def test_coordinator_with_only_modifier():
@@ -95,7 +93,7 @@ def test_coordinator_with_only_modifier():
     
     assert freeze - 1 == new_freeze
 
-    which_cells_changed = np.not_equal(grid[:], new_grid[:]).flatten().tolist()
+    which_cells_changed = np.not_equal(grid, new_grid).flatten().tolist()
     how_many_changed = Counter(which_cells_changed)
     
     # At most 1 cell is changed    

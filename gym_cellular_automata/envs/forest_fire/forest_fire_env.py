@@ -86,7 +86,7 @@ class ForestFireEnv(gym.Env):
 
             new_grid, new_context = self.coordinator(self.grid, action, self.context)
             
-            obs    = new_grid[:], new_context
+            obs    = new_grid, new_context
             reward = self._award()
             info   = self._report()
             
@@ -96,7 +96,7 @@ class ForestFireEnv(gym.Env):
             return obs, reward, done, info 
 
     def _award(self):
-        dict_counts = Counter(self.grid[:].flatten().tolist())
+        dict_counts = Counter(self.grid.flatten().tolist())
         
         cell_counts = np.array([dict_counts[self.empty],
                                 dict_counts[self.tree],

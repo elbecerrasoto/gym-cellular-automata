@@ -8,7 +8,7 @@ def are_my_neighbors_a_boundary(grid, pos):
     It checks the up, down, left, and right neighbors.
     """
     row, col = pos 
-    n_row, n_col = grid.data.shape
+    n_row, n_col = grid.shape
     
     up_offset, down_offset    = row + np.array([-1, 1])
     left_offset, right_offset = col + np.array([-1, 1])
@@ -24,9 +24,9 @@ def are_my_neighbors_a_boundary(grid, pos):
 
 def neighborhood_at(grid, pos, invariant=0):
     """
-    Calculates the Moore's neighborgood of cell at target position `pos`.
-    The boundary conditions are invariant and set to `empty`.
-    Returns a tuple with the values of the nighborhood cells in the following
+    Calculates the Moore's neighborgood of cell at target position 'pos'.
+    The boundary conditions are invariant and set to 'empty'.
+    Returns a named tuple with the values of the nighborhood cells in the following
     order: up_left, up_center, up_right,
             middle_left, middle, middle_right,
             down_left, down_center, down_right
