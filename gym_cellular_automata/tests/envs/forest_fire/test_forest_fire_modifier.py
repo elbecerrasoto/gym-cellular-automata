@@ -1,15 +1,14 @@
 import pytest
 import numpy as np
 
-from gym_cellular_automata import Grid
 from gym_cellular_automata.envs.forest_fire import ForestFireModifier
 
 from gym_cellular_automata.utils.config import get_forest_fire_config_dict
 CONFIG = get_forest_fire_config_dict()
 
-TEST_GRID = [[2,2,2],
-             [2,2,2],
-             [2,2,2]]
+TEST_GRID = np.array([[2,2,2],
+                      [2,2,2],
+                      [2,2,2]], dtype=np.uint8)
 
 EMPTY = CONFIG['cell_symbols']['empty']
 TREE  = CONFIG['cell_symbols']['tree']
@@ -41,7 +40,7 @@ def test_API(
     test_Operator_API_specifications(operator)
 
 def test_forest_fire_helicopter_movement():
-    grid = Grid(TEST_GRID, cell_states=CELL_STATES)
+    grid = TEST_GRID
     
     pos = np.array([1, 1])
     
@@ -73,7 +72,7 @@ def test_forest_fire_helicopter_movement():
 
 def test_ForestFireModifier_helicopter_movement_boundaries():
     
-    grid = Grid(TEST_GRID, cell_states=3)
+    grid = TEST_GRID
     
     modifier = ForestFireModifier(EFFECTS)
     
@@ -105,7 +104,7 @@ def test_ForestFireModifier_helicopter_illegal_actions():
         modifier(TEST_GRID, 'foo', pos)
 
 def test_ForestFireModifier_helicopter_fire_extinguish():
-    grid = Grid(TEST_GRID, cell_states=3)
+    grid = TEST_GRID
     pos = [1, 1]
     modifier = ForestFireModifier(EFFECTS)
     

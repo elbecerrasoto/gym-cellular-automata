@@ -1,6 +1,6 @@
+import numpy as np
 from gym import spaces
 
-from gym_cellular_automata import Grid
 from gym_cellular_automata.utils.neighbors import neighborhood_at
 from gym_cellular_automata.envs.forest_fire import ForestFireCellularAutomaton
 
@@ -24,6 +24,8 @@ COL = CONFIG['grid_shape']['n_col']
 P_FIRE = CONFIG['ca_params']['p_fire']
 P_TREE = CONFIG['ca_params']['p_tree']
 
+GRID_SPACE = spaces.Box(0, CELL_STATES - 1, shape = (ROW, COL), dtype = np.uint8)
+
 def test_API(
                 operator = ForestFireCellularAutomaton()
             ):
@@ -40,9 +42,9 @@ def test_forest_fire_cell_symbols():
 def test_forest_fire_update_on_tree_ring():
     ca_operator = ForestFireCellularAutomaton()
     
-    TREE_RING = Grid([[1,1,1],
-                      [1,2,1],
-                      [1,1,1]], cell_states=CELL_STATES)
+    TREE_RING = np.array([[1,1,1],
+                          [1,2,1],
+                          [1,1,1]], dtype=np.uint8)
     grid = TREE_RING
     
     ca_params = P_FIRE, P_TREE
@@ -99,7 +101,7 @@ def assert_forest_fire_update_at_position_row_col(grid, new_grid, row, col):
 def test_forest_fire_update():
     ca_operator = ForestFireCellularAutomaton()
     
-    grid = Grid(shape=(ROW, COL), cell_states=CELL_STATES)    
+    grid = GRID_SPACE.sample()    
     pos_space = spaces.MultiDiscrete([ROW, COL])
     
     for step in range(T_STEPS):

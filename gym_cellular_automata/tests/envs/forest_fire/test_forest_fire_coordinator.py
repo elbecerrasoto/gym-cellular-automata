@@ -2,8 +2,6 @@ from collections import Counter
 from gym import spaces
 import numpy as np
 
-from gym_cellular_automata import Grid
-
 from gym_cellular_automata.envs.forest_fire import ForestFireCellularAutomaton
 from gym_cellular_automata.envs.forest_fire import ForestFireModifier
 from gym_cellular_automata.envs.forest_fire import ForestFireCoordinator
@@ -25,7 +23,7 @@ EFFECTS = CONFIG['effects']
 MAX_FREEZE = CONFIG['max_freeze']
 
 CA_PARAMS_SPACE = ForestFireCellularAutomaton().context_space
-GRID_SPACE = Grid(cell_states=CELL_STATES, shape=(ROW, COL)).grid_space
+GRID_SPACE = spaces.Box(0, CELL_STATES - 1, shape = (ROW, COL), dtype = np.uint8)
 POS_SPACE = spaces.MultiDiscrete([ROW, COL])
 
 ACTION_SPACE = spaces.Box(1, 9, shape=tuple(), dtype=np.uint8)

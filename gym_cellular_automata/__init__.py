@@ -1,4 +1,3 @@
-from .grid import Grid
 from .operator import Operator
 
 # from gym.envs.registration import register

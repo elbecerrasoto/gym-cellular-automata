@@ -1,7 +1,6 @@
 import numpy as np
 from gym import spaces
 
-from gym_cellular_automata import Grid
 from gym_cellular_automata import Operator
 from gym_cellular_automata.utils.neighbors import neighborhood_at
 
@@ -28,7 +27,7 @@ class ForestFireCellularAutomaton(Operator):
 
     def update(self, grid, action, context):
         # A copy is needed for the sequential update of a CA
-        new_grid = Grid(grid.copy(), cell_states=3)
+        new_grid = grid.copy()
         p_fire, p_tree = context
         
         for row, cells in enumerate(grid):
