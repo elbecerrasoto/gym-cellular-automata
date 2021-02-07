@@ -1,3 +1,5 @@
+import numpy as np
+
 from gym import spaces
 from gym_cellular_automata import Operator
 
@@ -47,13 +49,13 @@ class ForestFireCoordinator(Operator):
             grid, _       = self.cellular_automaton(grid, action, ca_params)
             grid, new_pos = self.modifier(grid, action, pos)
             
-            freeze = self.max_freeze
+            freeze = np.array(self.max_freeze)
             
         else:
             
             grid, new_pos = self.modifier(grid, action, pos)
             
-            freeze -= 1
+            freeze = np.array(freeze - 1)
         
         context = ca_params, new_pos, freeze
         return grid, context

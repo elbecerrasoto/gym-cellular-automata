@@ -42,11 +42,9 @@ class ForestFireEnv(gym.Env):
         
     action_space = spaces.Box(1, 9, shape = tuple(), dtype = np.uint8)
     observation_space = spaces.Tuple((grid_space,
-                                      ca_params_space,
-                                      pos_space,
-                                      freeze_space))
+                                      context_space))
 
-    def init(self):
+    def __init__(self):
         
         self.cellular_automaton = ForestFireCellularAutomaton(grid_space    = self.grid_space,
                                                               action_space  = self.action_space,
@@ -68,9 +66,9 @@ class ForestFireEnv(gym.Env):
     def reset(self):
         self.grid = self.grid_space.sample()
         
-        ca_params = P_FIRE, P_TREE
-        pos = ROW // 2, COL // 2
-        freeze = MAX_FREEZE
+        ca_params = np.array([P_FIRE, P_TREE])
+        pos = np.array([ROW // 2, COL // 2])
+        freeze = np.array(MAX_FREEZE)
 
         self.context = ca_params, pos, freeze
         
@@ -98,17 +96,17 @@ class ForestFireEnv(gym.Env):
             return obs, reward, done, info 
 
     def _award(self):
-        cell_counts = Counter(self.grid.flatten().tolist())
-
-        weights = np.array([self.reward_per_empty,
-                            self.reward_per_tree,
-                            self.reward_per_fire])
+        dict_counts = Counter(self.grid[:].flatten().tolist())
         
-        counts = np.array([cell_counts[self.empty],
-                           cell_counts[self.tree],
-                           cell_counts[self.fire]])
+        cell_counts = np.array([dict_counts[self.empty],
+                                dict_counts[self.tree],
+                                dict_counts[self.fire]])
 
-        return np.dot(weights, counts)
+        reward_weights = np.array([self.reward_per_empty,
+                                    self.reward_per_tree,
+                                    self.reward_per_fire])
+
+        return np.dot(reward_weights, cell_counts)
     
     def _is_done(self):
         return False
