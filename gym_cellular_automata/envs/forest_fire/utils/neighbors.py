@@ -13,10 +13,10 @@ def are_my_neighbors_a_boundary(grid, pos):
     up_offset, down_offset    = row + np.array([-1, 1])
     left_offset, right_offset = col + np.array([-1, 1])
 
-    up    = up_offset    < 0
-    down  = down_offset  > n_row-1
-    left  = left_offset  < 0
-    right = right_offset > n_col-1
+    up    = bool(up_offset    < 0)
+    down  = bool(down_offset  > n_row-1)
+    left  = bool(left_offset  < 0)
+    right = bool(right_offset > n_col-1)
     
     Boundaries = namedtuple('Boundaries', ['up', 'down', 'left', 'right'])
     
