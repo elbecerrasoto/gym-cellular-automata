@@ -2,9 +2,10 @@ import numpy as np
 from gym import spaces
 
 from gym_cellular_automata import Operator
-from gym_cellular_automata.utils.neighbors import neighborhood_at
 
-from gym_cellular_automata.utils.config import get_forest_fire_config_dict
+from gym_cellular_automata.envs.forest_fire.utils.neighbors import neighborhood_at
+from gym_cellular_automata.envs.forest_fire.utils.config import get_forest_fire_config_dict
+
 CONFIG = get_forest_fire_config_dict()
 
 # ------------ Forest Fire Cellular Automaton

@@ -6,7 +6,7 @@ from gym import spaces
 
 import gym_cellular_automata
 from gym_cellular_automata.envs.forest_fire import ForestFireEnv
-from gym_cellular_automata.utils.config import get_forest_fire_config_dict
+from gym_cellular_automata.envs.forest_fire.utils.config import get_forest_fire_config_dict
 
 RANDOM_POLICY_ITERATIONS = 12
 
