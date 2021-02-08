@@ -5,8 +5,8 @@ import gym
 from gym import spaces
 from gym.utils import seeding
 
-from gym_cellular_automata.envs.forest_fire import ForestFireCellularAutomaton, ForestFireModifier, ForestFireCoordinator
-from gym_cellular_automata.envs.forest_fire.utils.config import get_forest_fire_config_dict
+from .operators import ForestFireCellularAutomaton, ForestFireModifier, ForestFireCoordinator
+from .utils.config import get_forest_fire_config_dict
 
 CELL_TYPE   = np.uint8
 ACTION_TYPE = np.uint8

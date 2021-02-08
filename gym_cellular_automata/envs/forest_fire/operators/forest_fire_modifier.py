@@ -2,7 +2,7 @@ import numpy as np
 from gym import spaces
 
 from gym_cellular_automata import Operator
-from gym_cellular_automata.envs.forest_fire.utils.neighbors import are_my_neighbors_a_boundary
+from ..utils.neighbors import are_my_neighbors_a_boundary
 
 # ------------ Forest Fire Modifier
 

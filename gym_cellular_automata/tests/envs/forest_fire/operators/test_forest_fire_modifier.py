@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from gym_cellular_automata.envs.forest_fire import ForestFireModifier
+from gym_cellular_automata.envs.forest_fire.operators import ForestFireModifier
 from gym_cellular_automata.envs.forest_fire.utils.config import get_forest_fire_config_dict
 
 CONFIG = get_forest_fire_config_dict()

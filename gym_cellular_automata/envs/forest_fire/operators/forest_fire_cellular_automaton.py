@@ -3,8 +3,8 @@ from gym import spaces
 
 from gym_cellular_automata import Operator
 
-from gym_cellular_automata.envs.forest_fire.utils.neighbors import neighborhood_at
-from gym_cellular_automata.envs.forest_fire.utils.config import get_forest_fire_config_dict
+from ..utils.neighbors import neighborhood_at
+from ..utils.config import get_forest_fire_config_dict
 
 CONFIG = get_forest_fire_config_dict()
 

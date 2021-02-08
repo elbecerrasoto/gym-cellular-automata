@@ -1,4 +1,4 @@
-from .operator import Operator
+from gym_cellular_automata.operator import Operator
 
 # from gym.envs.registration import register
 

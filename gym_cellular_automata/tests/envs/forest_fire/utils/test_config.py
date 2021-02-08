@@ -1,7 +1,6 @@
 import os
 from gym_cellular_automata.envs.forest_fire.utils.config import get_forest_fire_config_dict
-
-FOREST_FIRE_CONFIG_FILE = 'gym_cellular_automata/envs/forest_fire/forest_fire_config.yaml'
+from gym_cellular_automata.envs.forest_fire.utils.config import FOREST_FIRE_CONFIG_FILE
 
 def test_config_file_exists():
     assert os.path.isfile(FOREST_FIRE_CONFIG_FILE)
