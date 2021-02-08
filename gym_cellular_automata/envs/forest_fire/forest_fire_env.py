@@ -8,6 +8,9 @@ from gym.utils import seeding
 from gym_cellular_automata.envs.forest_fire import ForestFireCellularAutomaton, ForestFireModifier, ForestFireCoordinator
 from gym_cellular_automata.envs.forest_fire.utils.config import get_forest_fire_config_dict
 
+CELL_TYPE   = np.uint8
+ACTION_TYPE = np.uint8
+
 CONFIG = get_forest_fire_config_dict()
 
 CELL_STATES = CONFIG['cell_states']
@@ -38,9 +41,9 @@ class ForestFireEnv(gym.Env):
     context_space = spaces.Tuple((ca_params_space,
                                   pos_space,
                                   freeze_space))
-    grid_space = spaces.Box(0, CELL_STATES - 1, shape = (ROW, COL), dtype = np.uint8)
+    grid_space = spaces.Box(0, CELL_STATES - 1, shape = (ROW, COL), dtype = CELL_TYPE)
         
-    action_space = spaces.Box(1, 9, shape = tuple(), dtype = np.uint8)
+    action_space = spaces.Box(1, 9, shape = tuple(), dtype = ACTION_TYPE)
     observation_space = spaces.Tuple((grid_space,
                                       context_space))
 

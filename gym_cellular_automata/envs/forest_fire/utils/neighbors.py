@@ -43,9 +43,9 @@ def neighborhood_at(grid, pos, invariant=0):
     middle_center = grid[row,   col]
     middle_right  = grid[row,   col+1] if not is_boundary.right                         else invariant
     
-    down_left     = grid[row+1, col-1] if not (is_boundary.down or is_boundary.left)   else invariant
-    down_center   = grid[row+1, col]   if not  is_boundary.down                        else invariant
-    down_right    = grid[row+1, col+1] if not (is_boundary.down or is_boundary.right)  else invariant
+    down_left     = grid[row+1, col-1] if not (is_boundary.down or is_boundary.left)    else invariant
+    down_center   = grid[row+1, col]   if not  is_boundary.down                         else invariant
+    down_right    = grid[row+1, col+1] if not (is_boundary.down or is_boundary.right)   else invariant
     
     Neighbors = namedtuple('Neighbors', ['up_left', 'up_center', 'up_right',
                                          'middle_left', 'middle_center', 'middle_right',
