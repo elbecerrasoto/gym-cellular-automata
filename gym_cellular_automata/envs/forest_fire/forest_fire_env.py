@@ -1,4 +1,5 @@
 import numpy as np
+from matplotlib import pyplot as plt
 from collections import Counter
 
 import gym
@@ -7,6 +8,7 @@ from gym.utils import seeding
 
 from .operators import ForestFireCellularAutomaton, ForestFireModifier, ForestFireCoordinator
 from .utils.config import get_forest_fire_config_dict
+from .utils.render_ca import plot_grid, add_helicopter_cross
 
 CONFIG = get_forest_fire_config_dict()
 
@@ -123,4 +125,9 @@ class ForestFireEnv(gym.Env):
         return [seed]
 
     def render(self, mode='human'):
-        pass
+        ca_params, pos, freeze = self.context
+        
+        figure = add_helicopter_cross( plot_grid( self.grid ), pos )
+        plt.show(figure)
+
+        return figure

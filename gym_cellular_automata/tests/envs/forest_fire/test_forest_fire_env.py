@@ -109,3 +109,33 @@ def test_forest_fire_env_with_random_policy(env, reward_space):
         
         action = env.action_space.sample()
         obs, reward, done, info = env.step(action)
+        
+def manual_assesment(verbose = False):
+    from time import sleep
+    env=ForestFireEnv()
+    
+    obs, reward, _, _ = env.reset()
+    
+    if verbose:
+        print(f'\n\nThe FIRST obs is {obs}')
+        print(f'With reward {reward}')
+        
+    env.render()
+    
+    for i in range(64):
+
+        action = env.action_space.sample()
+        if verbose:
+            print(f'\n\nAction Selected: {action}')
+        
+        obs, reward, _, _ = env.step(action)
+
+        env.render()
+        
+        if verbose:
+            print('\nObservation')
+            print(f'Obs: {obs}')
+            print(f'Reward: {reward}\n')
+        
+        sleep(0.2)
+        print('.', end='')

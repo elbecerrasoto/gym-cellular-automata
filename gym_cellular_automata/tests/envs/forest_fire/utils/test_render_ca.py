@@ -1,7 +1,10 @@
 import numpy as np
+import matplotlib.pyplot as plt
+
 from gym import spaces
 
 from gym_cellular_automata.envs.forest_fire.utils.render_ca import plot_grid
+from gym_cellular_automata.envs.forest_fire.utils.render_ca import add_helicopter_cross
 from gym_cellular_automata.envs.forest_fire.utils.config import get_forest_fire_config_dict
 
 CONFIG = get_forest_fire_config_dict()
@@ -39,3 +42,12 @@ def test_color_ordering():
     assert symbols_with_colors[sorted_keys[0]] == colors_forest[0]
     assert symbols_with_colors[sorted_keys[1]] == colors_forest[1]
     assert symbols_with_colors[sorted_keys[2]] == colors_forest[2]
+
+def visualize_cross():
+    grid_space = spaces.Box(0, CELL_STATES - 1, shape=(ROW, COL), dtype=CELL_TYPE)
+    grid = grid_space.sample()
+    
+    figure = plot_grid(grid, TITLE)
+    my_new_figure = add_helicopter_cross(figure, (3, 3))
+    
+    plt.show(my_new_figure)

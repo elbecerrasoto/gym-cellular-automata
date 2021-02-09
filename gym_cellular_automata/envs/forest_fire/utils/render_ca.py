@@ -72,3 +72,13 @@ def plot_grid(grid, title = CONFIG['plot_title'], **kwargs):
 
     fig = plt.gcf()  
     return fig
+
+def add_helicopter_cross(fig, pos):
+    ax = fig.get_axes()[0]
+    row, col = pos
+    
+    marker_style = dict(color='0.7', marker='P',
+            markersize=12, markerfacecolor='0.2')
+    
+    ax.plot(col, row, **marker_style)
+    return fig
