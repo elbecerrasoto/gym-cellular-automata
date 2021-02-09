@@ -70,6 +70,9 @@ class ForestFireEnv(gym.Env):
         self.reward_per_fire  = CONFIG['rewards']['per_fire']
 
     def reset(self):
+        self.hits = 0
+        self.modifier.hit = False
+
         self.grid = self.grid_space.sample()
         
         ca_params = np.array([P_FIRE, P_TREE])
@@ -118,7 +121,8 @@ class ForestFireEnv(gym.Env):
         return False
     
     def _report(self):
-        return {}
+        self.hits += self.modifier.hit
+        return {'hits': self.hits}
   
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
