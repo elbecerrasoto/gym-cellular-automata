@@ -36,3 +36,13 @@ rewards:
   per_empty: 0.0
   per_tree: 1.0
   per_fire: -1.0
+
+# Cellular Automata rendering.
+cell_colors:
+  empty: '#F5A6AB' # Pink/Soft Red
+  tree:  '#62A873' # Pine Green
+  fire:  '#A85156' # Wine Red
+
+plot_title: 'Forest Fire Environment'
+
+plot_font: 'Lato' 
