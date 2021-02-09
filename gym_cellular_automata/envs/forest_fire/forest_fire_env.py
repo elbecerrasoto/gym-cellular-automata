@@ -8,9 +8,6 @@ from gym.utils import seeding
 from .operators import ForestFireCellularAutomaton, ForestFireModifier, ForestFireCoordinator
 from .utils.config import get_forest_fire_config_dict
 
-CELL_TYPE   = np.uint8
-ACTION_TYPE = np.uint8
-
 CONFIG = get_forest_fire_config_dict()
 
 CELL_STATES = CONFIG['cell_states']
@@ -24,6 +21,10 @@ P_TREE = CONFIG['ca_params']['p_tree']
 EFFECTS = CONFIG['effects']
 
 MAX_FREEZE = CONFIG['max_freeze']
+
+# spaces.Box requires typing for discrete values
+CELL_TYPE   = CONFIG['cell_type']
+ACTION_TYPE = CONFIG['action_type']
 
 # ------------ Forest Fire Environment
 
