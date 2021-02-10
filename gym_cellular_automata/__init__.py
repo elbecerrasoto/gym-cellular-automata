@@ -1,10 +1,12 @@
 from gym_cellular_automata.operator import Operator
 
-# from gym.envs.registration import register
+from gym.envs.registration import register
 
-# register(
-#     id='minimal-example-v0',
-#     entry_point='gym_automata.envs:MinimalExampleEnv',
-# )
+RESGISTERED_CA_ENVS = 'forest-fire-v0',
 
-# __all__ = ['Grid', 'Operator']
+register(
+    id='forest-fire-v0',
+    entry_point='gym_cellular_automata.envs:ForestFireEnv',
+)
+
+__all__ = ['Operator', 'RESGISTERED_CA_ENVS']
