@@ -132,6 +132,6 @@ class ForestFireEnv(gym.Env):
         ca_params, pos, freeze = self.context
         
         figure = add_helicopter_cross( plot_grid( self.grid ), pos )
-        plt.show(figure)
+        plt.show()
 
         return figure

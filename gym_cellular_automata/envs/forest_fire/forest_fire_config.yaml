@@ -37,7 +37,7 @@ max_freeze: 2
 
 rewards:
   per_empty: 0.0
-  per_tree: 1.0
+  per_tree:  1.0
   per_fire: -1.0
 
 # Cellular Automata rendering options.
@@ -47,4 +47,4 @@ cell_colors:
   fire:  '#A85156' # Wine Red
 
 plot_title: 'Forest Fire Environment'
-plot_font: 'Lato' 
+plot_font:  'Lato' 

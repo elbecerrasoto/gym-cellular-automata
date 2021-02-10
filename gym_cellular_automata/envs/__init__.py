@@ -1,1 +1,1 @@
-from gym_automata.envs.forest_fire import ForestFireEnv
+from gym_cellular_automata.envs.forest_fire import ForestFireEnv
