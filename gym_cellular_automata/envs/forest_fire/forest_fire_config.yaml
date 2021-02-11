@@ -1,3 +1,5 @@
+env_name: forest-fire-v0'
+
 cell_states: 3
 cell_type: 'uint8'
 
