@@ -1,3 +1,3 @@
-from .forest_fire_cellular_automaton import ForestFireCellularAutomaton
-from .forest_fire_modifier import ForestFireModifier
-from .forest_fire_coordinator import ForestFireCoordinator
+from .cellular_automaton import ForestFireCellularAutomaton
+from .modifier import ForestFireModifier
+from .coordinator import ForestFireCoordinator

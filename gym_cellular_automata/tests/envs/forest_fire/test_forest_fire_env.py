@@ -15,13 +15,13 @@ CONFIG = get_forest_fire_config_dict()
 ROW = CONFIG['grid_shape']['n_row']
 COL = CONFIG['grid_shape']['n_row']
 
-ACTION_DO_NOT_MOVE = CONFIG['actions']['middle_center']
+ACTION_NOT_MOVE = CONFIG['actions']['not_move']
 
-ACTION_LEFT  = CONFIG['actions']['middle_left']
-ACTION_RIGHT = CONFIG['actions']['middle_right']
+ACTION_LEFT  = CONFIG['actions']['left']
+ACTION_RIGHT = CONFIG['actions']['right']
 
-ACTION_UP   = CONFIG['actions']['up_center']
-ACTION_DOWN = CONFIG['actions']['down_center']
+ACTION_UP   = CONFIG['actions']['up']
+ACTION_DOWN = CONFIG['actions']['down']
 
 REWARD_PER_EMPTY = CONFIG['rewards']['per_empty']
 REWARD_PER_TREE  = CONFIG['rewards']['per_tree']

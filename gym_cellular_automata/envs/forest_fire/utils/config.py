@@ -15,9 +15,26 @@ def get_config_dict(file):
 
 def get_forest_fire_config_dict():
     config = get_config_dict(FOREST_FIRE_CONFIG_FILE)
-    config['cell_type'] = parse_type(config['cell_type'])
+    
+    config['effects']     = parse_effects(config)
+    config['cell_type']   = parse_type(config['cell_type'])
     config['action_type'] = parse_type(config['action_type'])
+    
     return config
+
+def parse_effects(config):
+    effects_raw = config['effects']
+    effects = dict()
+
+    for cell_name in effects_raw:
+        cell_symbol = config['cell_symbols'][cell_name]
+        
+        substitution_name = effects_raw[cell_name]
+        substitution = config['cell_symbols'][substitution_name]
+      
+        effects[cell_symbol] = substitution
+    
+    return effects
 
 def parse_type(type_str):
     def remove_whitespace(my_str):

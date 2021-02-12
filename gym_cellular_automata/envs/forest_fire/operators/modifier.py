@@ -3,6 +3,27 @@ from gym import spaces
 
 from gym_cellular_automata import Operator
 from ..utils.neighbors import are_my_neighbors_a_boundary
+from ..utils.config import get_forest_fire_config_dict
+
+CONFIG = get_forest_fire_config_dict()
+
+ACTION_UP_LEFT    = CONFIG['actions']['up_left']
+ACTION_UP         = CONFIG['actions']['up']
+ACTION_UP_RIGHT   = CONFIG['actions']['up_right']
+
+ACTION_LEFT       = CONFIG['actions']['left']
+ACTION_NOT_MOVE   = CONFIG['actions']['not_move']
+ACTION_RIGHT      = CONFIG['actions']['right']
+
+ACTION_DOWN_LEFT  = CONFIG['actions']['down_left']
+ACTION_DOWN       = CONFIG['actions']['down']
+ACTION_DOWN_RIGHT = CONFIG['actions']['down_right']
+
+UP_SET   = {ACTION_UP_LEFT,     ACTION_UP,   ACTION_UP_RIGHT}
+DOWN_SET = {ACTION_DOWN_LEFT,   ACTION_DOWN, ACTION_DOWN_RIGHT}
+
+LEFT_SET  = {ACTION_UP_LEFT,  ACTION_LEFT,  ACTION_DOWN_LEFT}
+RIGHT_SET = {ACTION_UP_RIGHT, ACTION_RIGHT, ACTION_DOWN_RIGHT}
 
 # ------------ Forest Fire Modifier
 
@@ -46,12 +67,12 @@ class ForestFireModifier(Operator):
 
         is_boundary = are_my_neighbors_a_boundary(grid, pos)
         
-        new_row = row - 1 if not is_boundary.up    and int(action) in {1, 2, 3} else \
-                  row + 1 if not is_boundary.down  and int(action) in {7, 8, 9} else \
+        new_row = row - 1 if not is_boundary.up    and int(action) in UP_SET   else \
+                  row + 1 if not is_boundary.down  and int(action) in DOWN_SET else \
                   row
         
-        new_col = col - 1 if not is_boundary.left  and int(action) in {1, 4, 7} else \
-                  col + 1 if not is_boundary.right and int(action) in {3, 6, 9} else \
+        new_col = col - 1 if not is_boundary.left  and int(action) in LEFT_SET  else \
+                  col + 1 if not is_boundary.right and int(action) in RIGHT_SET else \
                   col
 
         return np.array([new_row, new_col])

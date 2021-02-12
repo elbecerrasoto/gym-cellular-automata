@@ -128,4 +128,3 @@ class ForestFireEnv(gym.Env):
         plt.show()
 
         return figure
-

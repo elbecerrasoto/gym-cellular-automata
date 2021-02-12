@@ -21,17 +21,17 @@ COL = CONFIG['grid_shape']['n_col']
 
 EFFECTS = CONFIG['effects']
 
-ACTION_UP_LEFT       = CONFIG['actions']['up_left']
-ACTION_UP_CENTER     = CONFIG['actions']['up_center']
-ACTION_UP_RIGHT      = CONFIG['actions']['up_right']
+ACTION_UP_LEFT    = CONFIG['actions']['up_left']
+ACTION_UP         = CONFIG['actions']['up']
+ACTION_UP_RIGHT   = CONFIG['actions']['up_right']
 
-ACTION_MIDDLE_LEFT   = CONFIG['actions']['middle_left']
-ACTION_MIDDLE_CENTER = CONFIG['actions']['middle_center']
-ACTION_MIDDLE_RIGHT  = CONFIG['actions']['middle_right']
+ACTION_LEFT       = CONFIG['actions']['left']
+ACTION_NOT_MOVE   = CONFIG['actions']['not_move']
+ACTION_RIGHT      = CONFIG['actions']['right']
 
-ACTION_DOWN_LEFT     = CONFIG['actions']['down_left']
-ACTION_DOWN_CENTER   = CONFIG['actions']['down_center']
-ACTION_DOWN_RIGHT    = CONFIG['actions']['down_right']
+ACTION_DOWN_LEFT  = CONFIG['actions']['down_left']
+ACTION_DOWN       = CONFIG['actions']['down']
+ACTION_DOWN_RIGHT = CONFIG['actions']['down_right']
 
 def test_API(
                 operator = ForestFireModifier(EFFECTS)
@@ -49,23 +49,23 @@ def test_forest_fire_helicopter_movement():
     # Up
     row, col = modifier._move(grid, ACTION_UP_LEFT, pos)
     assert row == 0 and col == 0
-    row, col = modifier._move(grid, ACTION_UP_CENTER, pos)
+    row, col = modifier._move(grid, ACTION_UP, pos)
     assert row == 0 and col == 1
     row, col = modifier._move(grid, ACTION_UP_RIGHT, pos)
     assert row == 0 and col == 2
     
     # Middle
-    row, col = modifier._move(grid, ACTION_MIDDLE_LEFT, pos)
+    row, col = modifier._move(grid, ACTION_LEFT, pos)
     assert row == 1 and col == 0
-    row, col = modifier._move(grid, ACTION_MIDDLE_CENTER, pos)
+    row, col = modifier._move(grid, ACTION_NOT_MOVE, pos)
     assert row == 1 and col == 1
-    row, col = modifier._move(grid, ACTION_MIDDLE_RIGHT, pos)
+    row, col = modifier._move(grid, ACTION_RIGHT, pos)
     assert row == 1 and col == 2
     
     # Down
     row, col = modifier._move(grid, ACTION_DOWN_LEFT, pos)
     assert row == 2 and col == 0
-    row, col = modifier._move(grid, ACTION_DOWN_CENTER, pos)
+    row, col = modifier._move(grid, ACTION_DOWN, pos)
     assert row == 2 and col == 1
     row, col = modifier._move(grid, ACTION_DOWN_RIGHT, pos)
     assert row == 2 and col == 2
@@ -108,12 +108,12 @@ def test_ForestFireModifier_helicopter_fire_extinguish():
     pos = [1, 1]
     modifier = ForestFireModifier(EFFECTS)
     
-    new_grid, (row, col) = modifier(grid, ACTION_UP_CENTER, pos)
+    new_grid, (row, col) = modifier(grid, ACTION_UP, pos)
     assert new_grid[row, col] == EMPTY
     
     assert new_grid is grid, 'Same Object'
     
-    new_grid, (row, col) = modifier(grid, ACTION_DOWN_CENTER, pos)
+    new_grid, (row, col) = modifier(grid, ACTION_DOWN, pos)
     assert new_grid[row, col] == EMPTY
     
     assert new_grid is grid, 'Same Object'
