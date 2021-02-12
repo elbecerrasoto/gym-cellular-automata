@@ -75,46 +75,6 @@ def test_forest_fire_env_private_methods(env, reward_space):
     assert hasattr(env, '_report')
     assert isinstance(env._report(), dict)
 
-def test_forest_fire_report_method(env, all_fire_grid):
-    obs, reward, done, info = env.reset()
-    assert info['hits'] == 0
-    
-    context = np.array([0.0, 0.0]), np.array([0, 0]), np.array(10) 
-    env = set_env_with_custom_state(env, all_fire_grid.copy(), context)
-
-    obs, reward, done, info = env.step(ACTION_RIGHT)
-    assert info['hits'] == 1
-    
-    obs, reward, done, info = env.step(ACTION_DO_NOT_MOVE)
-    assert info['hits'] == 1
-    
-    obs, reward, done, info = env.step(ACTION_DOWN)
-    assert info['hits'] == 2
-    
-    obs, reward, done, info = env.reset()
-    assert info['hits'] == 0
-    
-    context = np.array([0.0, 0.0]), np.array([0, 0]), np.array(10)   
-    env = set_env_with_custom_state(env, all_fire_grid.copy(), context)    
-    
-    obs, reward, done, info = env.step(ACTION_DOWN)
-    assert info['hits'] == 1
-
-    obs, reward, done, info = env.step(ACTION_RIGHT)
-    assert info['hits'] == 2
-    
-    obs, reward, done, info = env.step(ACTION_RIGHT)
-    assert info['hits'] == 3
-    
-    obs, reward, done, info = env.step(ACTION_LEFT)
-    assert info['hits'] == 3
-    
-    obs, reward, done, info = env.step(ACTION_UP)
-    assert info['hits'] == 4
-
-    obs, reward, done, info = env.step(ACTION_RIGHT)
-    assert info['hits'] == 5
-
 def test_forest_fire_key_attributes(env):
     env.reset()
     hasattr(env, 'grid')
@@ -123,8 +83,10 @@ def test_forest_fire_key_attributes(env):
     hasattr(env, 'coordinator')
     isinstance(env.coordinator, gym_cellular_automata.Operator)
 
-def test_forest_fire_env_reset_output(env):
-    gym_api_out = env.reset()
+def test_forest_fire_env_step_output(env):
+    env.reset()
+    action = env.action_space.sample()
+    gym_api_out = env.step(action)
     
     assert isinstance(gym_api_out, tuple)
     assert len(gym_api_out) == 4
@@ -134,9 +96,8 @@ def test_forest_fire_env_reset_output(env):
     assert isinstance(gym_api_out[3], dict)
 
 def test_forest_fire_env_output_spaces(env, reward_space):
-    obs0, reward, done, info = env.reset()
+    obs0 = env.reset()
     
-    assert reward_space.contains(reward)
     assert env.observation_space.contains(obs0)
 
     grid, (ca_params, pos, freeze) = obs0   
@@ -163,24 +124,23 @@ def assert_observation_and_reward_spaces(env, obs, reward, reward_space):
     assert isinstance(freeze, np.ndarray)
     
 def test_forest_fire_env_with_random_policy(env, reward_space):
-    obs, reward, done, info = env.reset()
+    env.reset()
     
     for step in range(RANDOM_POLICY_ITERATIONS):
+
+        action = env.action_space.sample()
+        obs, reward, done, info = env.step(action)
         
         assert_observation_and_reward_spaces(env, obs, reward, reward_space)
         
-        action = env.action_space.sample()
-        obs, reward, done, info = env.step(action)
-
 def manual_assesment(verbose = False):
     from time import sleep
     env=ForestFireEnv()
     
-    obs, reward, _, info = env.reset()
+    obs = env.reset()
     
     if verbose:
         print(f'\n\nThe FIRST obs is {obs}')
-        print(f'With reward {reward}')
         
     env.render()
     

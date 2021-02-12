@@ -1,8 +1,4 @@
-import os
-import sys
-
 from gym.envs.registration import register
-
 from gym_cellular_automata.operator import Operator
 
 RESGISTERED_CA_ENVS = 'forest-fire-v0',

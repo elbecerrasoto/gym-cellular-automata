@@ -70,9 +70,6 @@ class ForestFireEnv(gym.Env):
         self.reward_per_fire  = CONFIG['rewards']['per_fire']
 
     def reset(self):
-        self.hits = 0
-        self.modifier.hit = False
-
         self.grid = self.grid_space.sample()
         
         ca_params = np.array([P_FIRE, P_TREE])
@@ -82,11 +79,8 @@ class ForestFireEnv(gym.Env):
         self.context = ca_params, pos, freeze
         
         obs = self.grid, self.context
-        reward = self._award()
-        done = self._is_done()
-        info = self._report()
         
-        return obs, reward, done, info
+        return obs
 
     def step(self, action):
         done = self._is_done()
@@ -121,8 +115,7 @@ class ForestFireEnv(gym.Env):
         return False
     
     def _report(self):
-        self.hits += self.modifier.hit
-        return {'hits': self.hits}
+        return {'hit': self.modifier.hit}
   
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -132,6 +125,7 @@ class ForestFireEnv(gym.Env):
         ca_params, pos, freeze = self.context
         
         figure = add_helicopter_cross( plot_grid( self.grid ), pos )
+        plt.savefig('forest_fire.svg')
         plt.show()
 
         return figure
