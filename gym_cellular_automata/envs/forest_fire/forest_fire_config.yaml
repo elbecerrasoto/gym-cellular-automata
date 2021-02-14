@@ -1,10 +1,10 @@
 cell_states: 3
-cell_type: 'uint8'
 
 cell_symbols:
   empty: 0
   tree:  1
   fire:  2
+cell_type: 'uint8'
 
 grid_shape:
   n_row: 5
@@ -19,9 +19,6 @@ ca_params:
 effects:
   fire: 'empty'
 
-n_actions: 9
-action_type: 'uint8'
-
 actions:
   up_left:    1
   up:         2
@@ -32,6 +29,7 @@ actions:
   down_left:  7
   down:       8
   down_right: 9
+action_type: 'uint8'
 
 # Steps that the Cellular Automaton remains idle.
 max_freeze: 2

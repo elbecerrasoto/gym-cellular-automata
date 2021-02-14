@@ -29,9 +29,9 @@ def neighborhood_at(grid, pos, invariant=0):
     Calculates the Moore's neighborgood of cell at target position 'pos'.
     The boundary conditions are invariant and set to 'empty'.
     Returns a named tuple with the values of the nighborhood cells in the following
-    order: up_left, up_center, up_right,
-            middle_left, middle, middle_right,
-            down_left, down_center, down_right
+    order: up_left, up, up_right,
+            left, middle, right,
+            down_left, down, down_right
     """
     row, col = pos
 
@@ -42,23 +42,23 @@ def neighborhood_at(grid, pos, invariant=0):
         if not (is_boundary.up or is_boundary.left)
         else invariant
     )
-    up_center = grid[row - 1, col] if not is_boundary.up else invariant
+    up = grid[row - 1, col] if not is_boundary.up else invariant
     up_right = (
         grid[row - 1, col + 1]
         if not (is_boundary.up or is_boundary.right)
         else invariant
     )
 
-    middle_left = grid[row, col - 1] if not is_boundary.left else invariant
-    middle_center = grid[row, col]
-    middle_right = grid[row, col + 1] if not is_boundary.right else invariant
+    left = grid[row, col - 1] if not is_boundary.left else invariant
+    self = grid[row, col]
+    right = grid[row, col + 1] if not is_boundary.right else invariant
 
     down_left = (
         grid[row + 1, col - 1]
         if not (is_boundary.down or is_boundary.left)
         else invariant
     )
-    down_center = grid[row + 1, col] if not is_boundary.down else invariant
+    down = grid[row + 1, col] if not is_boundary.down else invariant
     down_right = (
         grid[row + 1, col + 1]
         if not (is_boundary.down or is_boundary.right)
@@ -69,25 +69,17 @@ def neighborhood_at(grid, pos, invariant=0):
         "Neighbors",
         [
             "up_left",
-            "up_center",
+            "up",
             "up_right",
-            "middle_left",
-            "middle_center",
-            "middle_right",
+            "left",
+            "self",
+            "right",
             "down_left",
-            "down_center",
+            "down",
             "down_right",
         ],
     )
 
     return Neighbors(
-        up_left,
-        up_center,
-        up_right,
-        middle_left,
-        middle_center,
-        middle_right,
-        down_left,
-        down_center,
-        down_right,
+        up_left, up, up_right, left, self, right, down_left, down, down_right,
     )

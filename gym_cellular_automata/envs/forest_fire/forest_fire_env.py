@@ -19,7 +19,7 @@ CONFIG = get_forest_fire_config_dict()
 CELL_STATES = CONFIG["cell_states"]
 
 ROW = CONFIG["grid_shape"]["n_row"]
-COL = CONFIG["grid_shape"]["n_row"]
+COL = CONFIG["grid_shape"]["n_col"]
 
 P_FIRE = CONFIG["ca_params"]["p_fire"]
 P_TREE = CONFIG["ca_params"]["p_tree"]
@@ -27,6 +27,9 @@ P_TREE = CONFIG["ca_params"]["p_tree"]
 EFFECTS = CONFIG["effects"]
 
 MAX_FREEZE = CONFIG["max_freeze"]
+
+ACTION_MIN = CONFIG["actions"]["min"]
+ACTION_MAX = CONFIG["actions"]["max"]
 
 # spaces.Box requires typing for discrete values
 CELL_TYPE = CONFIG["cell_type"]
@@ -49,7 +52,7 @@ class ForestFireEnv(gym.Env):
     context_space = spaces.Tuple((ca_params_space, pos_space, freeze_space))
     grid_space = spaces.Box(0, CELL_STATES - 1, shape=(ROW, COL), dtype=CELL_TYPE)
 
-    action_space = spaces.Box(1, 9, shape=tuple(), dtype=ACTION_TYPE)
+    action_space = spaces.Box(ACTION_MIN, ACTION_MAX, shape=tuple(), dtype=ACTION_TYPE)
     observation_space = spaces.Tuple((grid_space, context_space))
 
     def __init__(self):

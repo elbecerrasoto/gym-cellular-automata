@@ -46,15 +46,15 @@ def test_neighbors_of_singleton(singleton_2d):
     neighbors = neighborhood_at(grid=singleton_2d, pos=(0, 0), invariant=EMPTY)
 
     assert neighbors.up_left == EMPTY
-    assert neighbors.up_center == EMPTY
+    assert neighbors.up == EMPTY
     assert neighbors.up_right == EMPTY
 
-    assert neighbors.middle_left == EMPTY
-    assert neighbors.middle_center == FIRE
-    assert neighbors.middle_right == EMPTY
+    assert neighbors.left == EMPTY
+    assert neighbors.self == FIRE
+    assert neighbors.right == EMPTY
 
     assert neighbors.down_left == EMPTY
-    assert neighbors.down_center == EMPTY
+    assert neighbors.down == EMPTY
     assert neighbors.down_right == EMPTY
 
 
@@ -78,13 +78,13 @@ def test_neighbors_of_fire_x_grid(fire_x_grid):
     neighbors = neighborhood_at(grid=fire_x_grid, pos=(2, 0), invariant=EMPTY)
 
     assert neighbors.up_left == EMPTY
-    assert neighbors.up_center == EMPTY
+    assert neighbors.up == EMPTY
     assert neighbors.up_right == FIRE
 
-    assert neighbors.middle_left == EMPTY
-    assert neighbors.middle_center == FIRE
-    assert neighbors.middle_right == TREE
+    assert neighbors.left == EMPTY
+    assert neighbors.self == FIRE
+    assert neighbors.right == TREE
 
     assert neighbors.down_left == EMPTY
-    assert neighbors.down_center == EMPTY
+    assert neighbors.down == EMPTY
     assert neighbors.down_right == EMPTY
