@@ -4,7 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors
 import seaborn as sns
+from svgpath2mpl import parse_path
 
+from .helicopter_shape import SVG_PATH
 from .config import get_forest_fire_config_dict
 
 CONFIG = get_forest_fire_config_dict()
@@ -20,7 +22,6 @@ def plot_grid(grid, title=CONFIG["plot_title"], **kwargs):
 
     default_kwargs = {
         "title_font": {"fontname": CONFIG["plot_font"]},
-        "axes_font": {"fontname": CONFIG["plot_font"]},
         "color_empty": CONFIG["cell_colors"]["empty"],
         "color_tree": CONFIG["cell_colors"]["tree"],
         "color_fire": CONFIG["cell_colors"]["fire"],
@@ -29,7 +30,6 @@ def plot_grid(grid, title=CONFIG["plot_title"], **kwargs):
     kwargs = {**default_kwargs, **kwargs}
 
     title_font = kwargs["title_font"]
-    axes_font = kwargs["axes_font"]
 
     color_empty = kwargs["color_empty"]
     color_tree = kwargs["color_tree"]
@@ -53,7 +53,7 @@ def plot_grid(grid, title=CONFIG["plot_title"], **kwargs):
     plt.imshow(grid, aspect="equal", cmap=cmap_colors, norm=norm_symbols)
 
     # Title showing Reward
-    plt.title(title, **title_font)
+    plt.title(title, **title_font, color="0.7")
 
     # Modify Axes
     ax = plt.gca()
@@ -63,8 +63,8 @@ def plot_grid(grid, title=CONFIG["plot_title"], **kwargs):
     ax.set_yticks(np.arange(0, n_row, 1))
 
     # Labels for major ticks
-    ax.set_xticklabels(np.arange(0, n_col, 1), **axes_font)
-    ax.set_yticklabels(np.arange(0, n_row, 1), **axes_font)
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
 
     # Minor ticks
     ax.set_xticks(np.arange(-0.5, n_col, 1), minor=True)
@@ -79,11 +79,27 @@ def plot_grid(grid, title=CONFIG["plot_title"], **kwargs):
     return fig
 
 
-def add_helicopter_cross(fig, pos):
+def parse_svg_into_mpl(svg_path):
+
+    mpl_path = parse_path(svg_path)
+
+    def center(mpl_path):
+        mpl_path.vertices -= mpl_path.vertices.mean(axis=0)
+        return mpl_path
+
+    def upsidedown(mpl_path):
+        mpl_path.vertices[:, 1] *= -1
+        return mpl_path
+
+    return upsidedown(center(mpl_path))
+
+
+def add_helicopter(fig, pos):
+    helicopter = parse_svg_into_mpl(SVG_PATH)
+
     ax = fig.get_axes()[0]
     row, col = pos
 
-    marker_style = dict(color="0.7", marker="P", markersize=12, markerfacecolor="0.2")
+    ax.plot(col, row, marker=helicopter, markersize=39, color="1", fillstyle="none")
 
-    ax.plot(col, row, **marker_style)
     return fig

@@ -43,4 +43,7 @@ print(gymca.RESGISTERED_CA_ENVS)
 ```
 
 ## Gallery
-![Interface](pics/forest_fire.svg)
+![Forest Fire](pics/forest_fire.svg)
+
+## Diagram
+![Diagram](pics/gym_automata_diagram.svg)

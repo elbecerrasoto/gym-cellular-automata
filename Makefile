@@ -1,24 +1,20 @@
 dev_branch := dev
 
-help :
+help:
 	cat Makefile
 
-install :
+install:
 	pip install -e .
 
-dev :
+dev:
 	git checkout $(dev_branch)
 	git status
 
-style :
+style:
 	black .
 
-test :
+test:
 	pytest
 
-test_forest_fire : 
+test_forest_fire: 
 	pytest gym_cellular_automata/tests/envs/forest_fire/
-
-.PHONY: help install \
-dev style test \
-test_forest_fire

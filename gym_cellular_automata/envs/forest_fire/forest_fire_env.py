@@ -12,7 +12,7 @@ from .operators import (
     ForestFireCoordinator,
 )
 from .utils.config import get_forest_fire_config_dict
-from .utils.render import plot_grid, add_helicopter_cross
+from .utils.render import plot_grid, add_helicopter
 
 CONFIG = get_forest_fire_config_dict()
 
@@ -133,7 +133,7 @@ class ForestFireEnv(gym.Env):
     def render(self, mode="human"):
         ca_params, pos, freeze = self.context
 
-        figure = add_helicopter_cross(plot_grid(self.grid), pos)
+        figure = add_helicopter(plot_grid(self.grid), pos)
         plt.show()
 
         return figure

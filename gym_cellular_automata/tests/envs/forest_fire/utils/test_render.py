@@ -5,7 +5,7 @@ from gym import spaces
 
 from gym_cellular_automata.envs.forest_fire.utils.render import (
     plot_grid,
-    add_helicopter_cross,
+    add_helicopter,
 )
 from gym_cellular_automata.envs.forest_fire.utils.config import (
     get_forest_fire_config_dict,
@@ -54,6 +54,6 @@ def visualize_cross():
     grid = grid_space.sample()
 
     figure = plot_grid(grid, TITLE)
-    my_new_figure = add_helicopter_cross(figure, (3, 3))
+    my_new_figure = add_helicopter(figure, (3, 3))
 
     plt.show(my_new_figure)
