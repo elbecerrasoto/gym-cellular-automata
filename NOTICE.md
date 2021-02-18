@@ -34,6 +34,11 @@ permission notices, disclaimers, and copyright statements.
 + Source: [PyYAML](https://github.com/yaml/pyyaml)
 + License: [MIT](https://github.com/yaml/pyyaml/blob/master/LICENSE)
 
+### svgpath2mpl
+
++ Source: [svgpath2mpl](https://github.com/nvictus/svgpath2mpl)
++ License: [BSD (3-Clause)](https://github.com/nvictus/svgpath2mpl/blob/master/LICENSE)
+
 ## Images
 
 ### Helicopter Icon
