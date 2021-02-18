@@ -9,8 +9,6 @@ permission notices, disclaimers, and copyright statements.
 
 ## Software
 
-    install_requires=["gym", "numpy", "matplotlib", "seaborn", "pyyaml"],
-
 ### OpenAI Gym
 
 + Source: [OpenAI Gym](https://github.com/openai/gym)
@@ -23,7 +21,7 @@ permission notices, disclaimers, and copyright statements.
 
 ### Matplotlib
 
-+ Source: [Matplotlib](https://github.com/numpy/numpy)
++ Source: [Matplotlib](https://github.com/matplotlib/matplotlib)
 + License: [Matplotlib](https://github.com/matplotlib/matplotlib/blob/master/LICENSE/LICENSE)
 
 ### Seaborn
