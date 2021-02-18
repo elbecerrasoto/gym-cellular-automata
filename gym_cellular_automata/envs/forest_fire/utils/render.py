@@ -53,7 +53,7 @@ def plot_grid(grid, title=CONFIG["plot_title"], **kwargs):
     plt.imshow(grid, aspect="equal", cmap=cmap_colors, norm=norm_symbols)
 
     # Title showing Reward
-    plt.title(title, **title_font, color="0.7")
+    plt.title(title, **title_font, color="0.7", size=21)
 
     # Modify Axes
     ax = plt.gca()

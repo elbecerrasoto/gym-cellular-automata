@@ -41,9 +41,9 @@ rewards:
 
 # Cellular Automata rendering options.
 cell_colors:
-  empty: '#ddd1d3ff' # Pink/Soft Red
-  tree:  '#a9c499ff' # Pine Green
-  fire:  '#dfa4a0ff' # Wine Red
+  empty: '#ddd1d3ff' # Gray
+  tree:  '#a9c499ff' # Green
+  fire:  '#dfa4a0ff' # Red
 
 plot_title: 'Forest Fire Environment'
 plot_font:  'Lato' 
