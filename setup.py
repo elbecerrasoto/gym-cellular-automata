@@ -15,7 +15,7 @@ setup(
     author="Emanuel Becerra Soto",
     author_email="elbecerrasoto@gmail.com",
     license="MIT",
-    install_requires=["gym", "numpy", "matplotlib", "seaborn", "pyyaml"],
+    install_requires=["gym", "numpy", "matplotlib", "seaborn", "pyyaml", "svgpath2mpl"],
     tests_require=["pytest"],
     python_requires=">=3.6",
 )
