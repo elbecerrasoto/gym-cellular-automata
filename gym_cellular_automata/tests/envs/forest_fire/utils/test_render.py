@@ -27,9 +27,9 @@ TREE = CONFIG["cell_symbols"]["tree"]
 FIRE = CONFIG["cell_symbols"]["fire"]
 SYMBOLS = EMPTY, TREE, FIRE
 
-COLOR_EMPTY = CONFIG["cell_colors"]["empty"]
-COLOR_TREE = CONFIG["cell_colors"]["tree"]
-COLOR_FIRE = CONFIG["cell_colors"]["fire"]
+COLOR_EMPTY = CONFIG["plot"]["cell_colors"]["empty"]
+COLOR_TREE = CONFIG["plot"]["cell_colors"]["tree"]
+COLOR_FIRE = CONFIG["plot"]["cell_colors"]["fire"]
 
 
 def test_color_ordering():

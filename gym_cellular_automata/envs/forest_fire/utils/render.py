@@ -14,57 +14,98 @@ CONFIG = get_forest_fire_config_dict()
 EMPTY = CONFIG["cell_symbols"]["empty"]
 TREE = CONFIG["cell_symbols"]["tree"]
 FIRE = CONFIG["cell_symbols"]["fire"]
-SYMBOLS = EMPTY, TREE, FIRE
+
+print(f"CONFIG {CONFIG}")
+
+DEFAULT_KWARGS = {
+    "color_empty": CONFIG["plot"]["cell_colors"]["empty"],
+    "color_tree": CONFIG["plot"]["cell_colors"]["tree"],
+    "color_fire": CONFIG["plot"]["cell_colors"]["fire"],
+    "title_size": CONFIG["plot"]["title_size"],
+    "title_color": CONFIG["plot"]["title_color"],
+    "helicopter_size": CONFIG["plot"]["helicopter_size"],
+    "helicopter_color": CONFIG["plot"]["helicopter_color"],
+    "fontname": CONFIG["plot"]["font"],
+}
 
 
-def plot_grid(grid, title=CONFIG["plot_title"], **kwargs):
-    n_row, n_col = grid.shape
+def plot_grid(grid, title=CONFIG["plot"]["title"], **kwargs):
 
-    default_kwargs = {
-        "title_font": {"fontname": CONFIG["plot_font"]},
-        "color_empty": CONFIG["cell_colors"]["empty"],
-        "color_tree": CONFIG["cell_colors"]["tree"],
-        "color_fire": CONFIG["cell_colors"]["fire"],
-    }
+    kwargs = {**DEFAULT_KWARGS, **kwargs}
 
-    kwargs = {**default_kwargs, **kwargs}
-
-    title_font = kwargs["title_font"]
-
-    color_empty = kwargs["color_empty"]
-    color_tree = kwargs["color_tree"]
-    color_fire = kwargs["color_fire"]
-    colors_forest = color_empty, color_tree, color_fire
-
-    symbols_with_colors = zip(SYMBOLS, colors_forest)
-    symbols_with_colors_sorted_by_symbol = sorted(
-        symbols_with_colors, key=itemgetter(0)
+    color_mapping = cell_colors_to_cmap_and_norm(
+        (kwargs["color_empty"], kwargs["color_tree"], kwargs["color_fire"])
     )
-    symbols, colors_forest = zip(*symbols_with_colors_sorted_by_symbol)
-
-    # Mapping from Color to Cell Symbols
-    cmap_colors = colors.ListedColormap(colors_forest)
-    norm_symbols = colors.BoundaryNorm([0, 1, 2, 3], 3)
 
     # Plot style
     sns.set_style("whitegrid")
 
     # Main Plot
-    plt.imshow(grid, aspect="equal", cmap=cmap_colors, norm=norm_symbols)
+    plt.imshow(
+        grid, aspect="equal", cmap=color_mapping["cmap"], norm=color_mapping["norm"]
+    )
 
-    # Title showing Reward
-    plt.title(title, **title_font, color="0.7", size=21)
+    # Title
+    plt.title(
+        title,
+        size=kwargs["title_size"],
+        color=kwargs["title_color"],
+        fontname=kwargs["fontname"],
+    )
 
-    # Modify Axes
-    ax = plt.gca()
+    # Modify Ticks by Axes methods
+    grid_ticks_settings(plt.gca(), n_row=grid.shape[0], n_col=grid.shape[1])
+
+    fig = plt.gcf()
+    return fig
+
+
+def add_helicopter(fig, pos, **kwargs):
+    helicopter = parse_svg_into_mpl(SVG_PATH)
+    kwargs = {**DEFAULT_KWARGS, **kwargs}
+
+    ax = fig.get_axes()[0]
+    row, col = pos
+
+    ax.plot(
+        col,
+        row,
+        marker=helicopter,
+        markersize=kwargs["helicopter_size"],
+        color=kwargs["helicopter_color"],
+        fillstyle="none",
+    )
+
+    return fig
+
+
+def cell_colors_to_cmap_and_norm(colors_forest):
+    """
+    Mappings from Color to Cell Symbols.
+    """
+    symbols = EMPTY, TREE, FIRE
+
+    symbols_with_colors = zip(symbols, colors_forest)
+    symbols_with_colors_sorted_by_symbol = sorted(
+        symbols_with_colors, key=itemgetter(0)
+    )
+    symbols, colors_forest = zip(*symbols_with_colors_sorted_by_symbol)
+
+    return {
+        "cmap": colors.ListedColormap(colors_forest),
+        "norm": colors.BoundaryNorm([0, 1, 2, 3], 3),
+    }
+
+
+def grid_ticks_settings(ax, n_row, n_col):
+
+    # NO Labels for ticks
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
 
     # Major ticks
     ax.set_xticks(np.arange(0, n_col, 1))
     ax.set_yticks(np.arange(0, n_row, 1))
-
-    # Labels for major ticks
-    ax.set_xticklabels([])
-    ax.set_yticklabels([])
 
     # Minor ticks
     ax.set_xticks(np.arange(-0.5, n_col, 1), minor=True)
@@ -73,10 +114,9 @@ def plot_grid(grid, title=CONFIG["plot_title"], **kwargs):
     # Gridlines based on minor ticks
     ax.grid(which="minor", color="whitesmoke", linestyle="-", linewidth=2)
     ax.grid(which="major", color="w", linestyle="-", linewidth=0)
-    ax.tick_params(axis=u"both", which=u"both", length=0)
+    ax.tick_params(axis="both", which="both", length=0)
 
-    fig = plt.gcf()
-    return fig
+    return ax
 
 
 def parse_svg_into_mpl(svg_path):
@@ -92,14 +132,3 @@ def parse_svg_into_mpl(svg_path):
         return mpl_path
 
     return upsidedown(center(mpl_path))
-
-
-def add_helicopter(fig, pos):
-    helicopter = parse_svg_into_mpl(SVG_PATH)
-
-    ax = fig.get_axes()[0]
-    row, col = pos
-
-    ax.plot(col, row, marker=helicopter, markersize=39, color="1", fillstyle="none")
-
-    return fig

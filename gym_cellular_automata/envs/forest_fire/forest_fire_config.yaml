@@ -4,7 +4,7 @@ cell_symbols:
   empty: 0
   tree:  1
   fire:  2
-cell_type: 'uint8'
+cell_type: "uint8"
 
 grid_shape:
   n_row: 5
@@ -14,10 +14,10 @@ ca_params:
   p_fire: 0.033
   p_tree: 0.333
 
-# Modifier's effects
+# Modifier"s effects
 # Change FIRE to EMPTY
 effects:
-  fire: 'empty'
+  fire: "empty"
 
 actions:
   up_left:    1
@@ -29,7 +29,7 @@ actions:
   down_left:  7
   down:       8
   down_right: 9
-action_type: 'uint8'
+action_type: "uint8"
 
 # Steps that the Cellular Automaton remains idle.
 max_freeze: 2
@@ -39,11 +39,15 @@ rewards:
   per_tree:  1.0
   per_fire: -1.0
 
-# Cellular Automata rendering options.
-cell_colors:
-  empty: '#ddd1d3ff' # Gray
-  tree:  '#a9c499ff' # Green
-  fire:  '#dfa4a0ff' # Red
-
-plot_title: 'Forest Fire Environment'
-plot_font:  'Lato' 
+# Rendering options.
+plot:
+  cell_colors:
+    empty: "#ddd1d3ff" # Gray
+    tree:  "#a9c499ff" # Green
+    fire:  "#dfa4a0ff" # Red
+  title: "Forest Fire Environment"
+  title_size: 21
+  title_color: "0.7"
+  helicopter_size: 39
+  helicopter_color: "0.1"
+  font: "Lato"
