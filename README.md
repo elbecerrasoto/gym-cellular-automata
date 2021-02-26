@@ -72,7 +72,7 @@ As the library is still on early development there is a dire need of everything!
 
 We aim to have a _zoo_ of Cellular Automata Environments. Thus of particular importance is adding more.
 
-This projects adheres to the following practices:
+This project adheres to the following practices:
 
 + Worflow: [GitHub flow](https://guides.github.com/introduction/flow/)
 + Style: [Black](https://github.com/psf/black)
