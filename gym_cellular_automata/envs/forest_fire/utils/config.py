@@ -106,3 +106,6 @@ def parse_type(type_str):
 
     else:
         return int
+
+
+CONFIG = get_forest_fire_config_dict()

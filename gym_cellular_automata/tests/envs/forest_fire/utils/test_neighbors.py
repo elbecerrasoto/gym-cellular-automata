@@ -6,11 +6,7 @@ from gym_cellular_automata.envs.forest_fire.utils.neighbors import (
     are_my_neighbors_a_boundary,
 )
 
-from gym_cellular_automata.envs.forest_fire.utils.config import (
-    get_forest_fire_config_dict,
-)
-
-CONFIG = get_forest_fire_config_dict()
+from gym_cellular_automata.envs.forest_fire.utils.config import CONFIG
 
 ROW = CONFIG["grid_shape"]["n_row"]
 COL = CONFIG["grid_shape"]["n_row"]

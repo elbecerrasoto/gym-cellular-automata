@@ -11,10 +11,8 @@ from .operators import (
     ForestFireModifier,
     ForestFireCoordinator,
 )
-from .utils.config import get_forest_fire_config_dict
+from .utils.config import CONFIG
 from .utils.render import plot_grid, add_helicopter
-
-CONFIG = get_forest_fire_config_dict()
 
 CELL_STATES = CONFIG["cell_states"]
 

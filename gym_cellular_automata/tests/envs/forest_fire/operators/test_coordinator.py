@@ -1,3 +1,5 @@
+import pytest
+
 from collections import Counter
 from gym import spaces
 import numpy as np
@@ -7,11 +9,7 @@ from gym_cellular_automata.envs.forest_fire.operators import (
     ForestFireModifier,
     ForestFireCoordinator,
 )
-from gym_cellular_automata.envs.forest_fire.utils.config import (
-    get_forest_fire_config_dict,
-)
-
-CONFIG = get_forest_fire_config_dict()
+from gym_cellular_automata.envs.forest_fire.utils.config import CONFIG
 
 EMPTY = CONFIG["cell_symbols"]["empty"]
 TREE = CONFIG["cell_symbols"]["tree"]
@@ -33,13 +31,15 @@ POS_SPACE = spaces.MultiDiscrete([ROW, COL])
 ACTION_SPACE = spaces.Box(1, 9, shape=tuple(), dtype=np.uint8)
 
 
-def instantiate_cellular_automaton():
+@pytest.fixture
+def cellular_automaton():
     return ForestFireCellularAutomaton(
         grid_space=GRID_SPACE, action_space=ACTION_SPACE, context_space=CA_PARAMS_SPACE
     )
 
 
-def instantiate_modifier():
+@pytest.fixture
+def modifier():
     return ForestFireModifier(
         EFFECTS,
         grid_space=GRID_SPACE,
@@ -48,15 +48,13 @@ def instantiate_modifier():
     )
 
 
-def instantiate_coordinator():
-    cellular_automaton = instantiate_cellular_automaton()
-    modifier = instantiate_modifier()
-
+@pytest.fixture
+def coordinator(cellular_automaton, modifier):
     return ForestFireCoordinator(cellular_automaton, modifier, max_freeze=MAX_FREEZE)
 
 
-def sample_coordinator_input():
-    coordinator = instantiate_coordinator()
+@pytest.fixture
+def sample_coordinator_input(coordinator):
 
     grid = coordinator.grid_space.sample()
     action = coordinator.action_space.sample()
@@ -76,15 +74,14 @@ def context_with_custom_freeze(custom=1):
 # ------------ Tests
 
 
-def test_API(operator=instantiate_coordinator()):
+def test_API(coordinator):
     from gym_cellular_automata.tests import test_Operator_API_specifications
 
-    test_Operator_API_specifications(operator)
+    test_Operator_API_specifications(coordinator)
 
 
-def test_coordinator_output():
-    coordinator = instantiate_coordinator()
-    grid, action, context = sample_coordinator_input()
+def test_coordinator_output(coordinator, sample_coordinator_input):
+    grid, action, context = sample_coordinator_input
 
     new_grid, new_context = coordinator(grid, action, context)
 
@@ -92,10 +89,8 @@ def test_coordinator_output():
     assert coordinator.context_space.contains(new_context)
 
 
-def test_coordinator_with_only_modifier():
-    coordinator = instantiate_coordinator()
-
-    grid, action, context = sample_coordinator_input()
+def test_coordinator_with_only_modifier(coordinator, sample_coordinator_input):
+    grid, action, context = sample_coordinator_input
 
     context = context_with_custom_freeze(1)
     ca_params, pos, freeze = context
@@ -112,10 +107,11 @@ def test_coordinator_with_only_modifier():
     assert how_many_changed[True] <= 1
 
 
-def test_coordinator_update_with_cellular_automaton_and_modifier():
-    coordinator = instantiate_coordinator()
+def test_coordinator_update_with_cellular_automaton_and_modifier(
+    coordinator, sample_coordinator_input
+):
     max_freeze = coordinator.max_freeze
-    grid, action, context = sample_coordinator_input()
+    grid, action, context = sample_coordinator_input
 
     context = context_with_custom_freeze(0)
 

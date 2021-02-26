@@ -7,11 +7,7 @@ from gym_cellular_automata.envs.forest_fire.utils.render import (
     plot_grid,
     add_helicopter,
 )
-from gym_cellular_automata.envs.forest_fire.utils.config import (
-    get_forest_fire_config_dict,
-)
-
-CONFIG = get_forest_fire_config_dict()
+from gym_cellular_automata.envs.forest_fire.utils.config import CONFIG
 
 CELL_STATES = CONFIG["cell_states"]
 

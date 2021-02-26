@@ -6,13 +6,9 @@ from gym import spaces
 
 import gym_cellular_automata
 from gym_cellular_automata.envs.forest_fire import ForestFireEnv
-from gym_cellular_automata.envs.forest_fire.utils.config import (
-    get_forest_fire_config_dict,
-)
+from gym_cellular_automata.envs.forest_fire.utils.config import CONFIG
 
 RANDOM_POLICY_ITERATIONS = 12
-
-CONFIG = get_forest_fire_config_dict()
 
 ROW = CONFIG["grid_shape"]["n_row"]
 COL = CONFIG["grid_shape"]["n_row"]
@@ -141,6 +137,10 @@ def test_forest_fire_env_with_random_policy(env, reward_space):
         obs, reward, done, info = env.step(action)
 
         assert_observation_and_reward_spaces(env, obs, reward, reward_space)
+
+
+def test_forest_fire_env_hit_info():
+    pass
 
 
 def manual_assesment(verbose=False):

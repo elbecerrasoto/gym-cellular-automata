@@ -4,9 +4,7 @@ from gym import spaces
 from gym_cellular_automata import Operator
 
 from ..utils.neighbors import neighborhood_at
-from ..utils.config import get_forest_fire_config_dict
-
-CONFIG = get_forest_fire_config_dict()
+from ..utils.config import CONFIG
 
 # ------------ Forest Fire Cellular Automaton
 

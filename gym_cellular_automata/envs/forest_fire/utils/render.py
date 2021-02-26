@@ -7,15 +7,12 @@ import seaborn as sns
 from svgpath2mpl import parse_path
 
 from .helicopter_shape import SVG_PATH
-from .config import get_forest_fire_config_dict
-
-CONFIG = get_forest_fire_config_dict()
+from .config import CONFIG
 
 EMPTY = CONFIG["cell_symbols"]["empty"]
 TREE = CONFIG["cell_symbols"]["tree"]
 FIRE = CONFIG["cell_symbols"]["fire"]
 
-print(f"CONFIG {CONFIG}")
 
 DEFAULT_KWARGS = {
     "color_empty": CONFIG["plot"]["cell_colors"]["empty"],

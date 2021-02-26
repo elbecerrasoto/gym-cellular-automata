@@ -42,12 +42,12 @@ rewards:
 # Rendering options.
 plot:
   cell_colors:
-    empty: "#ddd1d3ff" # Gray
-    tree:  "#a9c499ff" # Green
-    fire:  "#dfa4a0ff" # Red
+    empty: "#DDD1D3" # Gray
+    tree:  "#A9C499" # Green
+    fire:  "#DFA4A0" # Red
   title: "Forest Fire Environment"
   title_size: 21
-  title_color: "0.7"
+  title_color: "#B3B3B3"
   helicopter_size: 39
-  helicopter_color: "0.1"
+  helicopter_color: "#FFFFFF"
   font: "Lato"

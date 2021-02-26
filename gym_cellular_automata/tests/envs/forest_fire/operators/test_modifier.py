@@ -2,11 +2,7 @@ import pytest
 import numpy as np
 
 from gym_cellular_automata.envs.forest_fire.operators import ForestFireModifier
-from gym_cellular_automata.envs.forest_fire.utils.config import (
-    get_forest_fire_config_dict,
-)
-
-CONFIG = get_forest_fire_config_dict()
+from gym_cellular_automata.envs.forest_fire.utils.config import CONFIG
 
 TEST_GRID = np.array([[2, 2, 2], [2, 2, 2], [2, 2, 2]], dtype=np.uint8)
 

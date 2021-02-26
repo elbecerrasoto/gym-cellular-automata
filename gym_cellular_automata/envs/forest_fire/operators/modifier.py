@@ -3,9 +3,7 @@ from gym import spaces
 
 from gym_cellular_automata import Operator
 from ..utils.neighbors import are_my_neighbors_a_boundary
-from ..utils.config import get_forest_fire_config_dict
-
-CONFIG = get_forest_fire_config_dict()
+from ..utils.config import CONFIG
 
 ACTION_UP_LEFT = CONFIG["actions"]["up_left"]
 ACTION_UP = CONFIG["actions"]["up"]
