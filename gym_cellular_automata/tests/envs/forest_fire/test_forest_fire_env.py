@@ -9,6 +9,8 @@ from gym_cellular_automata.envs.forest_fire import ForestFireEnv
 from gym_cellular_automata.envs.forest_fire.utils.config import CONFIG
 
 RANDOM_POLICY_ITERATIONS = 12
+TEST_GRID_ROWS = 3
+TEST_GRID_COLS = 3
 
 ROW = CONFIG["grid_shape"]["n_row"]
 COL = CONFIG["grid_shape"]["n_row"]
@@ -27,6 +29,12 @@ REWARD_PER_FIRE = CONFIG["rewards"]["per_fire"]
 
 REWARD_TYPE = np.float32
 CELL_TYPE = CONFIG["cell_type"]
+ACTION_TYPE = CONFIG["action_type"]
+
+FIRE = CONFIG["cell_symbols"]["fire"]
+
+P_FIRE = CONFIG["ca_params"]["p_fire"]
+P_TREE = CONFIG["ca_params"]["p_tree"]
 
 
 @pytest.fixture
@@ -37,7 +45,8 @@ def env():
 
 @pytest.fixture
 def all_fire_grid():
-    return np.array([[2, 2, 2], [2, 2, 2], [2, 2, 2]], dtype=CELL_TYPE)
+    fire = np.array(FIRE, dtype=CELL_TYPE)
+    return np.repeat(fire, TEST_GRID_ROWS*TEST_GRID_COLS).reshape((TEST_GRID_ROWS, TEST_GRID_COLS))
 
 
 def set_env_with_custom_state(env, grid, context):
@@ -139,9 +148,35 @@ def test_forest_fire_env_with_random_policy(env, reward_space):
         assert_observation_and_reward_spaces(env, obs, reward, reward_space)
 
 
-def test_forest_fire_env_hit_info():
-    pass
+def test_forest_fire_env_hit_info(env, all_fire_grid):
+    
+    def set_up_env():
+        env.reset()
 
+        ca_params = np.array(P_FIRE, P_TREE)
+        pos = np.array([0, 0], dtype=ACTION_TYPE)
+        freeze = 3
+        context = ca_params, pos, freeze
+        
+        env = set_env_with_custom_state(env, all_fire_grid.copy(), context)
+
+    def assert_hit_right_notmove_down():
+        obs, reward, done, info = env.action(ACTION_RIGHT)
+        
+        assert info['hit'] is True
+        
+        obs, reward, done, info = env.action(ACTION_NOT_MOVE)
+        
+        assert info['hit'] is False
+    
+        obs, reward, done, info = env.action(ACTION_DOWN)
+        
+        assert info['hit'] is True
+
+    def hit_flag_robustness_to_env_resets(repeat=2):
+        for i in range(repeat):
+            set_up_env()
+            assert_hit_right_notmove_down()
 
 def manual_assesment(verbose=False):
     from time import sleep

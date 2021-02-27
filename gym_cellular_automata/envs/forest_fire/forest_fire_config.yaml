@@ -47,7 +47,7 @@ plot:
     fire:  "#DFA4A0" # Red
   title: "Forest Fire Environment"
   title_size: 21
-  title_color: "#B3B3B3"
+  title_color: "#B3B3B3" # Gray 70%
   helicopter_size: 39
-  helicopter_color: "#FFFFFF"
+  helicopter_color: "#FFFFFF" # White
   font: "Lato"
