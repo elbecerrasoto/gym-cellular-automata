@@ -7,32 +7,71 @@ from gym_cellular_automata import Operator
 # from ..utils.config import CONFIG
 
 # Inwards semantics (towards tree)
-WIND = [[0.12, 0.24, 0.48],
-        [0.06, 0.00, 0.24],
-        [0.06, 0.06, 0.12]]
-
-WIND = np.array(WIND, dtype = np.float64)
-
-uniform_space = spaces.Box(low=0.0, high=1.0, shape=(3, 3), dtype=np.float64)
-uniform_roll = uniform_space.sample()
-
-# propagation_success
-# masked_wind > sampled
-
-
-neighbors_ = (0, 0, 2,
-              1, 1, 2,
-              1, 1, 2) 
 
 EMPTY = 0
 TREE = 1
-FIRE = 2
+FIRE = 10
 
-neighbors = np.array(neighbors_, dtype=np.uint8).reshape(3, 3)
 
-active_wind = WIND.copy()
+WIND = [[1.00, 0.60, 1.00], [0.06, 0.00, 0.24], [0.06, 0.06, 0.12]]
 
-active_wind[neighbors == FIRE] *= 0.0
+WIND = np.array(WIND, dtype=np.float64)
+
+uniform_space = spaces.Box(low=0.0, high=1.0, shape=(3, 3), dtype=np.float64)
+
+
+# ------------ Sample just one per update
+
+
+uniform_roll = uniform_space.sample()
+
+failed_propagations = np.repeat(False, 3 * 3).reshape(3, 3)
+failed_propagations = WIND <= uniform_roll
+
+
+# ------------ Get the kernel
+
+
+IDENTITY = 2 ** 10
+PROPAGATION = 2 ** 5
+
+tree_break = TREE * IDENTITY
+fire_break = FIRE * IDENTITY
+
+non_propagation = TREE * IDENTITY + 8 * TREE * PROPAGATION
+propagate = TREE * IDENTITY + FIRE * PROPAGATION
+
+breaks = tree_break, non_propagation, propagate, fire_break
+
+# changing the kernel on each update
+# First get the kernel
+# pytorch stuff is pretty easy
+
+ROW_KERNEL = 3
+COL_KERNEL = 3
+
+kernel = np.repeat(PROPAGATION, 3 * 3).reshape(3, 3)
+
+
+kernel[failed_propagations] = 0
+
+kernel[1, 1] = IDENTITY
+
+
+# ------------ Test on a random grid
+
+
+cell_values = np.array([EMPTY, TREE, FIRE], dtype=np.uint8)
+
+ROW = 8
+COL = 8
+random_grid = np.random.choice(
+    cell_values, size=ROW * COL, p=[0.20, 0.70, 0.10]
+).reshape(ROW, COL)
+
+
+random_grid
+
 
 # ------------ Forest Fire Cellular Automaton
 
@@ -65,11 +104,7 @@ class ForestFireCellularAutomaton(Operator):
 
                 if cell == self.tree:
                     # Which fires succesfully propagates.
-                    
-                        
-                        pass
-                    
-                    new_grid[row][col] = self.fire
+                    pass
 
                 elif cell == self.fire:
                     # Consume fire at each step
@@ -79,44 +114,3 @@ class ForestFireCellularAutomaton(Operator):
                     continue
 
         return new_grid, context
-
-
-
-
-
-
-    Neighbors = namedtuple(
-        "Neighbors",
-        [
-            "up_left",
-            "up",
-            "up_right",
-            "left",
-            "self",
-            "right",
-            "down_left",
-            "down",
-            "down_right",
-        ],
-    )
-
-    return Neighbors(
-        up_left, up, up_right, left, self, right, down_left, down, down_right,
-    )
-
-
-
-
-strike = np.random.choice([True, False], 1, p=[p_fire, 1 - p_fire])[
-    0
-]
-new_grid[row][col] = self.fire if strike else cell
-
-# why the underscore though
-# np.bool_
-type(np.random.choice([True, False], p=[0.8, 0.2]))
-
-def propagation_prob(neighbors):
-    for neighbor in neighbors:
-        
-
