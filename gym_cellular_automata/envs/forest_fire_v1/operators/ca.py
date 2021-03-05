@@ -1,3 +1,7 @@
+from functools import reduce
+from operator import mul
+from collections import namedtuple
+
 import numpy as np
 from scipy.signal import convolve2d
 from gym import spaces
@@ -7,12 +11,31 @@ from gym_cellular_automata import Operator
 """
 + $e < t < f \in \mathbb{R}_+$
 + $I, P \in \mathbb{R}_+$
++ $I >> P$
 
 > $eI + 8fP < tI < tI + 8tP < tI + fP < tI + 8tP < fI$
 
 1. $tI + 8tP < tI + fP$
 2. $8tP < fP$
 3. $8t < f$
+"""
+
+
+"""
+### Advantages
+0. Analogic world tricks (voting and stuff)
+1. It gets rid of annoying get_neighbors utilities
+2. It is fast
+3. GPU?
+4. Piggybacking on robust libraries
+5. Deeper Understanding of Forest Fire
+
+### Disadvantages
+1. Complexity (coding, intuition)
+2. Probs are fixed on each 1 step Update (just 1 sampling event)
+3. Discretization gets difficult with many states and complex update logic
+4. Complexity can be turn down by adding filters, still this probably is faster
+    than an idented double for loop over python data structures.
 """
 
 # ------------ Globals
@@ -28,95 +51,159 @@ ROW = 8
 COL = 8
 
 # Signal Weights
-IDENTITY = 2 ** 10
-PROPAGATION = 2 ** 5
+BASE = 2
 
+I_EXP = 10
+P_EXP = 3
+
+IDENTITY = BASE ** I_EXP
+PROPAGATION = BASE ** P_EXP
+
+
+def assert_weights_relationships():
+    assert EMPTY*IDENTITY + 8*FIRE*PROPAGATION < TREE*IDENTITY, "empty / tree"
+    assert TREE*IDENTITY < TREE*IDENTITY + 8*TREE*PROPAGATION, "keep / keep"
+    assert TREE*IDENTITY + 8*TREE*PROPAGATION < TREE*IDENTITY + FIRE*PROPAGATION, "keep / burn"
+    assert TREE*IDENTITY + FIRE*PROPAGATION < TREE*IDENTITY + 8*FIRE*PROPAGATION, "burn / burn"
+    assert TREE*IDENTITY + 8*FIRE*PROPAGATION < FIRE*IDENTITY, "burn / consume"
+
+
+assert_weights_relationships()
+
+
+# fmt: off
 # Inwards semantics (towards tree)
 WIND = [[1.00, 1.00, 1.00],
         [1.00, 0.00, 1.00],
         [1.00, 1.00, 1.00]]
+# fmt: on
+
 WIND = np.array(WIND, dtype=np.float64)
 
 # Kernel Size
 ROW_K = 3
 COL_K = 3
 
-# ------------ Run test
 
-# ------------ Sampling
+# ------------ Breaks
 
 
-uniform_space = spaces.Box(low=0.0, high=1.0, shape=(3, 3), dtype=np.float64)
-uniform_roll = uniform_space.sample()
+def get_breaks():
+    """ 3 breaks needed for 4 actions.
+    empty < keep < burn < consume
+    """
+    keep_break = TREE * IDENTITY
+    burn_break = TREE * IDENTITY + FIRE * PROPAGATION
+    consume_break = FIRE * IDENTITY
 
-failed_propagations = np.repeat(False, 3 * 3).reshape(3, 3)
-failed_propagations = WIND <= uniform_roll
+    Breaks = namedtuple("Breaks", ["keep_break", "burn_break", "consume_break"])
 
-# ------------ Get kernel for 1-step update
+    return Breaks(keep_break, burn_break, consume_break)
 
-# Breaks
-tree_break = TREE * IDENTITY
-fire_break = FIRE * IDENTITY
+BREAKS = get_breaks()
 
-non_propagation = TREE * IDENTITY + 8 * TREE * PROPAGATION
-propagate = TREE * IDENTITY + FIRE * PROPAGATION
+# ------------ Utils
 
-kernel = np.repeat(PROPAGATION, ROW_K * COL_K).reshape(ROW_K, COL_K)
-kernel[failed_propagations] = 0
-kernel[1, 1] = IDENTITY
+
+def get_failed_propagations_mask():
+    """
+    Here goes the only sampling of the step.
+    """
+    uniform_space = spaces.Box(low=0.0, high=1.0, shape=(ROW_K, COL_K), dtype=np.float64)
+    uniform_roll = uniform_space.sample()
+    
+    failed_propagations = np.repeat(False, ROW_K * COL_K).reshape(ROW_K, COL_K)
+    failed_propagations = WIND <= uniform_roll
+    
+    return failed_propagations
 
 
 def get_kernel(failed_propagations):
     kernel = np.repeat(PROPAGATION, ROW_K * COL_K).reshape(ROW_K, COL_K)
+    
     kernel[failed_propagations] = EMPTY
     kernel[1, 1] = IDENTITY
+    
     return kernel
 
 
-# ------------ Convs with scipy
+def convolve(grid, kernel):
+    return convolve2d(grid, kernel, mode='same', boundary='fill', fillvalue=EMPTY)
+    
 
-convolved = convolve2d(grid, kernel, mode='same', boundary='fill', fillvalue=0)
+def get_breaks():
+    """ 3 breaks needed for 4 actions.
+    empty < keep < burn < consume
+    """
+    keep_break = TREE * IDENTITY
+    burn_break = TREE * IDENTITY + FIRE * PROPAGATION
+    consume_break = FIRE * IDENTITY
 
-# Init on empty by default
-empty = np.array(EMPTY, dtype=np.uint8)
-new_grid = np.repeat(empty, ROW*COL).reshape(ROW, COL)
+    Breaks = namedtuple("Breaks", ["keep_break", "burn_break", "consume_break"])
 
-# Keep Tree
-keep_tree = np.logical_and(convolved >= tree_break, convolved < non_propagation)
-
-# Burn Tree
-burn_tree = np.logical_and(convolved >= non_propagation, convolved < propagate)
-
-# Consume Fire
-consume_fire = convolved >= fire_break
-
-# ------------ Translate
-
-# Keep Tree
-new_grid[keep_tree] = TREE
-
-# Burn Tree
-new_grid[burn_tree] = FIRE
-
-# Consume Fire
-new_grid[consume_fire] = EMPTY
-
-# ------------ Manual Assess
-
-grid
-
-new_grid
+    return Breaks(keep_break, burn_break, consume_break)
 
 
-# ------------ Random grid
+def translate_analogic_to_discrete(grid, breaks):
+    # Init on empty by default
+    empty = np.array(EMPTY, dtype=np.uint8)
+    new_grid = np.repeat(empty, ROW*COL).reshape(ROW, COL)
+    
+    # 4 Actions to carry out:
+    
+    # 1. Do nothing on EMPTYs
+    # Implicitly defined by default values
+    # empty_mask = grid < breaks.keep_break
+    # new_grid[empty_mask] = EMPTY
 
-cell_values = np.array([EMPTY, TREE, FIRE], dtype=np.uint8)
+    # 2. Keep some TREEs
+    keep_mask = np.logical_and(grid >= breaks.keep_break, grid < breaks.burn_break)
+    new_grid[keep_mask] = TREE
+    
+    # 3. Burn the remaining TREEs
+    burn_mask = np.logical_and(grid >= breaks.burn_break, grid < breaks.consume_break)
+    new_grid[burn_mask] = FIRE
+    
+    # 4. Consume the FIREs
+    consume_mask = grid >= breaks.consume_break
+    new_grid[consume_mask] = EMPTY    
 
-random_grid = np.random.choice(
-    cell_values, size=ROW * COL, p=[0.20, 0.70, 0.10]
-).reshape(ROW, COL)
+    return new_grid
 
-grid = random_grid
+
+# ------------ 1-step CA update
+
+def update(grid):
+    # Sample Wind
+    fail_to_propagate = get_failed_propagations_mask()
+    
+    kernel = get_kernel(fail_to_propagate)
+
+    grid_signal = convolve(grid, kernel)
+
+    return translate_analogic_to_discrete(grid_signal, BREAKS)
+
+
+# ------------ Sample Run
+
+
+def get_random_grid(shape=(ROW, COL), probs=[0.20, 0.70, 0.10], dtype=np.uint8):
+    cell_values = np.array([EMPTY, TREE, FIRE], dtype=dtype)
+    size = reduce(mul, shape)
+    
+    return np.random.choice(cell_values, size=size, p=probs).reshape(shape)
+
+
+def main():
+
+    grid = get_random_grid()
+    
+    for i in range(12):
+        print(f'Grid at time {i}\n{grid}\n\n')
+        grid = update(grid)
+
+
+main()
 
 # ------------ Forest Fire Cellular Automaton
 
