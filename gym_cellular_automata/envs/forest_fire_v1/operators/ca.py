@@ -1,77 +1,122 @@
 import numpy as np
+from scipy.signal import convolve2d
 from gym import spaces
 
 from gym_cellular_automata import Operator
 
-# from ..utils.neighbors import neighborhood_at
-# from ..utils.config import CONFIG
+"""
++ $e < t < f \in \mathbb{R}_+$
++ $I, P \in \mathbb{R}_+$
 
-# Inwards semantics (towards tree)
+> $eI + 8fP < tI < tI + 8tP < tI + fP < tI + 8tP < fI$
 
+1. $tI + 8tP < tI + fP$
+2. $8tP < fP$
+3. $8t < f$
+"""
+
+# ------------ Globals
+
+
+# Cell Values
 EMPTY = 0
 TREE = 1
 FIRE = 10
 
+# Test Grid Size
+ROW = 8
+COL = 8
 
-WIND = [[1.00, 0.60, 1.00], [0.06, 0.00, 0.24], [0.06, 0.06, 0.12]]
+# Signal Weights
+IDENTITY = 2 ** 10
+PROPAGATION = 2 ** 5
 
+# Inwards semantics (towards tree)
+WIND = [[1.00, 1.00, 1.00],
+        [1.00, 0.00, 1.00],
+        [1.00, 1.00, 1.00]]
 WIND = np.array(WIND, dtype=np.float64)
 
+# Kernel Size
+ROW_K = 3
+COL_K = 3
+
+# ------------ Run test
+
+# ------------ Sampling
+
+
 uniform_space = spaces.Box(low=0.0, high=1.0, shape=(3, 3), dtype=np.float64)
-
-
-# ------------ Sample just one per update
-
-
 uniform_roll = uniform_space.sample()
 
 failed_propagations = np.repeat(False, 3 * 3).reshape(3, 3)
 failed_propagations = WIND <= uniform_roll
 
+# ------------ Get kernel for 1-step update
 
-# ------------ Get the kernel
-
-
-IDENTITY = 2 ** 10
-PROPAGATION = 2 ** 5
-
+# Breaks
 tree_break = TREE * IDENTITY
 fire_break = FIRE * IDENTITY
 
 non_propagation = TREE * IDENTITY + 8 * TREE * PROPAGATION
 propagate = TREE * IDENTITY + FIRE * PROPAGATION
 
-breaks = tree_break, non_propagation, propagate, fire_break
-
-# changing the kernel on each update
-# First get the kernel
-# pytorch stuff is pretty easy
-
-ROW_KERNEL = 3
-COL_KERNEL = 3
-
-kernel = np.repeat(PROPAGATION, 3 * 3).reshape(3, 3)
-
-
+kernel = np.repeat(PROPAGATION, ROW_K * COL_K).reshape(ROW_K, COL_K)
 kernel[failed_propagations] = 0
-
 kernel[1, 1] = IDENTITY
 
 
-# ------------ Test on a random grid
+def get_kernel(failed_propagations):
+    kernel = np.repeat(PROPAGATION, ROW_K * COL_K).reshape(ROW_K, COL_K)
+    kernel[failed_propagations] = EMPTY
+    kernel[1, 1] = IDENTITY
+    return kernel
 
+
+# ------------ Convs with scipy
+
+convolved = convolve2d(grid, kernel, mode='same', boundary='fill', fillvalue=0)
+
+# Init on empty by default
+empty = np.array(EMPTY, dtype=np.uint8)
+new_grid = np.repeat(empty, ROW*COL).reshape(ROW, COL)
+
+# Keep Tree
+keep_tree = np.logical_and(convolved >= tree_break, convolved < non_propagation)
+
+# Burn Tree
+burn_tree = np.logical_and(convolved >= non_propagation, convolved < propagate)
+
+# Consume Fire
+consume_fire = convolved >= fire_break
+
+# ------------ Translate
+
+# Keep Tree
+new_grid[keep_tree] = TREE
+
+# Burn Tree
+new_grid[burn_tree] = FIRE
+
+# Consume Fire
+new_grid[consume_fire] = EMPTY
+
+# ------------ Manual Assess
+
+grid
+
+new_grid
+
+
+# ------------ Random grid
 
 cell_values = np.array([EMPTY, TREE, FIRE], dtype=np.uint8)
 
-ROW = 8
-COL = 8
 random_grid = np.random.choice(
     cell_values, size=ROW * COL, p=[0.20, 0.70, 0.10]
 ).reshape(ROW, COL)
 
-
-random_grid
-
+grid = random_grid
 
 # ------------ Forest Fire Cellular Automaton
 
