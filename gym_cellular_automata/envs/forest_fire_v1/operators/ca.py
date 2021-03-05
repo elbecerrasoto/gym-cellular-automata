@@ -1,5 +1,3 @@
-from functools import reduce
-from operator import mul
 from collections import namedtuple
 
 import numpy as np
@@ -102,6 +100,39 @@ def get_breaks():
 
 BREAKS = get_breaks()
 
+
+# ------------ 1-step CA update
+
+def update(grid):
+    # Sample Wind
+    fail_to_propagate = get_failed_propagations_mask()
+    
+    kernel = get_kernel(fail_to_propagate)
+
+    grid_signal = convolve(grid, kernel)
+
+    return translate_analogic_to_discrete(grid_signal, BREAKS)
+
+
+# ------------ Forest Fire Cellular Automaton
+
+
+class WindyForestFireCA(Operator):
+    is_composition = False
+
+    def __init__(self, grid_space=None, action_space=None, context_space=None):
+
+        if context_space is None:
+            context_space = spaces.Box(0.0, 1.0, shape=(2,))
+
+        self.grid_space = grid_space
+        self.action_space = action_space
+        self.context_space = context_space
+
+    def update(self, grid, action, context=None):
+        return update(grid), context
+
+
 # ------------ Utils
 
 
@@ -170,79 +201,3 @@ def translate_analogic_to_discrete(grid, breaks):
 
     return new_grid
 
-
-# ------------ 1-step CA update
-
-def update(grid):
-    # Sample Wind
-    fail_to_propagate = get_failed_propagations_mask()
-    
-    kernel = get_kernel(fail_to_propagate)
-
-    grid_signal = convolve(grid, kernel)
-
-    return translate_analogic_to_discrete(grid_signal, BREAKS)
-
-
-# ------------ Sample Run
-
-
-def get_random_grid(shape=(ROW, COL), probs=[0.20, 0.70, 0.10], dtype=np.uint8):
-    cell_values = np.array([EMPTY, TREE, FIRE], dtype=dtype)
-    size = reduce(mul, shape)
-    
-    return np.random.choice(cell_values, size=size, p=probs).reshape(shape)
-
-
-def main():
-
-    grid = get_random_grid()
-    
-    for i in range(12):
-        print(f'Grid at time {i}\n{grid}\n\n')
-        grid = update(grid)
-
-
-main()
-
-# ------------ Forest Fire Cellular Automaton
-
-
-class ForestFireCellularAutomaton(Operator):
-    is_composition = False
-
-    empty = CONFIG["cell_symbols"]["empty"]
-    tree = CONFIG["cell_symbols"]["tree"]
-    fire = CONFIG["cell_symbols"]["fire"]
-
-    def __init__(self, grid_space=None, action_space=None, context_space=None):
-
-        if context_space is None:
-            context_space = spaces.Box(0.0, 1.0, shape=(2,))
-
-        self.grid_space = grid_space
-        self.action_space = action_space
-        self.context_space = context_space
-
-    def update(self, grid, action, context):
-        # A copy is needed for the sequential update of a CA
-        new_grid = grid.copy()
-        p_fire, p_tree = context
-
-        for row, cells in enumerate(grid):
-            for col, cell in enumerate(cells):
-
-                neighbors = neighborhood_at(grid, pos=(row, col), invariant=self.empty)
-
-                if cell == self.tree:
-                    # Which fires succesfully propagates.
-                    pass
-
-                elif cell == self.fire:
-                    # Consume fire at each step
-                    new_grid[row][col] = self.empty
-
-                else:
-                    continue
-
-        return new_grid, context
