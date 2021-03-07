@@ -42,7 +42,10 @@ class Bulldozer(Operator):
         self.effects = effects
 
         if action_space is None:
-            action_space = spaces.MultiDiscrete(len(CONFIG["actions"]["movement"]), len(CONFIG["actions"]["shooting"]))
+            action_space = spaces.MultiDiscrete([
+                len(CONFIG["actions"]["movement"]),
+                len(CONFIG["actions"]["shooting"])
+            ])
 
         self.grid_space = grid_space
         self.action_space = action_space
@@ -50,6 +53,10 @@ class Bulldozer(Operator):
 
 
     def update(self, grid, action, context):
+
+        if not self.action_space.contains(action):
+            raise ValueError(f"action: {action} does not belong to {self.action_space}")
+
         
         position = context
         
@@ -68,11 +75,6 @@ class Bulldozer(Operator):
 
 
     def _move(self, grid, action, pos):
-        action = np.array(action)
-
-        if not self.action_space.contains(action):
-            raise ValueError(f"action: {action} does not belong to {self.action_space}")
-
         row, col = pos
 
         is_boundary = are_my_neighbors_a_boundary(grid, pos)

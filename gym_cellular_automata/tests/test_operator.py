@@ -1,16 +1,10 @@
-import pytest
 import inspect
 from gym import spaces
 
 from gym_cellular_automata import Operator
 
 
-@pytest.fixture
-def operator():
-    return Operator()
-
-
-def test_Operator_API_specifications(operator):
+def test_Operator_API_specifications(operator = Operator()):
 
     assert isinstance(operator, Operator)
 
