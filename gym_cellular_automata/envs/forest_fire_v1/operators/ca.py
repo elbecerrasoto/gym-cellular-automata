@@ -81,20 +81,6 @@ def get_breaks():
 BREAKS = get_breaks()
 
 
-# ------------ 1-step CA update
-
-
-def UPDATE(grid):
-    # Sample Wind
-    fail_to_propagate = get_failed_propagations_mask()
-    
-    kernel = get_kernel(fail_to_propagate)
-
-    grid_signal = convolve(grid, kernel)
-
-    return translate_analogic_to_discrete(grid_signal, BREAKS)
-
-
 # ------------ Forest Fire Cellular Automaton
 
 
@@ -102,7 +88,7 @@ class WindyForestFire(Operator):
     is_composition = False
 
     def __init__(self, grid_space=None, action_space=None, context_space=None):
-
+        
         if context_space is None:
             context_space = spaces.Box(0.0, 1.0, shape=(3, 3), dtype=WIND_TYPE)
 
@@ -110,14 +96,24 @@ class WindyForestFire(Operator):
         self.action_space = action_space
         self.context_space = context_space
 
-    def update(self, grid, action=None, context=None):
-        return UPDATE(grid), context
+    def update(self, grid, action, context):
+        # Context contains Wind parameters 
+        # Sample which FIREs fail to propagate this update
+        fail_to_propagate = get_failed_propagations_mask(context)
+        
+        kernel = get_kernel(fail_to_propagate)
+    
+        grid_signal = convolve(grid, kernel)
+        
+        new_grid = translate_analogic_to_discrete(grid_signal, BREAKS)
+    
+        return new_grid, context
 
 
 # ------------ Utils
 
 
-def get_failed_propagations_mask():
+def get_failed_propagations_mask(wind):
     """
     Here goes the only sampling of the step.
     """
@@ -125,8 +121,8 @@ def get_failed_propagations_mask():
     uniform_roll = uniform_space.sample()
     
     failed_propagations = np.repeat(False, ROW_K * COL_K).reshape(ROW_K, COL_K)
-    failed_propagations = WIND <= uniform_roll
-    
+    failed_propagations = wind <= uniform_roll
+   
     return failed_propagations
 
 
@@ -150,7 +146,7 @@ def translate_analogic_to_discrete(grid, breaks):
     empty = np.array(EMPTY, dtype=CELL_TYPE)
     new_grid = np.repeat(empty, row*col).reshape(row, col)
     
-    # 4 Actions to carry out:
+    # 4 Conditions to carry out:
     
     # 1. Do nothing on EMPTYs
     # Implicitly defined by default values
