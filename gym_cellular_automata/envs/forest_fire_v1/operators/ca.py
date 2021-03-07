@@ -5,48 +5,33 @@ from scipy.signal import convolve2d
 from gym import spaces
 
 from gym_cellular_automata import Operator
+from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
-"""
-+ $e < t < f \in \mathbb{R}_+$
-+ $I, P \in \mathbb{R}_+$
-+ $I >> P$
+# fmt: off
+EMPTY = CONFIG["cell_symbols"]["empty"]
+TREE  = CONFIG["cell_symbols"]["tree"]
+FIRE  = CONFIG["cell_symbols"]["fire"]
 
-> $eI + 8fP < tI < tI + 8tP < tI + fP < tI + 8tP < fI$
+CELL_TYPE = CONFIG["cell_type"]
 
-1. $tI + 8tP < tI + fP$
-2. $8tP < fP$
-3. $8t < f$
-"""
+UP_LEFT    = CONFIG["wind"]["up_left"]
+UP         = CONFIG["wind"]["up"]
+UP_RIGHT   = CONFIG["wind"]["up_right"]
+LEFT       = CONFIG["wind"]["left"]
+SELF       = CONFIG["wind"]["self"]
+RIGHT      = CONFIG["wind"]["right"]
+DOWN_LEFT  = CONFIG["wind"]["down_left"]
+DOWN       = CONFIG["wind"]["down"]
+DOWN_RIGHT = CONFIG["wind"]["down_right"]
 
+WIND = [[UP_LEFT,   UP,   UP_RIGHT  ],
+        [LEFT,      SELF, RIGHT     ],
+        [DOWN_LEFT, DOWN, DOWN_RIGHT]]
 
-"""
-### Advantages
-0. Analogic world tricks (voting and stuff)
-1. It gets rid of annoying get_neighbors utilities
-2. It is fast
-3. GPU?
-4. Piggybacking on robust libraries
-5. Deeper Understanding of Forest Fire
+WIND_TYPE = np.float64
+# fmt: on
 
-### Disadvantages
-1. Complexity (coding, intuition)
-2. Probs are fixed on each 1 step Update (just 1 sampling event)
-3. Discretization gets difficult with many states and complex update logic
-4. Complexity can be turn down by adding filters, still this probably is faster
-    than an idented double for loop over python data structures.
-"""
-
-# ------------ Globals
-
-
-# Cell Values
-EMPTY = 0
-TREE = 1
-FIRE = 10
-
-# Test Grid Size
-ROW = 8
-COL = 8
+WIND = np.array(WIND, dtype=WIND_TYPE)
 
 # Signal Weights
 BASE = 2
@@ -57,36 +42,32 @@ P_EXP = 3
 IDENTITY = BASE ** I_EXP
 PROPAGATION = BASE ** P_EXP
 
-def assert_weights_relationships():
+# Kernel Size
+ROW_K = 3
+COL_K = 3
+
+
+# ------------ Correctness
+
+
+def assert_correctness():
     assert EMPTY*IDENTITY + 8*FIRE*PROPAGATION < TREE*IDENTITY, "empty / tree"
     assert TREE*IDENTITY < TREE*IDENTITY + 8*TREE*PROPAGATION, "keep / keep"
     assert TREE*IDENTITY + 8*TREE*PROPAGATION < TREE*IDENTITY + FIRE*PROPAGATION, "keep / burn"
     assert TREE*IDENTITY + FIRE*PROPAGATION < TREE*IDENTITY + 8*FIRE*PROPAGATION, "burn / burn"
     assert TREE*IDENTITY + 8*FIRE*PROPAGATION < FIRE*IDENTITY, "burn / consume"
+    assert ROW_K == 3, "Only Moore's neighborhood"
+    assert COL_K == 3, "Only Moore's neighborhood"
 
 
-assert_weights_relationships()
+assert_correctness()
 
-
-# fmt: off
-# Inwards semantics (towards tree)
-WIND = [[1.00, 1.00, 1.00],
-        [1.00, 0.00, 1.00],
-        [1.00, 1.00, 1.00]]
-# fmt: on
-
-WIND = np.array(WIND, dtype=np.float64)
-assert WIND[1,1] == 0.0, "self is always 0.0"
-
-# Kernel Size
-ROW_K = 3
-COL_K = 3
 
 # ------------ Breaks
 
 
 def get_breaks():
-    """ 3 breaks needed for 4 actions.
+    """ 3 breaks needed for 4 conditions.
     empty < keep < burn < consume
     """
     keep_break = TREE * IDENTITY
@@ -102,7 +83,8 @@ BREAKS = get_breaks()
 
 # ------------ 1-step CA update
 
-def update(grid):
+
+def UPDATE(grid):
     # Sample Wind
     fail_to_propagate = get_failed_propagations_mask()
     
@@ -116,20 +98,20 @@ def update(grid):
 # ------------ Forest Fire Cellular Automaton
 
 
-class WindyForestFireCA(Operator):
+class WindyForestFire(Operator):
     is_composition = False
 
     def __init__(self, grid_space=None, action_space=None, context_space=None):
 
         if context_space is None:
-            context_space = spaces.Box(0.0, 1.0, shape=(2,))
+            context_space = spaces.Box(0.0, 1.0, shape=(3, 3), dtype=WIND_TYPE)
 
         self.grid_space = grid_space
         self.action_space = action_space
         self.context_space = context_space
 
-    def update(self, grid, action, context=None):
-        return update(grid), context
+    def update(self, grid, action=None, context=None):
+        return UPDATE(grid), context
 
 
 # ------------ Utils
@@ -139,7 +121,7 @@ def get_failed_propagations_mask():
     """
     Here goes the only sampling of the step.
     """
-    uniform_space = spaces.Box(low=0.0, high=1.0, shape=(ROW_K, COL_K), dtype=np.float64)
+    uniform_space = spaces.Box(low=0.0, high=1.0, shape=(ROW_K, COL_K), dtype=WIND_TYPE)
     uniform_roll = uniform_space.sample()
     
     failed_propagations = np.repeat(False, ROW_K * COL_K).reshape(ROW_K, COL_K)
@@ -161,23 +143,12 @@ def convolve(grid, kernel):
     return convolve2d(grid, kernel, mode='same', boundary='fill', fillvalue=EMPTY)
     
 
-def get_breaks():
-    """ 3 breaks needed for 4 actions.
-    empty < keep < burn < consume
-    """
-    keep_break = TREE * IDENTITY
-    burn_break = TREE * IDENTITY + FIRE * PROPAGATION
-    consume_break = FIRE * IDENTITY
-
-    Breaks = namedtuple("Breaks", ["keep_break", "burn_break", "consume_break"])
-
-    return Breaks(keep_break, burn_break, consume_break)
-
-
 def translate_analogic_to_discrete(grid, breaks):
+    row, col = grid.shape
+    
     # Init on empty by default
-    empty = np.array(EMPTY, dtype=np.uint8)
-    new_grid = np.repeat(empty, ROW*COL).reshape(ROW, COL)
+    empty = np.array(EMPTY, dtype=CELL_TYPE)
+    new_grid = np.repeat(empty, row*col).reshape(row, col)
     
     # 4 Actions to carry out:
     
@@ -199,4 +170,3 @@ def translate_analogic_to_discrete(grid, breaks):
     new_grid[consume_mask] = EMPTY    
 
     return new_grid
-
