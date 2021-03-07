@@ -57,7 +57,6 @@ P_EXP = 3
 IDENTITY = BASE ** I_EXP
 PROPAGATION = BASE ** P_EXP
 
-
 def assert_weights_relationships():
     assert EMPTY*IDENTITY + 8*FIRE*PROPAGATION < TREE*IDENTITY, "empty / tree"
     assert TREE*IDENTITY < TREE*IDENTITY + 8*TREE*PROPAGATION, "keep / keep"
@@ -77,11 +76,11 @@ WIND = [[1.00, 1.00, 1.00],
 # fmt: on
 
 WIND = np.array(WIND, dtype=np.float64)
+assert WIND[1,1] == 0.0, "self is always 0.0"
 
 # Kernel Size
 ROW_K = 3
 COL_K = 3
-
 
 # ------------ Breaks
 
