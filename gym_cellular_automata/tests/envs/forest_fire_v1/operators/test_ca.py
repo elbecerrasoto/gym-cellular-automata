@@ -1,146 +1,112 @@
-import numpy as np
+from operator import mul
+from functools import reduce
 
-from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
-
-# fmt: off
-EMPTY = CONFIG["cell_symbols"]["empty"]
-TREE  = CONFIG["cell_symbols"]["tree"]
-FIRE  = CONFIG["cell_symbols"]["fire"]
-
-CELL_TYPE = CONFIG["cell_type"]
-
-UP_LEFT    = CONFIG["wind"]["up_left"]
-UP         = CONFIG["wind"]["up"]
-UP_RIGHT   = CONFIG["wind"]["up_right"]
-LEFT       = CONFIG["wind"]["left"]
-SELF       = CONFIG["wind"]["self"]
-RIGHT      = CONFIG["wind"]["right"]
-DOWN_LEFT  = CONFIG["wind"]["down_left"]
-DOWN       = CONFIG["wind"]["down"]
-DOWN_RIGHT = CONFIG["wind"]["down_right"]
-
-WIND = [[UP_LEFT,   UP,   UP_RIGHT  ],
-        [LEFT,      SELF, RIGHT     ],
-        [DOWN_LEFT, DOWN, DOWN_RIGHT]]
-
-WIND_TYPE = np.float64
-# fmt: on
-
-WIND = np.array(WIND, dtype=WIND_TYPE)
-
-
-def get_random_grid(shape=(ROW, COL), probs=[0.20, 0.70, 0.10], dtype=np.uint8):
-    cell_values = np.array([EMPTY, TREE, FIRE], dtype=dtype)
-    size = reduce(mul, shape)
-    
-    return np.random.choice(cell_values, size=ROW * COL, p=probs).reshape(shape)
-
-
-# to test units
-
-# convolve
-# signals
-# translation
-
-
-# To test
-
-
-
-# def get_failed_propagations_mask(wind)
-
-# def get_kernel(failed_propagations):
-
-# def convolve(grid, kernel):
-
-# def translate_analogic_to_discrete(grid, breaks):
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import pytest
 import numpy as np
 from gym import spaces
 
-from gym_cellular_automata.envs.forest_fire.operators import ForestFireCellularAutomaton
-from gym_cellular_automata.envs.forest_fire.utils.neighbors import neighborhood_at
-from gym_cellular_automata.envs.forest_fire.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire_v1.operators import ca
 
-# Steps to check CA rules
-T_STEPS = 32
+# Number of random grids to test
+N_TESTS = 32
+
+# Steps to check CA rules per grid
+T_STEPS = 8
+
 # Cells checked per step
-TESTS_PER_STEP = 8
+CHECKS_PER_STEP = 8
 
-EMPTY = CONFIG["cell_symbols"]["empty"]
-TREE = CONFIG["cell_symbols"]["tree"]
-FIRE = CONFIG["cell_symbols"]["fire"]
+# Test Grid Size
+TEST_ROW = 8
+TEST_COL = 8
 
-CELL_STATES = CONFIG["cell_states"]
-
-ROW = CONFIG["grid_shape"]["n_row"]
-COL = CONFIG["grid_shape"]["n_col"]
-
-P_FIRE = CONFIG["ca_params"]["p_fire"]
-P_TREE = CONFIG["ca_params"]["p_tree"]
-
-GRID_SPACE = spaces.Box(0, CELL_STATES - 1, shape=(ROW, COL), dtype=np.uint8)
+# Random grid init probabilities
+P_EMPTY = 0.20
+P_TREE = 0.70
+P_FIRE = 0.10
 
 
-def test_API(operator=ForestFireCellularAutomaton()):
-    from gym_cellular_automata.tests import test_Operator_API_specifications
+# def convolve(grid, kernel):
+# Test not shrinking
+# Test max values
+# Test min values
 
-    test_Operator_API_specifications(operator)
+# def translate_analogic_to_discrete(grid, breaks):
+# ??
+    
+# Extras
+# Test operator ABC
+# Profile on big grids
 
 
-def test_forest_fire_cell_symbols():
-    ca_operator = ForestFireCellularAutomaton()
-
-    assert ca_operator.empty == EMPTY
-    assert ca_operator.tree == TREE
-    assert ca_operator.fire == FIRE
+@pytest.fixture
+def windy_forest_fire():
+    return ca.WindyForestFire()
 
 
-def test_forest_fire_update_on_tree_ring():
-    ca_operator = ForestFireCellularAutomaton()
+def random_grid():
+    shape = (TEST_ROW, TEST_COL)
+    size = reduce(mul, shape)
+    probs = [P_EMPTY, P_TREE, P_FIRE]
+    cell_values = np.array([ca.EMPTY, ca.TREE, ca.FIRE], dtype=ca.CELL_TYPE)
 
-    TREE_RING = np.array([[1, 1, 1], [1, 2, 1], [1, 1, 1]], dtype=np.uint8)
-    grid = TREE_RING
+    return np.random.choice(cell_values, size, probs).reshape(shape)
 
-    ca_params = P_FIRE, P_TREE
 
-    grid, _ = ca_operator(grid, None, ca_params)
+@pytest.fixture
+def pos_space():
+    return spaces.MultiDiscrete([TEST_ROW, TEST_COL])
 
-    assert grid[1, 1] == EMPTY, "1st Ring Update"
-    assert grid[0, 0] == FIRE, "1st Ring Update"
-    assert grid[0, 2] == FIRE, "1st Ring Update"
-    assert grid[1, 0] == FIRE, "1st Ring Update"
-    assert grid[1, 2] == FIRE, "1st Ring Update"
 
-    grid, _ = ca_operator(grid, None, ca_params)
+@pytest.fixture
+def uniform_space():
+    return spaces.Box(0.0, 1.0, shape=(ca.ROW_K, ca.COL_K), dtype=ca.WIND_TYPE)
 
-    assert grid[0, 0] == EMPTY, "2nd Ring Update"
-    assert grid[0, 2] == EMPTY, "2nd Ring Update"
-    assert grid[1, 0] == EMPTY, "2nd Ring Update"
-    assert grid[1, 2] == EMPTY, "2nd Ring Update"
+
+@pytest.fixture
+def deterministic_winds(uniform_space):
+    return uniform_space.high, uniform_space.low
+
+
+def test_failed_propagations(deterministic_winds):
+    certain, impossible = deterministic_winds
+
+    all_false = ca.get_failed_propagations_mask(certain)
+    all_true = ca.get_failed_propagations_mask(impossible)
+
+    assert not np.all(all_false)
+    assert np.all(all_true)
+
+
+def test_kernel_generation(deterministic_winds, uniform_space):
+    certain, impossible = deterministic_winds
+    unif_sampling = uniform_space.sample()
+    
+    all_propagating_kernel = ca.get_kernel(ca.get_failed_propagations_mask(certain))
+    none_propagating_kernel = ca.get_kernel(ca.get_failed_propagations_mask(impossible))
+    
+    sampled_kernel = ca.get_kernel(ca.get_failed_propagations_mask(unif_sampling))
+    
+    kernels = all_propagating_kernel, none_propagating_kernel, sampled_kernel
+    
+    k_row, k_col = kernels[0].shape
+
+    assert k_row == 3
+    assert k_col == 3
+    
+    def check_kernel_weight_at_position(kernel, position, weight):
+        row, col = position
+        return kernel[row, col] == weight
+    
+    for kernel in kernels:
+        assert check_kernel_weight_at_position(kernel, (1, 1), ca.IDENTITY)
+        
+    assert check_kernel_weight_at_position(none_propagating_kernel, (0, 0), ca.EMPTY)
+    
+    assert check_kernel_weight_at_position(all_propagating_kernel, (0, 0), ca.PROPAGATION)
+
+    assert check_kernel_weight_at_position(all_propagating_kernel, (0, 0), ca.EMPTY) ^ \
+        check_kernel_weight_at_position(all_propagating_kernel, (0, 0), ca.PROPAGATION)
 
 
 def assert_forest_fire_update_at_position_row_col(grid, new_grid, row, col):
@@ -153,57 +119,58 @@ def assert_forest_fire_update_at_position_row_col(grid, new_grid, row, col):
 
     old_cell_value = grid[row, col]
     new_cell_value = new_grid[row, col]
-    neighborhood = neighborhood_at(grid, (row, col), invariant=EMPTY)
+
+    # The rule of staying on the same cell state is implicitly tested.
+    # Probabilistic rules cannot be black-box tested.
 
     # Explicit rules
-    if old_cell_value == TREE and FIRE in neighborhood:
-        # A TREE next to a FIRE turns into a FIRE.
-        assert new_cell_value == FIRE, "NON Fire Propagation" + log_error
-
-    if old_cell_value == FIRE:
+    if old_cell_value == ca.FIRE:
+        
         # A FIRE turns into an EMPTY.
-        assert new_cell_value == EMPTY, "NON Fire Consumption" + log_error
+        assert new_cell_value == ca.EMPTY, "NON Fire Consumption" + log_error
 
     # Implicit rules
-    if old_cell_value == EMPTY:
+    if old_cell_value == ca.EMPTY:
+        
+        # An EMPTY never turns into TREE.
+        assert new_cell_value != ca.TREE, "We do not sow" + log_error
+        
         # An EMPTY never turns into FIRE.
-        assert new_cell_value != FIRE, "Empty Combustion" + log_error
+        assert new_cell_value != ca.FIRE, "Empty Combustion" + log_error
 
-    if old_cell_value == TREE:
+
+    if old_cell_value == ca.TREE:
+        
         # A TREE never turns into EMPTY.
-        assert new_cell_value != EMPTY, "Dying Trees" + log_error
+        assert new_cell_value != ca.EMPTY, "Dying Trees" + log_error
 
-    if old_cell_value == FIRE:
+    if old_cell_value == ca.FIRE:
+        
         # A FIRE never turns into a TREE.
-        assert new_cell_value != TREE, "Created by Fire" + log_error
+        assert new_cell_value != ca.TREE, "Created by Fire" + log_error
+        
         # A FIRE never turns into a FIRE.
-        assert new_cell_value != FIRE, "Lingering Fire" + log_error
+        assert new_cell_value != ca.FIRE, "Lingering Fire" + log_error
 
 
-def test_forest_fire_update():
-    ca_operator = ForestFireCellularAutomaton()
+def test_windy_forest_fire_update(windy_forest_fire, pos_space):
 
-    grid = GRID_SPACE.sample()
-    pos_space = spaces.MultiDiscrete([ROW, COL])
-
-    for step in range(T_STEPS):
-        ca_params = ca_operator.context_space.sample()
-
-        new_grid, _ = ca_operator(grid, None, ca_params)
-
-        assert grid is not new_grid, "ca_operator is returning the same grid object"
-
-        for test in range(TESTS_PER_STEP):
-            row, col = pos_space.sample()
-
-            assert_forest_fire_update_at_position_row_col(grid, new_grid, row, col)
-
-        grid = new_grid
-
-
-
-
-
-
-
-
+    for i_test in range(N_TESTS):
+        
+        grid = random_grid()
+        
+        for step in range(T_STEPS):
+            
+            wind = windy_forest_fire.context_space.sample()
+    
+            new_grid, context = windy_forest_fire(grid, None, wind)
+    
+            assert grid is not new_grid, "Operator is returning the same grid object."
+    
+            for check in range(CHECKS_PER_STEP):
+                
+                row, col = pos_space.sample()
+    
+                assert_forest_fire_update_at_position_row_col(grid, new_grid, row, col)
+    
+            grid = new_grid
