@@ -1,0 +1,61 @@
+cell_symbols:
+  empty: 0
+  tree:  1
+  fire:  10
+
+cell_type: "uint8"
+
+grid_shape:
+  n_row: 256
+  n_col: 256
+
+wind:
+  up_left:    1.00
+  up:         1.00
+  up_right:   1.00
+  left:       1.00
+  self:       0.00
+  right:      1.00
+  down_left:  1.00
+  down:       1.00
+  down_right: 1.00
+
+# Bulldozer effects (optional)
+# Change TREE to EMPTY
+effects:
+  tree: "empty"
+
+actions:
+  movement:
+    up_left:    0
+    up:         1
+    up_right:   2
+    left:       3
+    not_move:   4
+    right:      5
+    down_left:  6
+    down:       7
+    down_right: 8
+  shooting:
+    shoot:      1
+    none:       0
+
+action_type: "uint8"
+
+rewards:
+  per_empty: 0.0
+  per_tree:  1.0
+  per_fire: -1.0
+
+# Rendering options.
+plot:
+  cell_colors:
+    empty: "#DDD1D3" # Gray
+    tree:  "#A9C499" # Green
+    fire:  "#DFA4A0" # Red
+  title: "Forest Fire Environment"
+  title_size: 21
+  title_color: "#B3B3B3" # Gray 70%
+  helicopter_size: 39
+  helicopter_color: "#FFFFFF" # White
+  font: "Lato"
