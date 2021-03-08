@@ -120,6 +120,7 @@ def test_coordinator_update_with_cellular_automaton_and_modifier(
 
     assert new_freeze == max_freeze
     # Testing the output grid is still needed it.
-    # The update breaks the CA logic
+    # The test is the following:
+    # The coordinator's update breaks the CA logic
     # specifically on the fire propagation rule
-    # or does nothing
+    # XOR does NOT

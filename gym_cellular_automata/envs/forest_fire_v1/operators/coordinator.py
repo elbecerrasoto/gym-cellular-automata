@@ -6,6 +6,22 @@ from gym_cellular_automata import Operator
 # ------------ Forest Fire Coordinator
 
 
+null = spaces.Discrete(1)
+
+null.sample()
+null.contains('a')
+
+
+null = spaces.Box(np.array(0), np.array(0))
+
+null = spaces.Box(np.array(0), np.array(0))
+
+null.sample()
+null.contains(np.array(0.0001))
+
+# The Null space captures all my exception behavior.
+
+
 class Coordinator(Operator):
     is_composition = True
 
@@ -50,6 +66,7 @@ class Coordinator(Operator):
             self.ca_params_space = cellular_automaton.context_space
             self.pos_space = modifier.context_space
 
+            # It is flattened
             self.context_space = spaces.Tuple(
                 (self.ca_params_space, self.pos_space, self.freeze_space)
             )
@@ -57,6 +74,7 @@ class Coordinator(Operator):
     def update(self, grid, action, context):
         ca_params, mod_params, freeze = context
         
+        # Permisive on what you accept
         freeze = int(freeze)
 
         if freeze == 0:
@@ -71,6 +89,7 @@ class Coordinator(Operator):
 
             grid, mod_params = self.modifier(grid, action, mod_params)
 
+            # Strict on what you return
             freeze = np.array(freeze - 1)
 
         context = ca_params, mod_params, freeze
