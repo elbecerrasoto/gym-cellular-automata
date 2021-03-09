@@ -2,7 +2,9 @@ import numpy as np
 from gym import spaces
 
 from gym_cellular_automata import Operator
-from gym_cellular_automata.envs.forest_fire.utils.neighbors import are_my_neighbors_a_boundary
+from gym_cellular_automata.envs.forest_fire.utils.neighbors import (
+    are_my_neighbors_a_boundary,
+)
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
 
@@ -36,34 +38,30 @@ RIGHT_SET = {UP_RIGHT,  RIGHT, DOWN_RIGHT}
 class Bulldozer(Operator):
     is_composition = False
 
-
     def __init__(self, effects, grid_space=None, action_space=None, context_space=None):
 
         self.effects = effects
 
         if action_space is None:
-            action_space = spaces.MultiDiscrete([
-                len(CONFIG["actions"]["movement"]),
-                len(CONFIG["actions"]["shooting"])
-            ])
+            action_space = spaces.MultiDiscrete(
+                [len(CONFIG["actions"]["movement"]), len(CONFIG["actions"]["shooting"])]
+            )
 
         self.grid_space = grid_space
         self.action_space = action_space
         self.context_space = context_space
-
 
     def update(self, grid, action, context):
 
         if not self.action_space.contains(action):
             raise ValueError(f"action: {action} does not belong to {self.action_space}")
 
-        
         position = context
-        
+
         movement, shooting = action
-        
+
         new_position = self._move(grid, movement, position)
-        
+
         row, col = new_position
 
         if shooting == SHOOT:
@@ -72,7 +70,6 @@ class Bulldozer(Operator):
                     grid[row, col] = self.effects[symbol]
 
         return grid, new_position
-
 
     def _move(self, grid, action, pos):
         row, col = pos

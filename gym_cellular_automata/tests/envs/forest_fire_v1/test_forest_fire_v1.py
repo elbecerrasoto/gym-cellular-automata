@@ -9,7 +9,3 @@ env.reset()
 for i in range(66):
     action = env.action_space.sample()
     print(env.step(action))
-    
-
-
-

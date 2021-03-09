@@ -19,22 +19,23 @@ class Grid(Space):
         >>> Grid(values=[-1, 0, 1], shape=(2,2))
 
     """
+
     def __init__(self, n=None, values=None, shape=None, probs=None, dtype=CELL_TYPE):
-        
+
         assert shape is not None, "'shape' must be a non-empty tuple."
         assert n is not None or values is not None, "'n' or 'values' must be provided."
 
         super().__init__(shape, dtype)
-        
+
         if values is not None:
             self._from_values = True
-            
+
             self.values = np.unique(np.array(values, dtype=dtype))
-            self.n = len(self.values) 
+            self.n = len(self.values)
 
         else:
             self._from_values = False
-            
+
             assert n > 0, "'n' must be a positive integer."
             self.n = n
 
@@ -45,12 +46,14 @@ class Grid(Space):
 
         self.size = reduce(mul, self.shape)
 
-    def sample(self):        
-        
-        return np.random.choice(self.values, self.size, p=self.probs).reshape(self.shape)
+    def sample(self):
+
+        return np.random.choice(self.values, self.size, p=self.probs).reshape(
+            self.shape
+        )
 
     def contains(self, x):
-        
+
         if isinstance(x, list):
             x = np.array(x, dtype=self.dtype)
 
@@ -62,8 +65,12 @@ class Grid(Space):
             return f"Grid(values={self.values}, shape={self.shape})"
 
         else:
-            
+
             return f"Grid(n={self.n}, shape={self.shape})"
 
     def __eq__(self, other):
-        return isinstance(other, Grid) and (self.shape == other.shape) and np.all(self.values == other.values)
+        return (
+            isinstance(other, Grid)
+            and (self.shape == other.shape)
+            and np.all(self.values == other.values)
+        )

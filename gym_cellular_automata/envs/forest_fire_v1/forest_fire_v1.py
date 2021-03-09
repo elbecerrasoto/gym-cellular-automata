@@ -21,7 +21,11 @@ import gym
 from gym import spaces
 from gym.utils import seeding
 
-from gym_cellular_automata.envs.forest_fire_v1.operators import WindyForestFire, Bulldozer, Coordinator
+from gym_cellular_automata.envs.forest_fire_v1.operators import (
+    WindyForestFire,
+    Bulldozer,
+    Coordinator,
+)
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
 ROW = CONFIG["grid_shape"]["n_row"]
@@ -31,7 +35,7 @@ EFFECTS = CONFIG["effects"]
 
 # Max freeze gets determined by size
 # NUMERATOR = 1
-# DENOMINATOR = 4  
+# DENOMINATOR = 4
 # MAX_FREEZE = NUMERATOR * ROW * COL // 2 * DENOMINATOR
 
 MAX_FREEZE = 64
@@ -50,20 +54,18 @@ FIRE = CONFIG["cell_symbols"]["fire"]
 
 
 def load_wind():
-    UP_LEFT    = CONFIG["wind"]["up_left"]
-    UP         = CONFIG["wind"]["up"]
-    UP_RIGHT   = CONFIG["wind"]["up_right"]
-    LEFT       = CONFIG["wind"]["left"]
-    SELF       = CONFIG["wind"]["self"]
-    RIGHT      = CONFIG["wind"]["right"]
-    DOWN_LEFT  = CONFIG["wind"]["down_left"]
-    DOWN       = CONFIG["wind"]["down"]
+    UP_LEFT = CONFIG["wind"]["up_left"]
+    UP = CONFIG["wind"]["up"]
+    UP_RIGHT = CONFIG["wind"]["up_right"]
+    LEFT = CONFIG["wind"]["left"]
+    SELF = CONFIG["wind"]["self"]
+    RIGHT = CONFIG["wind"]["right"]
+    DOWN_LEFT = CONFIG["wind"]["down_left"]
+    DOWN = CONFIG["wind"]["down"]
     DOWN_RIGHT = CONFIG["wind"]["down_right"]
-    
-    WIND = [[UP_LEFT,   UP,   UP_RIGHT  ],
-            [LEFT,      SELF, RIGHT     ],
-            [DOWN_LEFT, DOWN, DOWN_RIGHT]]
-    		
+
+    WIND = [[UP_LEFT, UP, UP_RIGHT], [LEFT, SELF, RIGHT], [DOWN_LEFT, DOWN, DOWN_RIGHT]]
+
     return np.array(WIND, dtype=WIND_TYPE)
 
 
@@ -77,7 +79,6 @@ def random_grid(shape=(ROW, COL), probs=[0.20, 0.80, 0.00]):
     return np.random.choice(cell_values, size, probs).reshape(shape)
 
 
-
 # ------------ Forest Fire Environment
 
 
@@ -88,17 +89,18 @@ class ForestFireEnv(gym.Env):
     tree = TREE
     fire = FIRE
 
-    ca_params_space = context_space = spaces.Box(0.0, 1.0, shape=(3, 3), dtype=WIND_TYPE)
+    ca_params_space = context_space = spaces.Box(
+        0.0, 1.0, shape=(3, 3), dtype=WIND_TYPE
+    )
     pos_space = spaces.MultiDiscrete([ROW, COL])
     freeze_space = spaces.Discrete(MAX_FREEZE + 1)
 
     context_space = spaces.Tuple((ca_params_space, pos_space, freeze_space))
     grid_space = spaces.Box(0, 10, shape=(ROW, COL), dtype=CELL_TYPE)
 
-    action_space = action_space = spaces.MultiDiscrete([
-                len(CONFIG["actions"]["movement"]),
-                len(CONFIG["actions"]["shooting"])
-            ])
+    action_space = action_space = spaces.MultiDiscrete(
+        [len(CONFIG["actions"]["movement"]), len(CONFIG["actions"]["shooting"])]
+    )
     observation_space = spaces.Tuple((grid_space, context_space))
 
     def __init__(self):
@@ -126,7 +128,7 @@ class ForestFireEnv(gym.Env):
 
     def reset(self):
         self.grid = random_grid()
-        
+
         fseed_row, fseed_col = self.pos_space.sample()
 
         self.grid[fseed_row, fseed_col] == FIRE
@@ -156,9 +158,9 @@ class ForestFireEnv(gym.Env):
             self.context = new_context
 
             return obs, reward, done, info
-        
+
         else:
-            
+
             raise Exception("Task is Done")
 
     def _award(self):
@@ -175,7 +177,7 @@ class ForestFireEnv(gym.Env):
         return np.dot(reward_weights, cell_counts)
 
     def _is_done(self):
-        return not bool( np.any(self.grid == self.fire) )
+        return not bool(np.any(self.grid == self.fire))
 
     def _report(self):
         return {}

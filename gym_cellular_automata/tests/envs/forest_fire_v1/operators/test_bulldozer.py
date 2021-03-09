@@ -26,9 +26,9 @@ def bulldozer():
 def all_trees_grid():
     shape = TEST_ROW, TEST_COL
     repetitions = reduce(mul, shape)
-    
+
     fire = np.array(TREE, dtype=CONFIG["cell_type"])
-    
+
     return np.repeat(fire, repetitions).reshape(shape)
 
 
@@ -42,28 +42,27 @@ def test_API(bulldozer):
 
 
 def test_bulldozing_trees(bulldozer, all_trees_grid, initial_pos):
-    
+
     # NOT SHOOT and NOT MOVE
     action = np.array([bd.NOT_MOVE, bd.NONE])
-    
+
     new_grid, new_pos = bulldozer(all_trees_grid, action, initial_pos)
-    
+
     row, col = new_pos
-    
+
     assert new_grid[row, col] == TREE
     assert np.all(initial_pos == new_pos)
 
-
     # SHOOT while moving DOWN and RIGHT
-    
+
     action = np.array([bd.DOWN_RIGHT, bd.SHOOT])
-    
+
     new_grid, new_pos = bulldozer(new_grid, action, new_pos)
-    
+
     row, col = new_pos
-    
+
     assert new_grid[row, col] == EMPTY
-    
+
     manual_move = initial_pos + [1, 1]
-    
+
     assert np.all(new_pos == manual_move)
