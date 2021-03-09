@@ -50,7 +50,7 @@ def random_grid():
     probs = [P_EMPTY, P_TREE, P_FIRE]
     cell_values = np.array([ca.EMPTY, ca.TREE, ca.FIRE], dtype=ca.CELL_TYPE)
 
-    return np.random.choice(cell_values, size, probs).reshape(shape)
+    return np.random.choice(cell_values, size, p=probs).reshape(shape)
 
 
 @pytest.fixture
