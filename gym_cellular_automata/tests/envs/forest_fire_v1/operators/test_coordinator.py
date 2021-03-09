@@ -1,4 +1,3 @@
-"""
 from operator import mul
 from functools import reduce
 
@@ -139,6 +138,3 @@ def test_API(coordinator):
 # Dying xor Rules
 
 # Test integration
-"""
-
-
