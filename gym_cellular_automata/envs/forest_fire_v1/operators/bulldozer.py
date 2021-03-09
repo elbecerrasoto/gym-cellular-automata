@@ -38,9 +38,9 @@ RIGHT_SET = {UP_RIGHT,  RIGHT, DOWN_RIGHT}
 class Bulldozer(Operator):
     is_composition = False
 
-    def __init__(self, effects, grid_space=None, action_space=None, context_space=None):
+    effects = CONFIG["effects"]
 
-        self.effects = effects
+    def __init__(self, grid_space=None, action_space=None, context_space=None):
 
         if action_space is None:
             action_space = spaces.MultiDiscrete(

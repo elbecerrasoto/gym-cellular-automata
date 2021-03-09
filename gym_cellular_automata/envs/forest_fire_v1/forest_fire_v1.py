@@ -31,8 +31,6 @@ from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 ROW = CONFIG["grid_shape"]["n_row"]
 COL = CONFIG["grid_shape"]["n_col"]
 
-EFFECTS = CONFIG["effects"]
-
 # Max freeze gets determined by size
 # NUMERATOR = 1
 # DENOMINATOR = 4
@@ -53,23 +51,7 @@ TREE = CONFIG["cell_symbols"]["tree"]
 FIRE = CONFIG["cell_symbols"]["fire"]
 
 
-def load_wind():
-    UP_LEFT = CONFIG["wind"]["up_left"]
-    UP = CONFIG["wind"]["up"]
-    UP_RIGHT = CONFIG["wind"]["up_right"]
-    LEFT = CONFIG["wind"]["left"]
-    SELF = CONFIG["wind"]["self"]
-    RIGHT = CONFIG["wind"]["right"]
-    DOWN_LEFT = CONFIG["wind"]["down_left"]
-    DOWN = CONFIG["wind"]["down"]
-    DOWN_RIGHT = CONFIG["wind"]["down_right"]
-
-    WIND = [[UP_LEFT, UP, UP_RIGHT], [LEFT, SELF, RIGHT], [DOWN_LEFT, DOWN, DOWN_RIGHT]]
-
-    return np.array(WIND, dtype=WIND_TYPE)
-
-
-WIND = load_wind()
+WIND = CONFIG["wind"]
 
 
 def random_grid(shape=(ROW, COL), probs=[0.20, 0.80, 0.00]):
@@ -112,7 +94,6 @@ class ForestFireEnv(gym.Env):
         )
 
         self.modifier = Bulldozer(
-            EFFECTS,
             grid_space=self.grid_space,
             action_space=self.action_space,
             context_space=self.pos_space,

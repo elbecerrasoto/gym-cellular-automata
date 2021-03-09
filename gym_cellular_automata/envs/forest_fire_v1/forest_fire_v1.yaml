@@ -9,7 +9,8 @@ grid_shape:
   n_row: 256
   n_col: 256
 
-wind:
+# Probability of fire propagation into current tree cell
+wind_probs:
   up_left:    1.00
   up:         1.00
   up_right:   1.00

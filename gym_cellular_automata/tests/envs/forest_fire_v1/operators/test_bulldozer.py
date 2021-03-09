@@ -7,8 +7,6 @@ import numpy as np
 from gym_cellular_automata.envs.forest_fire_v1.operators import bulldozer as bd
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
-from gym_cellular_automata.tests import test_Operator_API_specifications
-
 
 TEST_ROW = 8
 TEST_COL = 8
@@ -19,7 +17,7 @@ TREE = CONFIG["cell_symbols"]["tree"]
 
 @pytest.fixture
 def bulldozer():
-    return bd.Bulldozer(CONFIG["effects"])
+    return bd.Bulldozer()
 
 
 @pytest.fixture
@@ -27,9 +25,9 @@ def all_trees_grid():
     shape = TEST_ROW, TEST_COL
     repetitions = reduce(mul, shape)
 
-    fire = np.array(TREE, dtype=CONFIG["cell_type"])
+    tree = np.array(TREE, dtype=CONFIG["cell_type"])
 
-    return np.repeat(fire, repetitions).reshape(shape)
+    return np.repeat(tree, repetitions).reshape(shape)
 
 
 @pytest.fixture
@@ -38,6 +36,8 @@ def initial_pos():
 
 
 def test_API(bulldozer):
+    from gym_cellular_automata.tests import test_Operator_API_specifications
+
     test_Operator_API_specifications(bulldozer)
 
 
