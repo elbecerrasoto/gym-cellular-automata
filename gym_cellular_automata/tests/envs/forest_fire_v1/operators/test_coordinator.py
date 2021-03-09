@@ -112,7 +112,6 @@ def test_coordinator_on_freeze_diff_than_zero(
     assert np.all(grid == new_grid)
 
 
-"""
 def test_coordinator_on_freeze_equal_to_zero(
     coordinator, fixed_tree_grid, action_none_down_right, init_position
 ):
@@ -130,8 +129,7 @@ def test_coordinator_on_freeze_equal_to_zero(
     assert new_freeze == MAX_FREEZE, "Freeze reset"
 
     # 1-step CA update
-    ca_updated_grid = coordinator.cellular_automaton(grid, None, WIND)
+    ca_updated_grid, ca_params = coordinator.cellular_automaton(grid, None, WIND)
 
     # As the bulldozer did NOT cut a tree both grids should be equal
     assert np.all(ca_updated_grid == new_grid)
-"""
