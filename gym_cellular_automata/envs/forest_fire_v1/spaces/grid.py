@@ -1,3 +1,6 @@
+from operator import mul
+from functools import reduce
+
 import numpy as np
 from gym.spaces import Space
 
@@ -6,54 +9,58 @@ CELL_TYPE = np.int16
 
 
 class Grid(Space):
-    r"""A discrete space in :math:`\{ 0, 1, \\dots, n-1 \}`. 
+    r"""
+    A Space for Cellular Automata Lattices.
+    Arbitrary integers can be used as cell states.
 
     Example::
 
-        >>> Discrete(2)
+        >>> Grid(n=3, shape=(2, 2))
+        >>> Grid(values=[-1, 0, 1], shape=(2,2))
 
     """
-    def __init__(self, n=None, values=None, shape=None, probs=None, dtype=np.int16):
+    def __init__(self, n=None, values=None, shape=tuple(), probs=None, dtype=CELL_TYPE):
         
-        self.=
+        assert shape is not tuple(), "'shape' must be a non-empty tuple."
+        assert n is not None or values is not None, "'n' or 'values' must be provided."
+     
+        if values is not None:
+            
+            self._from_values = True
+            
+            self.values = np.array(values, dtype=dtype)
+            self.n = len(self.values) 
+
+        else:
+            
+            assert n > 0, "'n' must be a positive integer."
+            self._from_values = False
+
+            self.values = np.arange(self.n, dtype=dtype)
+        
+        self.size = reduce(mul, self.shape)
+        
+        uniform = np.repeat(1.0, self.n) / self.n
+        self.probs = uniform if probs is None else probs
+
         super(Grid, self).__init__(shape, dtype)
 
-    def sample(self):
+    def sample(self):        
         
-        return self.np_random.randint(self.n)
+        return np.random.choice(self.values, self.size, self.probs).reshape(self.shape)
 
     def contains(self, x):
         
-        if isinstance(x, int):
-            as_int = x
-        elif isinstance(x, (np.generic, np.ndarray)) and (x.dtype.char in np.typecodes['AllInteger'] and x.shape == ()):
-            as_int = int(x)
-        else:
-            return False
-        return as_int >= 0 and as_int < self.n
+        if isinstance(x, list):
+            x = np.array(x, dtype=self.dtype)
+
+        return {np.unique(x)}.issubset({self.values}) and self.shape == x.shape
 
     def __repr__(self):
-        return "Grid(%d)" % self.n
+        if self._from_values:
 
-    def __eq__(self, other):
-        return isinstance(other, Discrete) and self.n == other.n
+            return f"Grid(values={self.values}, shape={self.shape})"
 
-
-
-ca_params_space = spaces.Box(0.0, 1.0, shape=(2,))
-pos_space = spaces.MultiDiscrete([ROW, COL])
-freeze_space = spaces.Discrete(MAX_FREEZE + 1)
-
-context_space = spaces.Tuple((ca_params_space, pos_space, freeze_space))
-grid_space = spaces.Box(0, CELL_STATES - 1, shape=(ROW, COL), dtype=CELL_TYPE)
-
-action_space = spaces.Box(ACTION_MIN, ACTION_MAX, shape=tuple(), dtype=ACTION_TYPE)
-observation_space = spaces.Tuple((grid_space, context_space))
-
-def random_grid():
-    shape = (TEST_ROW, TEST_COL)
-    size = reduce(mul, shape)
-    probs = [P_EMPTY, P_TREE, P_FIRE]
-    cell_values = np.array([ca.EMPTY, ca.TREE, ca.FIRE], dtype=ca.CELL_TYPE)
-
-    return np.random.choice(cell_values, size, probs).reshape(shape)
+        else:
+            
+            return f"Grid(n={self.n}, shape={self.shape})"
