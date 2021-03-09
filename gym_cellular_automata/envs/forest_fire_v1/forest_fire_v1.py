@@ -1,21 +1,6 @@
-# !!!!!!!!! BUG on CA update
-
-# Layout is key
-
-# Env Layout
-
-# Moving the globals a little
-from operator import mul
-from functools import reduce
-
-# Logic?
-# Already done I think
-
-# Add init pos
-# Add termination
-# Render and Close to pass
-import numpy as np
 from collections import Counter
+from math import isclose
+import numpy as np
 
 import gym
 from gym import spaces
@@ -26,43 +11,64 @@ from gym_cellular_automata.envs.forest_fire_v1.operators import (
     Bulldozer,
     Coordinator,
 )
+from gym_cellular_automata.envs.forest_fire_v1.utils.grid import Grid
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
 ROW = CONFIG["grid_shape"]["n_row"]
 COL = CONFIG["grid_shape"]["n_col"]
 
-# Max freeze gets determined by size
-# NUMERATOR = 1
-# DENOMINATOR = 4
-# MAX_FREEZE = NUMERATOR * ROW * COL // 2 * DENOMINATOR
-
-MAX_FREEZE = 64
-
-
-# spaces.Box requires typing for discrete values
-CELL_TYPE = CONFIG["cell_type"]
-ACTION_TYPE = CONFIG["action_type"]
-
-WIND_TYPE = np.float64
-
+MAX_FREEZE = CONFIG["max_freeze"]
 
 EMPTY = CONFIG["cell_symbols"]["empty"]
 TREE = CONFIG["cell_symbols"]["tree"]
 FIRE = CONFIG["cell_symbols"]["fire"]
 
-
 WIND = CONFIG["wind"]
 
+# Initial Cell Probabilities
+P_TREE = CONFIG["p_tree"]
+P_EMPTY = CONFIG["p_empty"]
 
-def random_grid(shape=(ROW, COL), probs=[0.20, 0.80, 0.00]):
-    size = reduce(mul, shape)
-    cell_values = np.array([EMPTY, TREE, FIRE], dtype=CELL_TYPE)
+assert isclose(1.0, P_TREE + P_EMPTY)
 
-    return np.random.choice(cell_values, size, probs).reshape(shape)
+EPSILON_FIRE = 8e-6
+
+def set_grid_space(epsilon):
+    return Grid(values=[EMPTY, TREE, FIRE],
+                      shape=(ROW, COL),
+                      probs=[P_TREE-epsilon, P_EMPTY, epsilon])
+
+GRID_SPACE = set_grid_space(EPSILON_FIRE)
+POSITION_SPACE = spaces.MultiDiscrete([ROW, COL])
+
+# Sample and plant fire seed
+def initial_grid_distribution():
+    grid_space = Grid(values=[EMPTY, TREE, FIRE],
+                      shape=(ROW, COL),
+                      probs=[P_TREE, P_EMPTY, 0.0])
+    
+    grid = grid_space.sample()
+
+    row, col = POSITION_SPACE.sample()
+
+    grid[row, col] = FIRE
+
+    return grid    
+
+
+def initial_context_distribution():
+    wind = WIND
+    position = POSITION_SPACE.sample()
+    freeze = np.array(MAX_FREEZE)
+   
+    return wind, position, freeze
+
 
 
 # ------------ Forest Fire Environment
 
+
+WIND_TYPE = np.float64
 
 class ForestFireEnv(gym.Env):
     metadata = {"render.modes": ["human"]}
@@ -71,14 +77,13 @@ class ForestFireEnv(gym.Env):
     tree = TREE
     fire = FIRE
 
-    ca_params_space = context_space = spaces.Box(
-        0.0, 1.0, shape=(3, 3), dtype=WIND_TYPE
-    )
-    pos_space = spaces.MultiDiscrete([ROW, COL])
+    ca_params_space = spaces.Box(
+        0.0, 1.0, shape=(3, 3), dtype=WIND_TYPE)
+    pos_space = POSITION_SPACE
     freeze_space = spaces.Discrete(MAX_FREEZE + 1)
 
     context_space = spaces.Tuple((ca_params_space, pos_space, freeze_space))
-    grid_space = spaces.Box(0, 10, shape=(ROW, COL), dtype=CELL_TYPE)
+    grid_space = GRID_SPACE
 
     action_space = action_space = spaces.MultiDiscrete(
         [len(CONFIG["actions"]["movement"]), len(CONFIG["actions"]["shooting"])]
@@ -108,28 +113,20 @@ class ForestFireEnv(gym.Env):
         self.reward_per_fire = CONFIG["rewards"]["per_fire"]
 
     def reset(self):
-        self.grid = random_grid()
+        self.done = False
+        
+        self.grid = initial_grid_distribution()
+        self.context = initial_context_distribution()
 
-        fseed_row, fseed_col = self.pos_space.sample()
-
-        self.grid[fseed_row, fseed_col] == FIRE
-
-        ca_params = WIND
-        pos = np.array([ROW // 2, COL // 2])
-        freeze = np.array(MAX_FREEZE)
-
-        self.context = ca_params, pos, freeze
-
-        obs = self.grid, self.context
-
-        return obs
+        return self.grid, self.context
 
     def step(self, action):
-        done = self._is_done()
 
-        if not done:
+        if not self.done:
 
             new_grid, new_context = self.coordinator(self.grid, action, self.context)
+
+            self.done = self._is_done()
 
             obs = new_grid, new_context
             reward = self._award()
@@ -138,11 +135,25 @@ class ForestFireEnv(gym.Env):
             self.grid = new_grid
             self.context = new_context
 
-            return obs, reward, done, info
+            return obs, reward, self.done, info
 
         else:
 
             raise Exception("Task is Done")
+
+        # else:
+        #     if self.steps_beyond_done == 0:
+        #         logger.warn(
+        #             "You are calling 'step()' even though this "
+        #             "environment has already returned done = True. You "
+        #             "should always call 'reset()' once you receive 'done = "
+        #             "True' -- any further steps are undefined behavior."
+        #         )
+        #     self.steps_beyond_done += 1
+        #     reward = 0.0
+
+        # return np.array(self.state), reward, done, {}
+
 
     def _award(self):
         dict_counts = Counter(self.grid.flatten().tolist())
