@@ -3,7 +3,7 @@ from math import isclose
 import numpy as np
 
 import gym
-from gym import spaces
+from gym import spaces, logger
 from gym.utils import seeding
 
 from gym_cellular_automata.envs.forest_fire_v1.operators import (
@@ -33,42 +33,46 @@ assert isclose(1.0, P_TREE + P_EMPTY)
 
 EPSILON_FIRE = 8e-6
 
+
 def set_grid_space(epsilon):
-    return Grid(values=[EMPTY, TREE, FIRE],
-                      shape=(ROW, COL),
-                      probs=[P_TREE-epsilon, P_EMPTY, epsilon])
+    return Grid(
+        values=[EMPTY, TREE, FIRE],
+        shape=(ROW, COL),
+        probs=[P_TREE - epsilon, P_EMPTY, epsilon],
+    )
+
 
 GRID_SPACE = set_grid_space(EPSILON_FIRE)
 POSITION_SPACE = spaces.MultiDiscrete([ROW, COL])
 
 # Sample and plant fire seed
 def initial_grid_distribution():
-    grid_space = Grid(values=[EMPTY, TREE, FIRE],
-                      shape=(ROW, COL),
-                      probs=[P_TREE, P_EMPTY, 0.0])
-    
+    grid_space = Grid(
+        values=[EMPTY, TREE, FIRE], shape=(ROW, COL), probs=[P_TREE, P_EMPTY, 0.0]
+    )
+
     grid = grid_space.sample()
 
     row, col = POSITION_SPACE.sample()
 
     grid[row, col] = FIRE
 
-    return grid    
+    return grid
 
 
 def initial_context_distribution():
     wind = WIND
     position = POSITION_SPACE.sample()
     freeze = np.array(MAX_FREEZE)
-   
-    return wind, position, freeze
 
+    return wind, position, freeze
 
 
 # ------------ Forest Fire Environment
 
 
 WIND_TYPE = np.float64
+
 
 class ForestFireEnv(gym.Env):
     metadata = {"render.modes": ["human"]}
@@ -77,8 +81,7 @@ class ForestFireEnv(gym.Env):
     tree = TREE
     fire = FIRE
 
-    ca_params_space = spaces.Box(
-        0.0, 1.0, shape=(3, 3), dtype=WIND_TYPE)
+    ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3), dtype=WIND_TYPE)
     pos_space = POSITION_SPACE
     freeze_space = spaces.Discrete(MAX_FREEZE + 1)
 
@@ -112,9 +115,14 @@ class ForestFireEnv(gym.Env):
         self.reward_per_tree = CONFIG["rewards"]["per_tree"]
         self.reward_per_fire = CONFIG["rewards"]["per_fire"]
 
+        # How this sets the seed is beyond me. Homework for an other day.
+        self.seed()
+
     def reset(self):
+
         self.done = False
-        
+        self.steps_beyond_done = 0
+
         self.grid = initial_grid_distribution()
         self.context = initial_context_distribution()
 
@@ -124,36 +132,40 @@ class ForestFireEnv(gym.Env):
 
         if not self.done:
 
+            # MDP Transition
             new_grid, new_context = self.coordinator(self.grid, action, self.context)
 
-            self.done = self._is_done()
-
-            obs = new_grid, new_context
-            reward = self._award()
-            info = self._report()
-
+            # New State
             self.grid = new_grid
             self.context = new_context
+
+            # Termination as a function of New State
+            self._is_done()
+
+            # API Formatting
+            # Necessary condition for MDP, its New State is public
+            obs = new_grid, new_context
+            # Reward as a function of New State
+            reward = self._award()
+            info = self._report()
 
             return obs, reward, self.done, info
 
         else:
 
-            raise Exception("Task is Done")
+            if self.steps_beyond_done == 0:
 
-        # else:
-        #     if self.steps_beyond_done == 0:
-        #         logger.warn(
-        #             "You are calling 'step()' even though this "
-        #             "environment has already returned done = True. You "
-        #             "should always call 'reset()' once you receive 'done = "
-        #             "True' -- any further steps are undefined behavior."
-        #         )
-        #     self.steps_beyond_done += 1
-        #     reward = 0.0
+                logger.warn(
+                    "You are calling 'step()' even though this "
+                    "environment has already returned done = True. You "
+                    "should always call 'reset()' once you receive 'done = "
+                    "True' -- any further steps are undefined behavior."
+                )
 
-        # return np.array(self.state), reward, done, {}
+            self.steps_beyond_done += 1
 
+            # Graceful after termination
+            return (self.grid, self.context), 0.0, True, {}
 
     def _award(self):
         dict_counts = Counter(self.grid.flatten().tolist())
@@ -169,7 +181,7 @@ class ForestFireEnv(gym.Env):
         return np.dot(reward_weights, cell_counts)
 
     def _is_done(self):
-        return not bool(np.any(self.grid == self.fire))
+        self.done = not bool(np.any(self.grid == self.fire))
 
     def _report(self):
         return {}
