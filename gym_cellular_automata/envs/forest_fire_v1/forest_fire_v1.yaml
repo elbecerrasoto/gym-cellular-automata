@@ -3,7 +3,6 @@ cell_symbols:
   tree:  1
   fire:  10
 
-cell_type: "uint8"
 
 grid_shape:
   n_row: 256
@@ -47,7 +46,6 @@ actions:
     shoot:      1
     none:       0
 
-action_type: "uint8"
 
 rewards:
   per_empty: 0.0

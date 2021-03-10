@@ -13,9 +13,6 @@ TREE  = CONFIG["cell_symbols"]["tree"]
 FIRE  = CONFIG["cell_symbols"]["fire"]
 # fmt: on
 
-CELL_TYPE = CONFIG["cell_type"]
-WIND_TYPE = np.float64
-
 # Signal Weights
 BASE = 2
 
@@ -78,7 +75,7 @@ class WindyForestFire(Operator):
     def __init__(self, grid_space=None, action_space=None, context_space=None):
 
         if context_space is None:
-            context_space = spaces.Box(0.0, 1.0, shape=(3, 3), dtype=WIND_TYPE)
+            context_space = spaces.Box(0.0, 1.0, shape=(3, 3))
 
         self.grid_space = grid_space
         self.action_space = action_space
@@ -105,7 +102,7 @@ def get_failed_propagations_mask(wind):
     """
     Here goes the only sampling of the step.
     """
-    uniform_space = spaces.Box(low=0.0, high=1.0, shape=(ROW_K, COL_K), dtype=WIND_TYPE)
+    uniform_space = spaces.Box(low=0.0, high=1.0, shape=(ROW_K, COL_K))
     uniform_roll = uniform_space.sample()
 
     failed_propagations = np.repeat(False, ROW_K * COL_K).reshape(ROW_K, COL_K)
@@ -131,7 +128,7 @@ def translate_analogic_to_discrete(grid, breaks):
     row, col = grid.shape
 
     # Init on empty by default
-    empty = np.array(EMPTY, dtype=CELL_TYPE)
+    empty = np.array(EMPTY)
     new_grid = np.repeat(empty, row * col).reshape(row, col)
 
     # 4 Conditions to carry out:

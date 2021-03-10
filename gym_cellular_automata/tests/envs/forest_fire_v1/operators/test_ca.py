@@ -48,7 +48,7 @@ def random_grid():
     shape = (TEST_ROW, TEST_COL)
     size = reduce(mul, shape)
     probs = [P_EMPTY, P_TREE, P_FIRE]
-    cell_values = np.array([ca.EMPTY, ca.TREE, ca.FIRE], dtype=ca.CELL_TYPE)
+    cell_values = np.array([ca.EMPTY, ca.TREE, ca.FIRE])
 
     return np.random.choice(cell_values, size, p=probs).reshape(shape)
 
@@ -60,7 +60,7 @@ def pos_space():
 
 @pytest.fixture
 def uniform_space():
-    return spaces.Box(0.0, 1.0, shape=(ca.ROW_K, ca.COL_K), dtype=ca.WIND_TYPE)
+    return spaces.Box(0.0, 1.0, shape=(ca.ROW_K, ca.COL_K))
 
 
 @pytest.fixture

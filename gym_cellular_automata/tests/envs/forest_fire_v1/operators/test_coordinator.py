@@ -10,7 +10,6 @@ from gym_cellular_automata.envs.forest_fire_v1.utils.grid import Grid
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
 MAX_FREEZE = 1
-CELL_TYPE = CONFIG["cell_type"]
 
 # Test Grid Size
 ROW = 8

@@ -25,7 +25,7 @@ def all_trees_grid():
     shape = TEST_ROW, TEST_COL
     repetitions = reduce(mul, shape)
 
-    tree = np.array(TREE, dtype=CONFIG["cell_type"])
+    tree = np.array(TREE)
 
     return np.repeat(tree, repetitions).reshape(shape)
 

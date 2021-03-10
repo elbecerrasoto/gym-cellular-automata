@@ -71,9 +71,6 @@ def initial_context_distribution():
 # ------------ Forest Fire Environment
 
 
-WIND_TYPE = np.float64
-
-
 class ForestFireEnv(gym.Env):
     metadata = {"render.modes": ["human"]}
 
@@ -81,7 +78,7 @@ class ForestFireEnv(gym.Env):
     tree = TREE
     fire = FIRE
 
-    ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3), dtype=WIND_TYPE)
+    ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3))
     pos_space = POSITION_SPACE
     freeze_space = spaces.Discrete(MAX_FREEZE + 1)
 
