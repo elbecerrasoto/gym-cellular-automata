@@ -8,11 +8,16 @@ grid_shape:
   n_row: 256
   n_col: 256
 
+
 # Fire seed initialized to a single cell
+# Everything else is uniform sampled
 p_tree: 0.90
 p_empty: 0.10
 
+
+# Idle CA steps.
 max_freeze: 63
+
 
 # Probability of fire propagation into current tree cell
 wind_probs:
@@ -26,10 +31,12 @@ wind_probs:
   down:       1.00
   down_right: 1.00
 
+
 # Bulldozer effects (optional)
 # Change TREE to EMPTY
 effects:
   tree: "empty"
+
 
 actions:
   movement:
@@ -51,6 +58,7 @@ rewards:
   per_empty: 0.0
   per_tree:  1.0
   per_fire: -1.0
+
 
 # Rendering options.
 plot:

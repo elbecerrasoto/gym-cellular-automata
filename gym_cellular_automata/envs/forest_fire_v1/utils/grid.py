@@ -5,9 +5,6 @@ import numpy as np
 from gym.spaces import Space
 
 
-CELL_TYPE = np.int16
-
-
 class Grid(Space):
     r"""
     A Space for Cellular Automata Lattices.
@@ -20,7 +17,7 @@ class Grid(Space):
 
     """
 
-    def __init__(self, n=None, values=None, shape=None, probs=None, dtype=CELL_TYPE):
+    def __init__(self, n=None, values=None, shape=None, probs=None, dtype=np.int16):
 
         assert shape is not None, "'shape' must be a non-empty tuple."
         assert n is not None or values is not None, "'n' or 'values' must be provided."

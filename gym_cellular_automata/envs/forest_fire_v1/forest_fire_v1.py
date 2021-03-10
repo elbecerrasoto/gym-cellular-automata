@@ -1,5 +1,4 @@
 from collections import Counter
-from math import isclose
 import numpy as np
 
 import gym
@@ -14,59 +13,6 @@ from gym_cellular_automata.envs.forest_fire_v1.operators import (
 from gym_cellular_automata.envs.forest_fire_v1.utils.grid import Grid
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
-ROW = CONFIG["grid_shape"]["n_row"]
-COL = CONFIG["grid_shape"]["n_col"]
-
-MAX_FREEZE = CONFIG["max_freeze"]
-
-EMPTY = CONFIG["cell_symbols"]["empty"]
-TREE = CONFIG["cell_symbols"]["tree"]
-FIRE = CONFIG["cell_symbols"]["fire"]
-
-WIND = CONFIG["wind"]
-
-# Initial Cell Probabilities
-P_TREE = CONFIG["p_tree"]
-P_EMPTY = CONFIG["p_empty"]
-
-assert isclose(1.0, P_TREE + P_EMPTY)
-
-EPSILON_FIRE = 8e-6
-
-
-def set_grid_space(epsilon):
-    return Grid(
-        values=[EMPTY, TREE, FIRE],
-        shape=(ROW, COL),
-        probs=[P_TREE - epsilon, P_EMPTY, epsilon],
-    )
-
-
-GRID_SPACE = set_grid_space(EPSILON_FIRE)
-POSITION_SPACE = spaces.MultiDiscrete([ROW, COL])
-
-# Sample and plant fire seed
-def initial_grid_distribution():
-    grid_space = Grid(
-        values=[EMPTY, TREE, FIRE], shape=(ROW, COL), probs=[P_TREE, P_EMPTY, 0.0]
-    )
-
-    grid = grid_space.sample()
-
-    row, col = POSITION_SPACE.sample()
-
-    grid[row, col] = FIRE
-
-    return grid
-
-
-def initial_context_distribution():
-    wind = WIND
-    position = POSITION_SPACE.sample()
-    freeze = np.array(MAX_FREEZE)
-
-    return wind, position, freeze
-
 
 # ------------ Forest Fire Environment
 
@@ -74,45 +20,43 @@ def initial_context_distribution():
 class ForestFireEnv(gym.Env):
     metadata = {"render.modes": ["human"]}
 
-    empty = EMPTY
-    tree = TREE
-    fire = FIRE
+    # Globals here!
+    # fmt:off
+    _max_freeze      = CONFIG["max_freeze"]
+    
+    _n_moves         = len(CONFIG["actions"]["movement"])
+    _n_shoots        = len(CONFIG["actions"]["shooting"])
 
-    ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3))
-    pos_space = POSITION_SPACE
-    freeze_space = spaces.Discrete(MAX_FREEZE + 1)
+    _reward_per_tree = CONFIG["rewards"]["per_tree"]
 
-    context_space = spaces.Tuple((ca_params_space, pos_space, freeze_space))
-    grid_space = GRID_SPACE
+    _row             = CONFIG["grid_shape"]["n_row"]
+    _col             = CONFIG["grid_shape"]["n_col"]
 
-    action_space = action_space = spaces.MultiDiscrete(
-        [len(CONFIG["actions"]["movement"]), len(CONFIG["actions"]["shooting"])]
-    )
-    observation_space = spaces.Tuple((grid_space, context_space))
+    _empty           = CONFIG["cell_symbols"]["empty"]
+    _tree            = CONFIG["cell_symbols"]["tree"]
+    _fire            = CONFIG["cell_symbols"]["fire"]
+
+    _p_tree          = CONFIG["p_tree"]
+    _p_empty         = CONFIG["p_empty"]
+
+    _wind            = CONFIG["wind"]
+    # fmt: on
 
     def __init__(self):
 
-        self.cellular_automaton = WindyForestFire(
-            grid_space=self.grid_space,
-            action_space=self.action_space,
-            context_space=self.ca_params_space,
-        )
+        self._set_spaces()
 
-        self.modifier = Bulldozer(
-            grid_space=self.grid_space,
-            action_space=self.action_space,
-            context_space=self.pos_space,
-        )
+        self.cellular_automaton = WindyForestFire(**self._ca_kwargs)
+
+        self.modifier = Bulldozer(**self._mod_kwargs)
 
         self.coordinator = Coordinator(
-            self.cellular_automaton, self.modifier, max_freeze=MAX_FREEZE
+            self.cellular_automaton,
+            self.modifier,
+            max_freeze=self._max_freeze,
+            **self._coord_kwargs
         )
 
-        self.reward_per_empty = CONFIG["rewards"]["per_empty"]
-        self.reward_per_tree = CONFIG["rewards"]["per_tree"]
-        self.reward_per_fire = CONFIG["rewards"]["per_fire"]
-
-        # How this sets the seed is beyond me. Homework for an other day.
         self.seed()
 
     def reset(self):
@@ -120,8 +64,8 @@ class ForestFireEnv(gym.Env):
         self.done = False
         self.steps_beyond_done = 0
 
-        self.grid = initial_grid_distribution()
-        self.context = initial_context_distribution()
+        self.grid = self._initial_grid_distribution()
+        self.context = self._initial_context_distribution()
 
         return self.grid, self.context
 
@@ -164,28 +108,91 @@ class ForestFireEnv(gym.Env):
             # Graceful after termination
             return (self.grid, self.context), 0.0, True, {}
 
-    def _award(self):
-        dict_counts = Counter(self.grid.flatten().tolist())
-
-        cell_counts = np.array(
-            [dict_counts[self.empty], dict_counts[self.tree], dict_counts[self.fire]]
-        )
-
-        reward_weights = np.array(
-            [self.reward_per_empty, self.reward_per_tree, self.reward_per_fire]
-        )
-
-        return np.dot(reward_weights, cell_counts)
-
-    def _is_done(self):
-        self.done = not bool(np.any(self.grid == self.fire))
-
-    def _report(self):
-        return {}
-
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
     def render(self, mode="human"):
         pass
+
+    def _award(self):
+
+        if not self.done:
+
+            return 0.0
+
+        else:
+
+            return self.reward_per_tree * self._count_cells()[self.tree]
+
+    def _is_done(self):
+        self.done = not bool(np.any(self.grid == self._fire))
+
+    def _report(self):
+        return {}
+
+    def _initial_grid_distribution(self):
+        grid_space = Grid(
+            values=[self._empty, self._tree, self._fire],
+            shape=(self._row, self._col),
+            probs=[self._p_tree, self._p_empty, 0.0],
+        )
+
+        grid = grid_space.sample()
+
+        row, col = self.mod_params_space.sample()
+        grid[row, col] = self._fire
+
+        return grid
+
+    def _initial_context_distribution(self):
+        position = self.mod_params_space.sample()
+        freeze = np.array(self._max_freeze)
+
+        return self._wind, position, freeze
+
+    def _count_cells(self):
+        """Returns dict of cell counts"""
+        return Counter(self.grid.flatten().tolist())
+
+    def _set_spaces(self):
+        epsilon = 8e-6
+
+        self.grid_space = Grid(
+            values=[self._empty, self._tree, self._fire],
+            shape=(self._row, self._col),
+            probs=[self._empty, self._tree - epsilon, epsilon],
+        )
+
+        self.ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3))
+        self.mod_params_space = spaces.MultiDiscrete([self._row, self._col])
+        self.coord_params_space = spaces.Discrete(self._max_freeze + 1)
+
+        self.context_space = spaces.Tuple(
+            (self.ca_params_space, self.mod_params_space, self.ca_params_space)
+        )
+
+        # RL Spaces
+        self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
+        self.action_space = spaces.MultiDiscrete([self._n_moves, self._n_shoots])
+
+        # Operator Spaces
+        self._ca_kwargs = {
+            "grid_space": self.grid_space,
+            "action_space": self.action_space,
+            "context_space": self.ca_params_space,
+        }
+        self._mod_kwargs = {
+            "grid_space": self.grid_space,
+            "action_space": self.action_space,
+            "context_space": self.mod_params_space,
+        }
+        self._coord_kwargs = {
+            "grid_space": self.grid_space,
+            "action_space": self.action_space,
+            "context_space": self.coord_params_space,
+        }
+
+        self.ca_space = spaces.Dict(spaces=self._ca_kwargs)
+        self.mod_space = spaces.Dict(spaces=self._mod_kwargs)
+        self.coord_space = spaces.Dict(spaces=self._coord_kwargs)
