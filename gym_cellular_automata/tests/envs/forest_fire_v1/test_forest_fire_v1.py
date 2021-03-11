@@ -1,4 +1,5 @@
 import pytest  # With plugin pytest-repeat
+import numpy as np
 
 import gym
 from gym import spaces
@@ -12,13 +13,13 @@ from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 ROW = CONFIG["grid_shape"]["n_row"]
 COL = CONFIG["grid_shape"]["n_col"]
 
-
 EMPTY = CONFIG["cell_symbols"]["empty"]
 TREE = CONFIG["cell_symbols"]["tree"]
 FIRE = CONFIG["cell_symbols"]["fire"]
 
-
 MAX_FREEZE = CONFIG["max_freeze"]
+
+REWARD_PER_TREE = CONFIG["rewards"]["per_tree"]
 
 
 @pytest.fixture
@@ -49,6 +50,13 @@ def coord_params_space():
 @pytest.fixture
 def context_space(ca_params_space, mod_params_space, coord_params_space):
     return spaces.Tuple((ca_params_space, mod_params_space, coord_params_space))
+
+
+@pytest.fixture
+def all_trees():
+    return Grid(
+        values=[EMPTY, TREE, FIRE], shape=(ROW, COL), probs=[0.0, 1.0, 0.0]
+    ).sample()
 
 
 def test_forest_fire_env_is_a_gym_env(env, grid_space, context_space):
@@ -103,3 +111,34 @@ def test_gym_if_done_behave_gracefully(env, grid_space, context_space):
 
     assert done
     assert reward == 0.0
+
+
+def test_termination_behavior(env, all_trees):
+    env.reset()
+
+    env.grid = all_trees
+    action = env.action_space.sample()
+
+    # Acting on an all_tree grid causes termination
+    obs, reward, done, info = env.step(action)
+    grid, context = obs
+
+    assert done
+
+    def get_dict_of_counts(grid):
+        values, counts = np.unique(grid, return_counts=True)
+        return dict(zip(values, counts))
+
+    assert reward == REWARD_PER_TREE * get_dict_of_counts(grid)[TREE]
+
+
+def test_single_fire_seed(env):
+    obs = env.reset()
+
+    grid, context = obs
+    ca_params, mod_params, freeze = context
+
+    assert freeze == MAX_FREEZE
+
+    # Single fire seed
+    assert len(grid[grid == FIRE]) == 1

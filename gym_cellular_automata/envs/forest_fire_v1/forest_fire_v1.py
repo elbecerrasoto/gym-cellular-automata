@@ -123,7 +123,7 @@ class ForestFireEnv(gym.Env):
 
         else:
 
-            return self.reward_per_tree * self._count_cells()[self.tree]
+            return self._reward_per_tree * self._count_cells()[self._tree]
 
     def _is_done(self):
         self.done = not bool(np.any(self.grid == self._fire))
