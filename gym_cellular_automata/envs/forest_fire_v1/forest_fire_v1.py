@@ -20,7 +20,6 @@ from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 class ForestFireEnv(gym.Env):
     metadata = {"render.modes": ["human"]}
 
-    # Globals here!
     # fmt:off
     _max_freeze      = CONFIG["max_freeze"]
     
