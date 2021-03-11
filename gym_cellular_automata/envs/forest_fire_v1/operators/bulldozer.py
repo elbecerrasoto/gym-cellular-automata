@@ -8,44 +8,44 @@ from gym_cellular_automata.envs.forest_fire.utils.neighbors import (
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
 
-# fmt: off
-UP_LEFT    = CONFIG["actions"]["movement"]["up_left"]
-UP         = CONFIG["actions"]["movement"]["up"]
-UP_RIGHT   = CONFIG["actions"]["movement"]["up_right"]
-
-LEFT       = CONFIG["actions"]["movement"]["left"]
-NOT_MOVE   = CONFIG["actions"]["movement"]["not_move"]
-RIGHT      = CONFIG["actions"]["movement"]["right"]
-
-DOWN_LEFT  = CONFIG["actions"]["movement"]["down_left"]
-DOWN       = CONFIG["actions"]["movement"]["down"]
-DOWN_RIGHT = CONFIG["actions"]["movement"]["down_right"]
-
-SHOOT = CONFIG["actions"]["shooting"]["shoot"]
-NONE  = CONFIG["actions"]["shooting"]["none"]
-
-UP_SET    = {UP_LEFT,   UP,    UP_RIGHT}
-DOWN_SET  = {DOWN_LEFT, DOWN,  DOWN_RIGHT}
-
-LEFT_SET  = {UP_LEFT,   LEFT,  DOWN_LEFT}
-RIGHT_SET = {UP_RIGHT,  RIGHT, DOWN_RIGHT}
-# fmt: on
-
-
 # ------------ Forest Fire Modifier
 
 
 class Bulldozer(Operator):
     is_composition = False
 
-    effects = CONFIG["effects"]
+    # fmt:off
+    _effects = CONFIG["effects"]
+    
+    _up_left    = CONFIG["actions"]["movement"]["up_left"]
+    _up         = CONFIG["actions"]["movement"]["up"]
+    _up_right   = CONFIG["actions"]["movement"]["up_right"]
+    
+    _left       = CONFIG["actions"]["movement"]["left"]
+    _not_move   = CONFIG["actions"]["movement"]["not_move"]
+    _right      = CONFIG["actions"]["movement"]["right"]
+    
+    _down_left  = CONFIG["actions"]["movement"]["down_left"]
+    _down       = CONFIG["actions"]["movement"]["down"]
+    _down_right = CONFIG["actions"]["movement"]["down_right"]
+    
+    _up_set    = {_up_left,   _up,    _up_right}
+    _down_set  = {_down_left, _down,  _down_right}
+    
+    _left_set  = {_up_left,   _left,  _down_left}
+    _right_set = {_up_right,  _right, _down_right} 
+    
+    _shoot = CONFIG["actions"]["shooting"]["shoot"]
+    _none  = CONFIG["actions"]["shooting"]["none"]
+    
+    _n_moves         = len(CONFIG["actions"]["movement"])
+    _n_shoots        = len(CONFIG["actions"]["shooting"])
+    # fmt: on
 
     def __init__(self, grid_space=None, action_space=None, context_space=None):
 
         if action_space is None:
-            action_space = spaces.MultiDiscrete(
-                [len(CONFIG["actions"]["movement"]), len(CONFIG["actions"]["shooting"])]
-            )
+            action_space = spaces.MultiDiscrete([self._n_moves, self._n_shoots])
 
         self.grid_space = grid_space
         self.action_space = action_space
@@ -64,10 +64,13 @@ class Bulldozer(Operator):
 
         row, col = new_position
 
-        if shooting == SHOOT:
-            for symbol in self.effects:
+        if shooting == self._shoot:
+
+            for symbol in self._effects:
+
                 if grid[row, col] == symbol:
-                    grid[row, col] = self.effects[symbol]
+
+                    grid[row, col] = self._effects[symbol]
 
         return grid, new_position
 
@@ -78,17 +81,17 @@ class Bulldozer(Operator):
 
         new_row = (
             row - 1
-            if not is_boundary.up and int(action) in UP_SET
+            if not is_boundary.up and int(action) in self._up_set
             else row + 1
-            if not is_boundary.down and int(action) in DOWN_SET
+            if not is_boundary.down and int(action) in self._down_set
             else row
         )
 
         new_col = (
             col - 1
-            if not is_boundary.left and int(action) in LEFT_SET
+            if not is_boundary.left and int(action) in self._left_set
             else col + 1
-            if not is_boundary.right and int(action) in RIGHT_SET
+            if not is_boundary.right and int(action) in self._right_set
             else col
         )
 

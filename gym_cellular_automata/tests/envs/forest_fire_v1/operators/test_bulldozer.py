@@ -4,20 +4,27 @@ from functools import reduce
 import pytest
 import numpy as np
 
-from gym_cellular_automata.envs.forest_fire_v1.operators import bulldozer as bd
+from gym_cellular_automata.envs.forest_fire_v1.operators.bulldozer import Bulldozer
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
 
 TEST_ROW = 8
 TEST_COL = 8
 
+# fmt: off
 EMPTY = CONFIG["cell_symbols"]["empty"]
-TREE = CONFIG["cell_symbols"]["tree"]
+TREE  = CONFIG["cell_symbols"]["tree"]
 
+NOT_MOVE   = CONFIG["actions"]["movement"]["not_move"]
+DOWN_RIGHT = CONFIG["actions"]["movement"]["down_right"]
+
+NONE  = CONFIG["actions"]["shooting"]["none"]
+SHOOT = CONFIG["actions"]["shooting"]["shoot"]
+# ftm:on
 
 @pytest.fixture
 def bulldozer():
-    return bd.Bulldozer()
+    return Bulldozer()
 
 
 @pytest.fixture
@@ -44,7 +51,7 @@ def test_API(bulldozer):
 def test_bulldozing_trees(bulldozer, all_trees_grid, initial_pos):
 
     # NOT SHOOT and NOT MOVE
-    action = np.array([bd.NOT_MOVE, bd.NONE])
+    action = np.array([NOT_MOVE, NONE])
 
     new_grid, new_pos = bulldozer(all_trees_grid, action, initial_pos)
 
@@ -55,7 +62,7 @@ def test_bulldozing_trees(bulldozer, all_trees_grid, initial_pos):
 
     # SHOOT while moving DOWN and RIGHT
 
-    action = np.array([bd.DOWN_RIGHT, bd.SHOOT])
+    action = np.array([DOWN_RIGHT, SHOOT])
 
     new_grid, new_pos = bulldozer(new_grid, action, new_pos)
 
