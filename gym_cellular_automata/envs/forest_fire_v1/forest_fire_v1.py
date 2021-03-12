@@ -134,7 +134,7 @@ class ForestFireEnv(gym.Env):
         grid_space = Grid(
             values=[self._empty, self._tree, self._fire],
             shape=(self._row, self._col),
-            probs=[self._p_tree, self._p_empty, 0.0],
+            probs=[self._p_empty, self._p_tree, 0.0],
         )
 
         grid = grid_space.sample()
