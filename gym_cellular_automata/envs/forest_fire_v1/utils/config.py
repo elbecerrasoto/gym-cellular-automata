@@ -34,7 +34,6 @@ def parse_wind(config):
     up         = config["wind_probs"]["up"]
     up_right   = config["wind_probs"]["up_right"]
     left       = config["wind_probs"]["left"]
-    self       = config["wind_probs"]["self"]
     right      = config["wind_probs"]["right"]
     down_left  = config["wind_probs"]["down_left"]
     down       = config["wind_probs"]["down"]
@@ -42,7 +41,7 @@ def parse_wind(config):
     
     wind = np.array(
         [[up_left,   up,     up_right],
-         [left,      self,      right],
+         [left,      0.0,      right],
          [down_left, down, down_right]],
     )
     # fmt: on

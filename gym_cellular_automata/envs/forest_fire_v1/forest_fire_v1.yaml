@@ -26,7 +26,6 @@ wind_probs:
   up:         0.84
   up_right:   0.84
   left:       0.12
-  self:       0.12
   right:      0.84
   down_left:  0.12
   down:       0.12

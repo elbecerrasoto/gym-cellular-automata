@@ -142,7 +142,8 @@ class ForestFireEnv(gym.Env):
 
         grid = grid_space.sample()
 
-        row, col = self.mod_params_space.sample()
+        row, col = self._fire_seed = self.mod_params_space.sample()
+
         grid[row, col] = self._fire
 
         return grid
