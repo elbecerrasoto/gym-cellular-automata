@@ -69,6 +69,39 @@ def prot2():
     plt.show()
 
 
+def local_grid():
+    ax_hood = plt.subplot()
+
+    bd_hood = moore_n(grid, pos, n=4, invariant=EMPTY)
+
+    n_row, n_col = bd_hood.shape
+    mid_row, mid_col = n_row // 2, n_row // 2
+
+    ax_hood.imshow(bd_hood, interpolation="none", cmap=cmap, norm=norm)
+    # ax_hood.plot(pos[1], pos[0])
+
+    # NO Labels for ticks
+    ax_hood.set_xticklabels([])
+    ax_hood.set_yticklabels([])
+
+    # Major ticks
+    ax_hood.set_xticks(np.arange(0, n_col, 1))
+    ax_hood.set_yticks(np.arange(0, n_row, 1))
+
+    # Minor ticks
+    ax_hood.set_xticks(np.arange(-0.5, n_col, 1), minor=True)
+    ax_hood.set_yticks(np.arange(-0.5, n_row, 1), minor=True)
+
+    # Gridlines based on minor ticks
+    ax_hood.grid(which="minor", color="whitesmoke", linestyle="-", linewidth=2)
+    ax_hood.grid(which="major", color="w", linestyle="-", linewidth=0)
+    ax_hood.tick_params(axis="both", which="both", length=0)
+
+    ax_hood.plot(mid_col, mid_row, marker="$B$", markersize=16, color="1.0")
+
+    plt.show()
+
+
 grid_space = Grid(values=[EMPTY, BURNED, TREE, FIRE], shape=(256, 256))
 grid = grid_space.sample()
 
@@ -98,7 +131,7 @@ cmap = ListedColormap(colors)
 
 fig, axs = plt.subplots(1, 2)
 
-ax_grid, ax_hood = axs
+ax_hood, ax_grid = axs
 
 ax_grid.imshow(grid, interpolation="none", cmap=cmap, norm=norm)
 ax_grid.set_xticklabels([])
@@ -106,17 +139,24 @@ ax_grid.set_yticklabels([])
 ax_grid.grid([])
 ax_grid.grid([])
 
+ax_grid.spines["right"].set_visible(False)
+ax_grid.spines["top"].set_visible(False)
+ax_grid.spines["left"].set_visible(False)
+ax_grid.spines["bottom"].set_visible(False)
 
-# ------------------
+# Fire Seed
+ax_grid.plot(
+    env._fire_seed[1], env._fire_seed[0], marker="o", markersize=6, color=COLOR_FIRE
+)
 
+# Bulldozer
+ax_grid.plot(pos[1], pos[0], marker="$B$", markersize=6, color="1.0")
 
-ax_hood = plt.subplot()
 
 bd_hood = moore_n(grid, pos, n=4, invariant=EMPTY)
 
-bd_hood
-
-n_col, n_row = bd_hood.shape
+n_row, n_col = bd_hood.shape
+mid_row, mid_col = n_row // 2, n_row // 2
 
 
 ax_hood.imshow(bd_hood, interpolation="none", cmap=cmap, norm=norm)
@@ -139,4 +179,16 @@ ax_hood.grid(which="minor", color="whitesmoke", linestyle="-", linewidth=2)
 ax_hood.grid(which="major", color="w", linestyle="-", linewidth=0)
 ax_hood.tick_params(axis="both", which="both", length=0)
 
+ax_hood.spines["right"].set_visible(False)
+ax_hood.spines["top"].set_visible(False)
+ax_hood.spines["left"].set_visible(False)
+ax_hood.spines["bottom"].set_visible(False)
+
+
+ax_hood.plot(mid_col, mid_row, marker="$B$", markersize=12, color="1.0")
+
+plt.savefig("prototype_14.png", dpi=200)
 plt.show()
+
+
+# ------------------
