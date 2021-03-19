@@ -1,7 +1,8 @@
 cell_symbols:
+  burned: 1
   empty: 0
-  tree:  1
-  fire:  10
+  tree:  3
+  fire:  25
 
 
 grid_shape:
