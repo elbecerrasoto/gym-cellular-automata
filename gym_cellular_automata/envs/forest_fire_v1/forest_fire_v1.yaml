@@ -17,19 +17,19 @@ p_empty: 0.10
 
 
 # Idle CA steps.
-max_freeze: 63
+max_freeze: 31
 
 
 # Probability of fire propagation into current tree cell
 wind_probs:
-  up_left:    0.48
+  up_left:    0.60
   up:         0.84
-  up_right:   0.84
-  left:       0.12
+  up_right:   0.96
+  left:       0.24
   right:      0.84
   down_left:  0.12
-  down:       0.12
-  down_right: 0.48
+  down:       0.24
+  down_right: 0.60
 
 
 # Bulldozer effects (optional)

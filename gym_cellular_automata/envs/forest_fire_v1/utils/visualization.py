@@ -6,10 +6,7 @@ Visualization Prototype
 from gym_cellular_automata.envs.forest_fire_v1 import ForestFireEnv
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 from gym_cellular_automata.envs.forest_fire_v1.utils.grid import Grid
-from gym_cellular_automata.envs.forest_fire_v1.utils.neighbors import (
-    neighborhood_at,
-    moore_n,
-)
+from gym_cellular_automata.envs.forest_fire_v1.utils.neighbors import moore_n
 
 
 import numpy as np

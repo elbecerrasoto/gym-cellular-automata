@@ -142,3 +142,48 @@ def test_single_fire_seed(env):
 
     # Single fire seed
     assert len(grid[grid == FIRE]) == 1
+
+
+def manual_assesment(steps=2048, verbose=False, wait=0.1, simulate_ff=False):
+    from time import sleep
+
+    done = False
+
+    if simulate_ff:
+        ForestFireEnv._max_freeze = 0
+
+    env = ForestFireEnv()
+
+    obs = env.reset()
+
+    grid, context = obs
+    wind, pos, freeze = context
+
+    for step in range(steps):
+        if done:
+            break
+
+        if verbose:
+            print(f"\n\n------------ Step: {step} ------------")
+            print(f"Grid:\n{grid}\n")
+            print(f"Wind:\n{wind}\n")
+            print(f"Position:\n{pos}\n")
+            print(f"Freeze:\n{freeze}\n")
+
+        env.render()
+
+        action = env.action_space.sample()
+
+        if verbose:
+            print(f"Selected Action:\n{action}")
+
+        obs, reward, done, info = env.step(action)
+
+        grid, context = obs
+        wind, pos, freeze = context
+
+        if not verbose:
+            print(".", end="")
+            if step % 8 == 0:
+                print(step, end="")
+        sleep(wait)

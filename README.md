@@ -5,7 +5,7 @@
     <a href="pics/gym_automata_diagram.svg"><img src="pics/gym_automata_diagram.svg"></a>
     <br />
     <br />
-    <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-1.1.8-blue" alt="Semantic Versioning"></a>
+    <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-1.2.0a1-blue" alt="Semantic Versioning"></a>
     <a href="http://choosealicense.com/licenses/mit/"><img src="https://img.shields.io/badge/license-MIT-red.svg?style=flat" alt="MIT License"></a>
     <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a>
     <br />
