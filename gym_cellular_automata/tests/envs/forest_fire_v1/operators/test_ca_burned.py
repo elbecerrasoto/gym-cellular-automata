@@ -22,21 +22,21 @@ CHECKS_PER_STEP = 8
 ROW = 8
 COL = 8
 
-# fmt: on
+# fmt: off
 # Random grid init probabilities
-P_EMPTY = 0.30
+P_EMPTY  = 0.30
 P_BURNED = 0.00
-P_TREE = 0.60
-P_FIRE = 0.10
+P_TREE   = 0.60
+P_FIRE   = 0.10
 
 assert isclose(
     sum((P_EMPTY, P_BURNED, P_TREE, P_FIRE)), 1.0
 ), "Grid Init. Probs. must sum to 1.0"
 
-EMPTY = CONFIG["cell_symbols"]["empty"]
+EMPTY  = CONFIG["cell_symbols"]["empty"]
 BURNED = CONFIG["cell_symbols"]["burned"]
-TREE = CONFIG["cell_symbols"]["tree"]
-FIRE = CONFIG["cell_symbols"]["fire"]
+TREE   = CONFIG["cell_symbols"]["tree"]
+FIRE   = CONFIG["cell_symbols"]["fire"]
 # fmt: on
 
 
@@ -45,8 +45,9 @@ def ca():
     return WindyForestFireB()
 
 
+# Deterministic Wind
 @pytest.fixture
-def wind_deterministic(ca):
+def wind(ca):
     return ca.context_space.high
 
 
@@ -79,32 +80,47 @@ def assert_forest_fire_update_at_position_row_col(grid, new_grid, row, col):
 
     # Explicit rules
 
-    if old_cell_value == TREE and FIRE in neighborhood:
+    if old_cell_value == TREE:
 
-        # TREE -> FIRE (conditional)
-        assert new_cell_value == FIRE, "FIRE Propagation (failed)" + log_error
+        # TREE -> FIRE (propagate)
+        if FIRE in neighborhood:
+            assert new_cell_value == FIRE, "FIRE Propagation (failed)" + log_error
 
+        # TREE -> TREE (keep)
+        else:
+            assert new_cell_value == TREE, "Keep some TREE (failed)" + log_error
+
+    # FIRE -> BURNED
     if old_cell_value == FIRE:
-
-        # FIRE -> BURNED
         assert new_cell_value == BURNED, "FIRE Consumption (failed)" + log_error
 
     # Implicit rules (Staying the same)
 
+    # EMPTY -> EMPTY
     if old_cell_value == EMPTY:
-
-        # EMPTY -> EMPTY
         assert new_cell_value == EMPTY, "EMPTY is EMPTY forever (failed)" + log_error
 
+    # BURNED -> BURNED
     if old_cell_value == BURNED:
+        assert new_cell_value == BURNED, "BURNED is BURNED forever (failed)" + log_error
 
-        # BURNED -> BURNED
-        assert new_cell_value == TREE, "BURNED is BURNED forever (failed)" + log_error
 
-    if old_cell_value == TREE:
+@pytest.mark.repeat(TESTS)
+def test_windy_forest_fire_update(ca, grid_space, pos_space, wind):
 
-        # TREE -> TREE (conditional)
-        assert new_cell_value == TREE, "Keep some TREE (failed)" + log_error
+    grid = grid_space.sample()
+
+    for step in range(STEPS):
+
+        new_grid, wind = ca(grid, None, wind)
+
+        for check in range(CHECKS_PER_STEP):
+
+            row, col = pos_space.sample()
+
+            assert_forest_fire_update_at_position_row_col(grid, new_grid, row, col)
+
+        grid = new_grid
 
 
 def visual_inspection(steps: int = 12, sleep: int = 1) -> None:
