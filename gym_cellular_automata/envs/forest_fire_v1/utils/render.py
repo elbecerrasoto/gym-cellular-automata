@@ -1,131 +1,95 @@
-from operator import itemgetter
-
+"""
+Visualization Prototype
+"""
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import colors
-import seaborn as sns
-from svgpath2mpl import parse_path
 
-from .helicopter_shape import SVG_PATH
-from .config import CONFIG
+import seaborn as sns
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap, BoundaryNorm
+
+from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire_v1.utils.neighbors import moore_n
+
+sns.set_style("whitegrid")
+
 
 EMPTY = CONFIG["cell_symbols"]["empty"]
+BURNED = CONFIG["cell_symbols"]["burned"]
 TREE = CONFIG["cell_symbols"]["tree"]
 FIRE = CONFIG["cell_symbols"]["fire"]
 
 
-DEFAULT_KWARGS = {
-    "color_empty": CONFIG["plot"]["cell_colors"]["empty"],
-    "color_tree": CONFIG["plot"]["cell_colors"]["tree"],
-    "color_fire": CONFIG["plot"]["cell_colors"]["fire"],
-    "title_size": CONFIG["plot"]["title_size"],
-    "title_color": CONFIG["plot"]["title_color"],
-    "helicopter_size": CONFIG["plot"]["helicopter_size"],
-    "helicopter_color": CONFIG["plot"]["helicopter_color"],
-    "fontname": CONFIG["plot"]["font"],
-}
+COLOR_EMPTY = "#DDD1D3"  # Gray
+COLOR_BURNED = "#DFA4A0"  # Red
+COLOR_TREE = "#A9C499"  # Green
+COLOR_FIRE = "IndianRed"
 
 
-def plot_grid(grid, title=CONFIG["plot"]["title"], **kwargs):
-
-    kwargs = {**DEFAULT_KWARGS, **kwargs}
-
-    color_mapping = cell_colors_to_cmap_and_norm(
-        (kwargs["color_empty"], kwargs["color_tree"], kwargs["color_fire"])
-    )
-
-    # Plot style
-    sns.set_style("whitegrid")
-
-    # Main Plot
-    plt.imshow(
-        grid, aspect="equal", cmap=color_mapping["cmap"], norm=color_mapping["norm"]
-    )
-
-    # Title
-    plt.title(
-        title,
-        size=kwargs["title_size"],
-        color=kwargs["title_color"],
-        fontname=kwargs["fontname"],
-    )
-
-    # Modify Ticks by Axes methods
-    grid_ticks_settings(plt.gca(), n_row=grid.shape[0], n_col=grid.shape[1])
-
-    fig = plt.gcf()
-    return fig
-
-
-def add_helicopter(fig, pos, **kwargs):
-    helicopter = parse_svg_into_mpl(SVG_PATH)
-    kwargs = {**DEFAULT_KWARGS, **kwargs}
-
-    ax = fig.get_axes()[0]
-    row, col = pos
-
-    ax.plot(
-        col,
-        row,
-        marker=helicopter,
-        markersize=kwargs["helicopter_size"],
-        color=kwargs["helicopter_color"],
-        fillstyle="none",
-    )
-
-    return fig
-
-
-def cell_colors_to_cmap_and_norm(colors_forest):
+def env_visualization(grid, pos, fire_seed):
     """
-    Mappings from Color to Cell Symbols.
+    Local Global Approach
     """
-    symbols = EMPTY, TREE, FIRE
 
-    symbols_with_colors = zip(symbols, colors_forest)
-    symbols_with_colors_sorted_by_symbol = sorted(
-        symbols_with_colors, key=itemgetter(0)
-    )
-    symbols, colors_forest = zip(*symbols_with_colors_sorted_by_symbol)
+    colors = (COLOR_EMPTY, COLOR_BURNED, COLOR_TREE, COLOR_FIRE)
+    values = (EMPTY, BURNED, TREE, FIRE)
+    norm = BoundaryNorm(values, len(colors), extend="max")
+    cmap = ListedColormap(colors)
 
-    return {
-        "cmap": colors.ListedColormap(colors_forest),
-        "norm": colors.BoundaryNorm([0, 1, 2, 3], 3),
-    }
+    fig, axs = plt.subplots(1, 2)
 
+    # left, right
+    ax_hood, ax_grid = axs
 
-def grid_ticks_settings(ax, n_row, n_col):
+    # -------- Global
+
+    ax_grid.imshow(grid, interpolation="none", cmap=cmap, norm=norm)
+    ax_grid.set_xticklabels([])
+    ax_grid.set_yticklabels([])
+    ax_grid.grid([])
+    ax_grid.grid([])
+
+    ax_grid.spines["right"].set_visible(False)
+    ax_grid.spines["top"].set_visible(False)
+    ax_grid.spines["left"].set_visible(False)
+    ax_grid.spines["bottom"].set_visible(False)
+
+    # Fire Seed
+    ax_grid.plot(fire_seed[1], fire_seed[0], marker="o", markersize=6, color=COLOR_FIRE)
+
+    # Bulldozer
+    ax_grid.plot(pos[1], pos[0], marker="$B$", markersize=6, color="1.0")
+
+    # -------- Local
+
+    bd_hood = moore_n(grid, pos, n=4, invariant=EMPTY)
+
+    n_row, n_col = bd_hood.shape
+    mid_row, mid_col = n_row // 2, n_row // 2
+
+    ax_hood.imshow(bd_hood, interpolation="none", cmap=cmap, norm=norm)
 
     # NO Labels for ticks
-    ax.set_xticklabels([])
-    ax.set_yticklabels([])
+    ax_hood.set_xticklabels([])
+    ax_hood.set_yticklabels([])
 
     # Major ticks
-    ax.set_xticks(np.arange(0, n_col, 1))
-    ax.set_yticks(np.arange(0, n_row, 1))
+    ax_hood.set_xticks(np.arange(0, n_col, 1))
+    ax_hood.set_yticks(np.arange(0, n_row, 1))
 
     # Minor ticks
-    ax.set_xticks(np.arange(-0.5, n_col, 1), minor=True)
-    ax.set_yticks(np.arange(-0.5, n_row, 1), minor=True)
+    ax_hood.set_xticks(np.arange(-0.5, n_col, 1), minor=True)
+    ax_hood.set_yticks(np.arange(-0.5, n_row, 1), minor=True)
 
     # Gridlines based on minor ticks
-    ax.grid(which="minor", color="whitesmoke", linestyle="-", linewidth=2)
-    ax.grid(which="major", color="w", linestyle="-", linewidth=0)
-    ax.tick_params(axis="both", which="both", length=0)
+    ax_hood.grid(which="minor", color="whitesmoke", linestyle="-", linewidth=2)
+    ax_hood.grid(which="major", color="w", linestyle="-", linewidth=0)
+    ax_hood.tick_params(axis="both", which="both", length=0)
 
-    return ax
+    ax_hood.spines["right"].set_visible(False)
+    ax_hood.spines["top"].set_visible(False)
+    ax_hood.spines["left"].set_visible(False)
+    ax_hood.spines["bottom"].set_visible(False)
 
+    ax_hood.plot(mid_col, mid_row, marker="$B$", markersize=12, color="1.0")
 
-def parse_svg_into_mpl(svg_path):
-
-    mpl_path = parse_path(svg_path)
-
-    def center(mpl_path):
-        mpl_path.vertices -= mpl_path.vertices.mean(axis=0)
-        return mpl_path
-
-    def upsidedown(mpl_path):
-        mpl_path.vertices[:, 1] *= -1
-        return mpl_path
-
-    return upsidedown(center(mpl_path))
+    plt.show()

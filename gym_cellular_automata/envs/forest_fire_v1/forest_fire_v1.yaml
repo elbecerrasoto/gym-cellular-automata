@@ -17,20 +17,19 @@ p_empty: 0.10
 
 
 # Idle CA steps.
-max_freeze: 63
+max_freeze: 31
 
 
 # Probability of fire propagation into current tree cell
 wind_probs:
-  up_left:    1.00
-  up:         1.00
-  up_right:   1.00
-  left:       1.00
-  self:       0.00
-  right:      1.00
-  down_left:  1.00
-  down:       1.00
-  down_right: 1.00
+  up_left:    0.60
+  up:         0.84
+  up_right:   0.96
+  left:       0.24
+  right:      0.84
+  down_left:  0.12
+  down:       0.24
+  down_right: 0.60
 
 
 # Bulldozer effects (optional)
@@ -59,17 +58,3 @@ rewards:
   per_empty: 0.0
   per_tree:  1.0
   per_fire: -1.0
-
-
-# Rendering options.
-plot:
-  cell_colors:
-    empty: "#DDD1D3" # Gray
-    tree:  "#A9C499" # Green
-    fire:  "#DFA4A0" # Red
-  title: "Forest Fire Environment"
-  title_size: 21
-  title_color: "#B3B3B3" # Gray 70%
-  helicopter_size: 39
-  helicopter_color: "#FFFFFF" # White
-  font: "Lato"

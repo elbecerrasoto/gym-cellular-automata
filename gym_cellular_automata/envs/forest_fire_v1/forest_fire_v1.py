@@ -11,6 +11,7 @@ from gym_cellular_automata.envs.forest_fire_v1.operators import (
     Coordinator,
 )
 from gym_cellular_automata.envs.forest_fire_v1.utils.grid import Grid
+from gym_cellular_automata.envs.forest_fire_v1.utils.render import env_visualization
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
 
@@ -54,7 +55,7 @@ class ForestFireEnv(gym.Env):
             self.cellular_automaton,
             self.modifier,
             max_freeze=self._max_freeze,
-            **self._coord_kwargs
+            **self._coord_kwargs,
         )
 
         self.seed()
@@ -113,7 +114,16 @@ class ForestFireEnv(gym.Env):
         return [seed]
 
     def render(self, mode="human"):
-        pass
+        if mode == "human":
+
+            wind, pos, freeze = self.context
+            env_visualization(self.grid, pos, self._fire_seed)
+
+        else:
+
+            logger.warn(
+                f"Undefined mode.\nAvailable modes {self.metadata['render.modes']}"
+            )
 
     def _award(self):
 
@@ -142,7 +152,8 @@ class ForestFireEnv(gym.Env):
 
         grid = grid_space.sample()
 
-        row, col = self.mod_params_space.sample()
+        row, col = self._fire_seed = self.mod_params_space.sample()
+
         grid[row, col] = self._fire
 
         return grid
