@@ -8,15 +8,16 @@ from gym_cellular_automata import Operator
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
 # fmt: off
-EMPTY = CONFIG["cell_symbols"]["empty"]
-TREE  = CONFIG["cell_symbols"]["tree"]
-FIRE  = CONFIG["cell_symbols"]["fire"]
+EMPTY  = CONFIG["cell_symbols"]["empty"]
+BURNED = CONFIG["cell_symbols"]["burned"]
+TREE   = CONFIG["cell_symbols"]["tree"]
+FIRE   = CONFIG["cell_symbols"]["fire"]
 # fmt: on
 
 # Signal Weights
 BASE = 2
 
-I_EXP = 10
+I_EXP = 11
 P_EXP = 3
 
 IDENTITY = BASE ** I_EXP
@@ -31,17 +32,44 @@ COL_K = 3
 
 
 def assert_correctness():
-    assert EMPTY * IDENTITY + 8 * FIRE * PROPAGATION < TREE * IDENTITY, "empty / tree"
-    assert TREE * IDENTITY < TREE * IDENTITY + 8 * TREE * PROPAGATION, "keep / keep"
-    assert (
-        TREE * IDENTITY + 8 * TREE * PROPAGATION < TREE * IDENTITY + FIRE * PROPAGATION
-    ), "keep / burn"
-    assert (
-        TREE * IDENTITY + FIRE * PROPAGATION < TREE * IDENTITY + 8 * FIRE * PROPAGATION
-    ), "burn / burn"
-    assert TREE * IDENTITY + 8 * FIRE * PROPAGATION < FIRE * IDENTITY, "burn / consume"
+
     assert ROW_K == 3, "Only Moore's neighborhood"
     assert COL_K == 3, "Only Moore's neighborhood"
+
+    # Neighbors without including the current cell
+    n = 8
+
+    # Weights
+    i = IDENTITY
+    p = PROPAGATION
+
+    # Values
+    E = EMPTY
+    B = BURNED
+    T = TREE
+    F = FIRE
+
+    # Ordering of cell values
+    assert E < B
+    assert B < T
+    assert T < F
+
+    # Ordering of Weights
+    assert p < i
+
+    # Test the boundaries of the 5 intervals
+    # Interval Names:
+    # Unborn, Dead, Keep, Propagate, Consume
+
+    worst = n * p * F
+
+    assert i * E + worst < i * B, "Unborn / Dead"
+    assert i * B + worst < i * T, "Dead / Keep"
+
+    # Key Assert, a TREE cell is subject to two different rules
+    assert i * T + n * p * T < i * T + p * F, "Keep / Propagate"
+
+    assert i * T + worst < i * F, "Propagate / Consume"
 
 
 assert_correctness()
@@ -51,16 +79,25 @@ assert_correctness()
 
 
 def get_breaks():
-    """ 3 breaks needed for 4 conditions.
-    empty < keep < burn < consume
     """
-    keep_break = TREE * IDENTITY
-    burn_break = TREE * IDENTITY + FIRE * PROPAGATION
-    consume_break = FIRE * IDENTITY
+    4 breaks needed for 5 rules.
+    """
 
-    Breaks = namedtuple("Breaks", ["keep_break", "burn_break", "consume_break"])
+    # "Unborn / Dead"
+    dead_break = IDENTITY * BURNED
 
-    return Breaks(keep_break, burn_break, consume_break)
+    # "Dead / Keep"
+    keep_break = IDENTITY * TREE
+
+    # "Keep / Propagate"
+    propagate_break = IDENTITY * TREE + PROPAGATION * FIRE
+
+    # "Propagate / Consume"
+    consume_break = IDENTITY * FIRE
+
+    Breaks = namedtuple("Breaks", ["dead", "keep", "propagate", "consume"])
+
+    return Breaks(dead_break, keep_break, propagate_break, consume_break)
 
 
 BREAKS = get_breaks()
@@ -69,7 +106,7 @@ BREAKS = get_breaks()
 # ------------ Forest Fire Cellular Automaton
 
 
-class WindyForestFire(Operator):
+class WindyForestFireB(Operator):
     is_composition = False
 
     def __init__(self, grid_space=None, action_space=None, context_space=None):
@@ -131,23 +168,33 @@ def translate_analogic_to_discrete(grid, breaks):
     empty = np.array(EMPTY)
     new_grid = np.repeat(empty, row * col).reshape(row, col)
 
-    # 4 Conditions to carry out:
+    # 5 Rules to carry out:
 
-    # 1. Do nothing on EMPTYs
+    # 1. Unborn
+    # EMPTY -> EMPTY
+
     # Implicitly defined by default values
-    # empty_mask = grid < breaks.keep_break
-    # new_grid[empty_mask] = EMPTY
+    unborn_mask = grid < breaks.dead
+    new_grid[unborn_mask] = EMPTY
 
-    # 2. Keep some TREEs
-    keep_mask = np.logical_and(grid >= breaks.keep_break, grid < breaks.burn_break)
+    # 2. Dead
+    # BURNED -> BURNED
+    dead_mask = np.logical_and(grid >= breaks.dead, grid < breaks.keep)
+    new_grid[dead_mask] = BURNED
+
+    # 3. Keep
+    # TREE -> TREE
+    keep_mask = np.logical_and(grid >= breaks.keep, grid < breaks.propagate)
     new_grid[keep_mask] = TREE
 
-    # 3. Burn the remaining TREEs
-    burn_mask = np.logical_and(grid >= breaks.burn_break, grid < breaks.consume_break)
-    new_grid[burn_mask] = FIRE
+    # 4. Propagate
+    # TREE -> FIRE
+    propagate_mask = np.logical_and(grid >= breaks.propagate, grid < breaks.consume)
+    new_grid[propagate_mask] = FIRE
 
-    # 4. Consume the FIREs
-    consume_mask = grid >= breaks.consume_break
-    new_grid[consume_mask] = EMPTY
+    # 4. Consume
+    # FIRE -> BURNED
+    propagate_mask = grid >= breaks.consume
+    new_grid[propagate_mask] = BURNED
 
     return new_grid

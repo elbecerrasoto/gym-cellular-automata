@@ -81,5 +81,5 @@ def neighborhood_at(grid, pos, invariant=0):
     )
 
     return Neighbors(
-        up_left, up, up_right, left, self, right, down_left, down, down_right,
+        up_left, up, up_right, left, self, right, down_left, down, down_right
     )
