@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 
 from gym_cellular_automata.envs.forest_fire_v1.operators import (
-    WindyForestFire,
+    WindyForestFireB,
     Bulldozer,
     Coordinator,
 )
@@ -25,12 +25,15 @@ SHOOT = CONFIG["actions"]["shooting"]["shoot"]
 NONE = CONFIG["actions"]["shooting"]["none"]
 
 
-WIND = CONFIG["wind"]
-
-
 @pytest.fixture
 def ca():
-    return WindyForestFire()
+    return WindyForestFireB()
+
+
+# Deterministic Wind
+@pytest.fixture
+def wind(ca):
+    return ca.context_space.high
 
 
 @pytest.fixture
@@ -79,14 +82,14 @@ def test_API(coordinator):
 
 
 def test_coordinator_on_freeze_diff_than_zero(
-    coordinator, fixed_tree_grid, action_shoot_down_right, init_position
+    coordinator, fixed_tree_grid, action_shoot_down_right, init_position, wind
 ):
 
     freeze = 1
 
     grid = fixed_tree_grid
     action = action_shoot_down_right
-    context = WIND, init_position, freeze
+    context = wind, init_position, freeze
 
     print(f"action drs: {action_shoot_down_right}")
     print(f"init pos {init_position}")
@@ -112,14 +115,14 @@ def test_coordinator_on_freeze_diff_than_zero(
 
 
 def test_coordinator_on_freeze_equal_to_zero(
-    coordinator, fixed_tree_grid, action_none_down_right, init_position
+    coordinator, fixed_tree_grid, action_none_down_right, init_position, wind
 ):
 
     freeze = 0
 
     grid = fixed_tree_grid
     action = action_none_down_right
-    context = WIND, init_position, freeze
+    context = wind, init_position, freeze
 
     new_grid, new_context = coordinator(grid, action, context)
 
@@ -128,7 +131,7 @@ def test_coordinator_on_freeze_equal_to_zero(
     assert new_freeze == MAX_FREEZE, "Freeze reset"
 
     # 1-step CA update
-    ca_updated_grid, ca_params = coordinator.cellular_automaton(grid, None, WIND)
+    ca_updated_grid, ca_params = coordinator.cellular_automaton(grid, None, wind)
 
     # As the bulldozer did NOT cut a tree both grids should be equal
     assert np.all(ca_updated_grid == new_grid)
