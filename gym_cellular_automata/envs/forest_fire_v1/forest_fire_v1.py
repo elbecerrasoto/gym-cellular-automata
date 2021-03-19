@@ -32,6 +32,7 @@ class ForestFireEnv(gym.Env):
     _col             = CONFIG["grid_shape"]["n_col"]
 
     _empty           = CONFIG["cell_symbols"]["empty"]
+    _burned          = CONFIG["cell_symbols"]["burned"]
     _tree            = CONFIG["cell_symbols"]["tree"]
     _fire            = CONFIG["cell_symbols"]["fire"]
 
@@ -131,11 +132,13 @@ class ForestFireEnv(gym.Env):
         return {}
 
     def _initial_grid_distribution(self):
+        # fmt: off
         grid_space = Grid(
-            values=[self._empty, self._tree, self._fire],
+            values = [  self._empty,  self._burned,   self._tree,  self._fire],
+            probs  = [self._p_empty,           0.0, self._p_tree,         0.0],
             shape=(self._row, self._col),
-            probs=[self._p_empty, self._p_tree, 0.0],
         )
+        # fmt: on
 
         grid = grid_space.sample()
 
@@ -155,12 +158,10 @@ class ForestFireEnv(gym.Env):
         return Counter(self.grid.flatten().tolist())
 
     def _set_spaces(self):
-        epsilon = 8e-6
 
         self.grid_space = Grid(
-            values=[self._empty, self._tree, self._fire],
+            values=[self._empty, self._burned, self._tree, self._fire],
             shape=(self._row, self._col),
-            probs=[self._empty, self._tree - epsilon, epsilon],
         )
 
         self.ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3))
