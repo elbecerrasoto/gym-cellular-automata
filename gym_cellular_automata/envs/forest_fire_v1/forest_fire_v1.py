@@ -6,7 +6,7 @@ from gym import spaces, logger
 from gym.utils import seeding
 
 from gym_cellular_automata.envs.forest_fire_v1.operators import (
-    WindyForestFire,
+    WindyForestFireB,
     Bulldozer,
     Coordinator,
 )
@@ -46,7 +46,7 @@ class ForestFireEnv(gym.Env):
 
         self._set_spaces()
 
-        self.cellular_automaton = WindyForestFire(**self._ca_kwargs)
+        self.cellular_automaton = WindyForestFireB(**self._ca_kwargs)
 
         self.modifier = Bulldozer(**self._mod_kwargs)
 
