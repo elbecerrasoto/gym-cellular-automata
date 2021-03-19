@@ -83,3 +83,24 @@ def neighborhood_at(grid, pos, invariant=0):
     return Neighbors(
         up_left, up, up_right, left, self, right, down_left, down, down_right
     )
+
+
+def moore_n(grid, pos, n=1, invariant=0):
+    row, col = pos
+
+    left_up = row - n, col - n
+    right_up = row - n, col + n
+
+    left_down = row + n, col - n
+    right_down = row + n, col + n
+
+    for corner in [left_up, right_up, left_down, right_down]:
+        i_am_boundary = are_my_neighbors_a_boundary(grid, corner)
+
+        if any(i_am_boundary):
+            # Early return if any boundary
+            return np.array(
+                neighborhood_at(grid, pos, invariant), dtype=grid.dtype
+            ).reshape(3, 3)
+
+    return grid[left_up[0] : left_down[0] + 1, left_up[1] : right_up[1] + 1]

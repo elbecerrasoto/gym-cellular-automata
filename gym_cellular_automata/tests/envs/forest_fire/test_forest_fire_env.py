@@ -39,14 +39,15 @@ P_TREE = CONFIG["ca_params"]["p_tree"]
 
 @pytest.fixture
 def env():
-    env = ForestFireEnv()
-    return env
+    return ForestFireEnv()
 
 
 @pytest.fixture
 def all_fire_grid():
     fire = np.array(FIRE, dtype=CELL_TYPE)
-    return np.repeat(fire, TEST_GRID_ROWS*TEST_GRID_COLS).reshape((TEST_GRID_ROWS, TEST_GRID_COLS))
+    return np.repeat(fire, TEST_GRID_ROWS * TEST_GRID_COLS).reshape(
+        (TEST_GRID_ROWS, TEST_GRID_COLS)
+    )
 
 
 def set_env_with_custom_state(env, grid, context):
@@ -149,7 +150,6 @@ def test_forest_fire_env_with_random_policy(env, reward_space):
 
 
 def test_forest_fire_env_hit_info(env, all_fire_grid):
-    
     def set_up_env():
         env.reset()
 
@@ -157,26 +157,27 @@ def test_forest_fire_env_hit_info(env, all_fire_grid):
         pos = np.array([0, 0], dtype=ACTION_TYPE)
         freeze = 3
         context = ca_params, pos, freeze
-        
+
         env = set_env_with_custom_state(env, all_fire_grid.copy(), context)
 
     def assert_hit_right_notmove_down():
         obs, reward, done, info = env.action(ACTION_RIGHT)
-        
-        assert info['hit'] is True
-        
+
+        assert info["hit"] is True
+
         obs, reward, done, info = env.action(ACTION_NOT_MOVE)
-        
-        assert info['hit'] is False
-    
+
+        assert info["hit"] is False
+
         obs, reward, done, info = env.action(ACTION_DOWN)
-        
-        assert info['hit'] is True
+
+        assert info["hit"] is True
 
     def hit_flag_robustness_to_env_resets(repeat=2):
         for i in range(repeat):
             set_up_env()
             assert_hit_right_notmove_down()
+
 
 def manual_assesment(verbose=False):
     from time import sleep
