@@ -30,12 +30,6 @@ ACTION_DOWN = CONFIG["actions"]["down"]
 ACTION_DOWN_RIGHT = CONFIG["actions"]["down_right"]
 
 
-def test_API(operator=ForestFireModifier(EFFECTS)):
-    from gym_cellular_automata.tests import test_Operator_API_specifications
-
-    test_Operator_API_specifications(operator)
-
-
 def test_forest_fire_helicopter_movement():
     grid = TEST_GRID
 

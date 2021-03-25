@@ -42,12 +42,6 @@ def initial_pos():
     return np.array([0, 0])
 
 
-def test_API(bulldozer):
-    from gym_cellular_automata.tests import test_Operator_API_specifications
-
-    test_Operator_API_specifications(bulldozer)
-
-
 def test_bulldozing_trees(bulldozer, all_trees_grid, initial_pos):
 
     # NOT SHOOT and NOT MOVE

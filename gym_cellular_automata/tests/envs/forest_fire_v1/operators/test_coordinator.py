@@ -75,12 +75,6 @@ def action_none_down_right():
     return np.array([DOWN_RIGHT, NONE])
 
 
-def test_API(coordinator):
-    from gym_cellular_automata.tests import test_Operator_API_specifications
-
-    test_Operator_API_specifications(coordinator)
-
-
 def test_coordinator_on_freeze_diff_than_zero(
     coordinator, fixed_tree_grid, action_shoot_down_right, init_position, wind
 ):

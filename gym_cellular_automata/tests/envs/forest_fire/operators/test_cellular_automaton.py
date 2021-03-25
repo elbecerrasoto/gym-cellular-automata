@@ -25,12 +25,6 @@ P_TREE = CONFIG["ca_params"]["p_tree"]
 GRID_SPACE = spaces.Box(0, CELL_STATES - 1, shape=(ROW, COL), dtype=np.uint8)
 
 
-def test_API(operator=ForestFireCellularAutomaton()):
-    from gym_cellular_automata.tests import test_Operator_API_specifications
-
-    test_Operator_API_specifications(operator)
-
-
 def test_forest_fire_cell_symbols():
     ca_operator = ForestFireCellularAutomaton()
 

@@ -74,12 +74,6 @@ def context_with_custom_freeze(custom=1):
 # ------------ Tests
 
 
-def test_API(coordinator):
-    from gym_cellular_automata.tests import test_Operator_API_specifications
-
-    test_Operator_API_specifications(coordinator)
-
-
 def test_coordinator_output(coordinator, sample_coordinator_input):
     grid, action, context = sample_coordinator_input
 

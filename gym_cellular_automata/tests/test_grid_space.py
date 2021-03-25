@@ -50,4 +50,4 @@ def test_grid_equality(space1, space2):
 def test_copy(space):
     space1 = space
     space2 = copy(space)
-    assert space1 == space2, "Expected {} to equal {}".format(space1, space)
+    assert space1 == space2, "Expected {} to equal {}".format(space1, space2)
