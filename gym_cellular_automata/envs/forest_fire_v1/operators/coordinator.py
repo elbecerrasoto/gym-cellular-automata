@@ -7,7 +7,6 @@ from gym_cellular_automata import Operator
 
 
 class Coordinator(Operator):
-    is_composition = True
 
     def __init__(
         self,

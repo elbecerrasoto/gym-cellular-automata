@@ -70,7 +70,6 @@ BREAKS = get_breaks()
 
 
 class WindyForestFire(Operator):
-    is_composition = False
 
     def __init__(self, grid_space=None, action_space=None, context_space=None):
 

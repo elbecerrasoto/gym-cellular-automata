@@ -32,7 +32,6 @@ ACTION_TYPE = CONFIG["action_type"]
 
 
 class ForestFireModifier(Operator):
-    is_composition = False
     hit = False
 
     def __init__(self, effects, grid_space=None, action_space=None, context_space=None):

@@ -10,7 +10,6 @@ from ..utils.config import CONFIG
 
 
 class ForestFireCellularAutomaton(Operator):
-    is_composition = False
 
     empty = CONFIG["cell_symbols"]["empty"]
     tree = CONFIG["cell_symbols"]["tree"]

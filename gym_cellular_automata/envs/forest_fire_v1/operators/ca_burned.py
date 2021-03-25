@@ -107,7 +107,6 @@ BREAKS = get_breaks()
 
 
 class WindyForestFireB(Operator):
-    is_composition = False
 
     def __init__(self, grid_space=None, action_space=None, context_space=None):
 
@@ -174,8 +173,8 @@ def translate_analogic_to_discrete(grid, breaks):
     # EMPTY -> EMPTY
 
     # Implicitly defined by default values
-    unborn_mask = grid < breaks.dead
-    new_grid[unborn_mask] = EMPTY
+    # unborn_mask = grid < breaks.dead
+    # new_grid[unborn_mask] = EMPTY
 
     # 2. Dead
     # BURNED -> BURNED

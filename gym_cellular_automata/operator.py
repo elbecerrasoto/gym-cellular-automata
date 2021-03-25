@@ -1,4 +1,6 @@
-class Operator:
+from abc import ABC, abstractmethod
+
+class Operator(ABC):
 
     # Set these in ALL subclasses
     suboperators = tuple()
@@ -7,8 +9,10 @@ class Operator:
     action_space = None
     context_space = None
 
+    @abstractmethod
     def update(self, grid, action, context):
-        """
+        """Update a Cellular Automaton's Lattice (Grid) on base of provided action and context.
+        
         Parameters
         ----------
         
@@ -26,14 +30,11 @@ class Operator:
 
         Returns
         -------
+        new_grid : array-like
+            Modified grid. 
         
-        new_grid, new_context : tuple
-            
-            new_grid : array-like
-                Modified grid. 
-            
-            new_context : object
-                Modified context.
+        new_context : object
+            Modified context.
 
         """
         raise NotImplementedError
