@@ -7,7 +7,6 @@ from gym_cellular_automata import Operator
 
 
 class ForestFireCoordinator(Operator):
-
     def __init__(
         self,
         cellular_automaton,

@@ -107,7 +107,6 @@ BREAKS = get_breaks()
 
 
 class WindyForestFireB(Operator):
-
     def __init__(self, grid_space=None, action_space=None, context_space=None):
 
         if context_space is None:

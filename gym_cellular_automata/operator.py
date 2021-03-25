@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+from copy import copy
+
 
 class Operator(ABC):
 
@@ -11,6 +13,7 @@ class Operator(ABC):
 
     @abstractmethod
     def update(self, grid, action, context):
+
         """Update a Cellular Automaton's Lattice (Grid) on base of provided action and context.
         
         Parameters
@@ -37,7 +40,11 @@ class Operator(ABC):
             Modified context.
 
         """
-        raise NotImplementedError
+
+        new_grid = copy(grid)
+        new_context = copy(context)
+
+        return new_grid, new_context
 
     def __call__(self, *args, **kwargs):
         return self.update(*args, **kwargs)
