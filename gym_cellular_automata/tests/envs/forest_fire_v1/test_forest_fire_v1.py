@@ -6,7 +6,7 @@ from gym import spaces
 
 from gym_cellular_automata.envs.forest_fire_v1 import ForestFireEnv
 
-from gym_cellular_automata.envs.forest_fire_v1.utils.grid import Grid
+from gym_cellular_automata.grid_space import Grid
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
 

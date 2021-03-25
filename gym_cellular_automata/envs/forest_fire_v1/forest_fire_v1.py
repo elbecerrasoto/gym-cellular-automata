@@ -10,7 +10,7 @@ from gym_cellular_automata.envs.forest_fire_v1.operators import (
     Bulldozer,
     Coordinator,
 )
-from gym_cellular_automata.envs.forest_fire_v1.utils.grid import Grid
+from gym_cellular_automata.grid_space import Grid
 from gym_cellular_automata.envs.forest_fire_v1.utils.render import env_visualization
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 

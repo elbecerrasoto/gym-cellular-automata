@@ -1,10 +1,10 @@
 from math import isclose
 import pytest
 
+from gym_cellular_automata.grid_space import Grid
 from gym_cellular_automata.envs.forest_fire_v1.operators import WindyForestFireB
-from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
-from gym_cellular_automata.envs.forest_fire_v1.utils.grid import Grid
 from gym_cellular_automata.envs.forest_fire.utils.neighbors import neighborhood_at
+from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
 from gym import spaces
 

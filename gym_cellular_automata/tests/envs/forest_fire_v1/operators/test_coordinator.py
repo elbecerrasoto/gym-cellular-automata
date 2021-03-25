@@ -1,12 +1,12 @@
 import pytest
 import numpy as np
 
+from gym_cellular_automata.grid_space import Grid
 from gym_cellular_automata.envs.forest_fire_v1.operators import (
     WindyForestFireB,
     Bulldozer,
     Coordinator,
 )
-from gym_cellular_automata.envs.forest_fire_v1.utils.grid import Grid
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
 MAX_FREEZE = 1

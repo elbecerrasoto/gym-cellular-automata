@@ -8,9 +8,6 @@ def test_Operator_API_specifications(operator=Operator()):
 
     assert isinstance(operator, Operator)
 
-    if operator.is_composition is not None:
-        assert isinstance(operator.is_composition, bool)
-
     assert isinstance(operator.suboperators, tuple)
 
     if operator.grid_space is not None:
