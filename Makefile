@@ -10,8 +10,7 @@ style:
 test:
 	pytest
 
-test_forest_fire: 
-	pytest gym_cellular_automata/tests/envs/forest_fire/
-
-ff_v1: 
-	pytest gym_cellular_automata/tests/envs/forest_fire_v1/
+clean:
+	find ./ -type d -name "__pycache__" | xargs rm -rf
+	find ./ -type d -name "*.egg-info" | xargs rm -rf
+	find ./ -type f -name "ipython.html" | xargs rm -f
