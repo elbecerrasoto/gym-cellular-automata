@@ -1,3 +1,5 @@
+from math import modf
+
 from collections import Counter
 import numpy as np
 
@@ -5,14 +7,110 @@ import gym
 from gym import spaces, logger
 from gym.utils import seeding
 
-from gym_cellular_automata.envs.forest_fire_v1.operators import (
-    WindyForestFireB,
-    Bulldozer,
-    Coordinator,
-)
+from gym_cellular_automata.envs.forest_fire_v1.operators import WindyForestFireB, Bulldozer
 from gym_cellular_automata.grid_space import Grid
 from gym_cellular_automata.envs.forest_fire_v1.utils.render import env_visualization
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
+
+
+
+# Generations of time dictionaries
+
+T_NONE  = 1e-4
+T_MOVE  = 0.04
+T_SHOOT = 0.16
+
+
+MOVEMENTS_TIMINGS = {
+    "he": 3}
+
+SHOOTING_TIMINGS = {
+    "he": 3}
+
+
+
+class MyEnv:
+
+    def transition(self, operators, action, state):
+    
+        operation_flow = self.get_operation_flow(operators, action, state))
+        
+        for i_op in operation_flow:
+        
+            operator = operators[i_op]
+            context = self.contexts[i_op]
+        
+            new_grid, new_context = operator(self.grid, action, context)
+        
+            grid = new_grid
+            contexts[i_op] = new_context
+        
+       wnew_context = self.context_wrapper(self, new_context)
+       
+       obs = grid, wnew_context
+       
+       return obs
+
+
+class BulldozerEnv:
+
+    from math import modf
+
+    T_NONE  = 1e-4
+    T_MOVE  = 0.04
+    T_SHOOT = 0.16
+
+    def get_operation_flow(self, operators, action, state)
+
+        movement, shooting = action
+        grid, contexts = state
+        
+        t_shoot = self.shooting_timings[shooting]
+        t_move = self.movement_timings[movement]
+        
+        t_taken = t_move + t_move
+        
+        self.accumulated_time += t_taken
+
+        # Decimal and Integer parts
+        self.accumulated_time, ca_computations = modf(self.accumulated_time)
+
+        # Assuming the follonwing order:
+        # operators = CA, Bulldozer 
+        
+        operation_flow_idxs = int(ca_computations) * [0] + [1]
+        
+        return operation_flow_idxs
+
+
+
+
+
+
+T_NONE  = 1e-4
+T_MOVE  = 0.04
+T_SHOOT = 0.16
+
+# fmt: on
+
+
+def get_operation_flow(operators, action, state)
+
+    movement, shooting = action
+    grid, contexts = state
+    
+    t_shoot = shooting_timings[shooting]
+    t_move = movement_timings[shooting]
+    
+    t_taken = t_move + t_move
+    
+    accumulated_time += t_taken
+    
+    accumulated_time, ca_computations = modf(accumulated_time)
+
+
+
+
 
 
 # ------------ Forest Fire Environment
@@ -22,7 +120,12 @@ class ForestFireEnv(gym.Env):
     metadata = {"render.modes": ["human"]}
 
     # fmt:off
-    _max_freeze      = CONFIG["max_freeze"]
+    
+    # Timings
+    _t_none  = 1e-4
+    _t_move  = 0.04
+    _t_shoot = 0.16
+
     
     _n_moves         = len(CONFIG["actions"]["movement"])
     _n_shoots        = len(CONFIG["actions"]["shooting"])
@@ -50,13 +153,6 @@ class ForestFireEnv(gym.Env):
         self.cellular_automaton = WindyForestFireB(**self._ca_kwargs)
 
         self.modifier = Bulldozer(**self._mod_kwargs)
-
-        self.coordinator = Coordinator(
-            self.cellular_automaton,
-            self.modifier,
-            max_freeze=self._max_freeze,
-            **self._coord_kwargs,
-        )
 
         self.seed()
 
@@ -177,7 +273,6 @@ class ForestFireEnv(gym.Env):
 
         self.ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3))
         self.mod_params_space = spaces.MultiDiscrete([self._row, self._col])
-        self.coord_params_space = spaces.Discrete(self._max_freeze + 1)
 
         self.context_space = spaces.Tuple(
             (self.ca_params_space, self.mod_params_space, self.ca_params_space)
@@ -198,12 +293,6 @@ class ForestFireEnv(gym.Env):
             "action_space": self.action_space,
             "context_space": self.mod_params_space,
         }
-        self._coord_kwargs = {
-            "grid_space": self.grid_space,
-            "action_space": self.action_space,
-            "context_space": self.coord_params_space,
-        }
 
         self.ca_space = spaces.Dict(spaces=self._ca_kwargs)
         self.mod_space = spaces.Dict(spaces=self._mod_kwargs)
-        self.coord_space = spaces.Dict(spaces=self._coord_kwargs)
