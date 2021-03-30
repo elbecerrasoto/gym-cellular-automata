@@ -1,64 +1,73 @@
-"""
-Induction based timings.
-
-As opposed to Perception based.
-
-"""
 from math import modf
-
-# fmt: off
-
-# Small t_none guarantees termination
-T_NONE  = 1e-4
-T_MOVE  = 0.04
-T_SHOOT = 0.16
-
-# fmt: on
-
-action = 4, 5
-
-movement, shooting = action
-
-t_shoot = shooting_timings[shooting]
-t_move = movement_timings[shooting]
-
-t_taken = t_move + t_move
-
-accumulated_time += t_taken
-
-accumulated_time, ca_computations = modf(accumulated_time)
-
-# Do shit
-int(accumulated_time)
+import numpy as np
+from gym_cellular_automata import Operator
+from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
 
-ca_op
+class Sequencer(Operator):
 
-operators = ()
+    # fmt: off
+    _t_none  = 1e-4
+    _t_move  = 0.024
+    _t_shoot = 0.120
+  
+    _up_set    = CONFIG["actions"]["sets"]["up"]
+    _down_set  = CONFIG["actions"]["sets"]["down"]
+    
+    _left_set  = CONFIG["actions"]["sets"]["left"]
+    _right_set = CONFIG["actions"]["sets"]["right"]
+    
+    _shoot = CONFIG["actions"]["shooting"]["shoot"]
+    _none  = CONFIG["actions"]["shooting"]["none"]
 
-# CA o B
-# CA^n o B
+    # fmt: on
 
+    def __init__(
+        self, operators, grid_space=None, action_space=None, context_space=None
+    ):
 
-# Temporal Sequencing
-def get_operation_flow(operators, state, action):
-    return ...
+        self.suboperators = tuple(operators)
 
+    def update(self, grid, action, context):
 
-grid = ...
-operators = ...
-contexts = ...
-action = ...
+        op_contexts, temporal_params = context
 
+        operation_flow, new_temporal_params = self._get_operation_flow(
+            grid, action, context
+        )
 
-operation_flow = get_operation_flow(operators, action, state=(grid, contexts))
+        # Apply Operator Sequence over grid
+        # Assume the same action could be applied to each Operator
+        for operation in operation_flow:
 
-for i_op in operation_flow:
+            operator = self.operators[operation]
+            op_context = op_contexts[operation]
 
-    operator = operators[i_op]
-    context = contexts[i_op]
+            new_grid, new_context = operator(grid, action, op_context)
 
-    new_grid, new_context = operator(grid, action, context)
+            grid = new_grid
+            op_contexts[operation] = new_context
 
-    grid = new_grid
-    contexts[i_op] = new_context
+        new_context = op_contexts, temporal_params
+
+        return new_grid, new_context
+
+    def _get_operation_flow(self, grid, action, context):
+
+        movement, shooting = action
+
+        op_contexts, temporal_params = context
+
+        # Mappings of actions taken ---> to time on units of CA updates
+        t_move = self.movement_timings[movement]
+        t_shoot = self.shooting_timings[shooting]
+
+        t_taken = t_move + t_shoot
+
+        self.accumulated_time += t_taken
+        # Decimal and Integer parts
+        self.accumulated_time, ca_computations = modf(self.accumulated_time)
+        # Assuming the following order:
+        # operators = CA, Bulldozer
+        operation_flow_idxs = int(ca_computations) * [0] + [1]
+        return operation_flow_idxs

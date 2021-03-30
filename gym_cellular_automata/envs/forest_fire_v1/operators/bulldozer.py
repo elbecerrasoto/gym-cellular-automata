@@ -16,24 +16,12 @@ class Bulldozer(Operator):
 
     # fmt:off
     _effects = CONFIG["effects"]
+   
+    _up_set    = CONFIG["actions"]["sets"]["up"]
+    _down_set  = CONFIG["actions"]["sets"]["down"]
     
-    _up_left    = CONFIG["actions"]["movement"]["up_left"]
-    _up         = CONFIG["actions"]["movement"]["up"]
-    _up_right   = CONFIG["actions"]["movement"]["up_right"]
-    
-    _left       = CONFIG["actions"]["movement"]["left"]
-    _not_move   = CONFIG["actions"]["movement"]["not_move"]
-    _right      = CONFIG["actions"]["movement"]["right"]
-    
-    _down_left  = CONFIG["actions"]["movement"]["down_left"]
-    _down       = CONFIG["actions"]["movement"]["down"]
-    _down_right = CONFIG["actions"]["movement"]["down_right"]
-    
-    _up_set    = {_up_left,   _up,    _up_right}
-    _down_set  = {_down_left, _down,  _down_right}
-    
-    _left_set  = {_up_left,   _left,  _down_left}
-    _right_set = {_up_right,  _right, _down_right} 
+    _left_set  = CONFIG["actions"]["sets"]["left"]
+    _right_set = CONFIG["actions"]["sets"]["right"]
     
     _shoot = CONFIG["actions"]["shooting"]["shoot"]
     _none  = CONFIG["actions"]["shooting"]["none"]

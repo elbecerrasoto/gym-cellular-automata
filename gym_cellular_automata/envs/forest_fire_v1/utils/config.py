@@ -20,11 +20,34 @@ def get_config_dict(file):
 def get_forest_fire_config_dict():
     config = get_config_dict(FOREST_FIRE_CONFIG_FILE)
 
+    config["actions"]["sets"] = parse_actions(config)
+
     config["effects"] = parse_effects(config)
 
     config["wind"] = parse_wind(config)
 
     return config
+
+
+def parse_actions(config):
+    up_left = config["actions"]["movement"]["up_left"]
+    up = config["actions"]["movement"]["up"]
+    up_right = config["actions"]["movement"]["up_right"]
+
+    left = config["actions"]["movement"]["left"]
+    right = config["actions"]["movement"]["right"]
+
+    down_left = config["actions"]["movement"]["down_left"]
+    down = config["actions"]["movement"]["down"]
+    down_right = config["actions"]["movement"]["down_right"]
+
+    up_set = {up_left, up, up_right}
+    down_set = {down_left, down, down_right}
+
+    left_set = {up_left, left, down_left}
+    right_set = {up_right, right, down_right}
+
+    return {"up": up_set, "down": down_set, "left": left_set, "right": right_set}
 
 
 def parse_wind(config):
