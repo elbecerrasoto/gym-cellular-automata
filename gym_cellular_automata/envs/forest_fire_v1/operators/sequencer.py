@@ -30,8 +30,9 @@ class Sequencer(Operator):
 
         op_contexts, temporal_params = context
 
+        # Operation sequence per step only depends on actions and temporal params
         operation_flow, new_temporal_params = self._get_operation_flow(
-            grid, action, context
+            grid, action, temporal_params
         )
 
         # Apply Operator Sequence over grid
@@ -54,25 +55,23 @@ class Sequencer(Operator):
 
         movement, shooting = action
 
-        op_contexts, temporal_params = context
+        accumulated_time = context
 
-        # Mappings of actions taken ---> to time on units of CA updates
+        # Mapping of actions ---> to time (on units of CA updates)
         t_move = self.movement_timings[movement]
         t_shoot = self.shooting_timings[shooting]
 
         t_taken = t_move + t_shoot
 
-        self.accumulated_time += t_taken
+        accumulated_time += t_taken
 
         # Decimal and Integer parts
+        accumulated_time, ca_computations = modf(accumulated_time)
 
-        self.accumulated_time, ca_computations = modf(self.accumulated_time)
-        # Assuming the following order:
-        # operators = CA, Bulldozer
+        # Operartors order is: CA, Modifier
+        operation_flow = int(ca_computations) * [0] + [1]
 
-        operation_flow_idxs = int(ca_computations) * [0] + [1]
-
-        return operation_flow_idxs
+        return operation_flow, accumulated_time
 
     def _init_action_time_mappings(self):
 
