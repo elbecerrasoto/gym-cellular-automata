@@ -5,14 +5,14 @@ import gym
 from gym import spaces, logger
 from gym.utils import seeding
 
-from gym_cellular_automata.envs.forest_fire_v1.operators import (
+from gym_cellular_automata.envs.forest_fire.v1.operators import (
     WindyForestFireB,
     Bulldozer,
     Coordinator,
 )
 from gym_cellular_automata.grid_space import Grid
-from gym_cellular_automata.envs.forest_fire_v1.utils.render import env_visualization
-from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.v1.utils.render import env_visualization
+from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
 
 
 # ------------ Forest Fire Environment

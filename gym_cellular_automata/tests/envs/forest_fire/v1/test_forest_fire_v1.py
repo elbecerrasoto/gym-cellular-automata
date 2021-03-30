@@ -4,10 +4,10 @@ import numpy as np
 import gym
 from gym import spaces
 
-from gym_cellular_automata.envs.forest_fire_v1 import ForestFireEnv
+from gym_cellular_automata.envs.forest_fire.v1 import ForestFireEnv
 
 from gym_cellular_automata.grid_space import Grid
-from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
 
 
 ROW = CONFIG["grid_shape"]["n_row"]

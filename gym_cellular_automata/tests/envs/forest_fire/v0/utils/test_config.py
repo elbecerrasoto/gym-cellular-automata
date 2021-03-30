@@ -2,11 +2,11 @@ import os
 import pytest
 import numpy as np
 
-from gym_cellular_automata.envs.forest_fire.utils.config import (
+from gym_cellular_automata.envs.forest_fire.v0.utils.config import (
     get_forest_fire_config_dict,
 )
-from gym_cellular_automata.envs.forest_fire.utils.config import FOREST_FIRE_CONFIG_FILE
-from gym_cellular_automata.envs.forest_fire.utils.config import parse_type
+from gym_cellular_automata.envs.forest_fire.v0.utils.config import FOREST_FIRE_CONFIG_FILE
+from gym_cellular_automata.envs.forest_fire.v0.utils.config import parse_type
 
 
 def test_config_file_exists():

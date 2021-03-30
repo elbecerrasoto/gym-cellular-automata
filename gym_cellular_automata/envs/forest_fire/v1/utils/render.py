@@ -7,8 +7,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap, BoundaryNorm
 
-from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
-from gym_cellular_automata.envs.forest_fire_v1.utils.neighbors import moore_n
+from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.v1.utils.neighbors import moore_n
 
 sns.set_style("whitegrid")
 
@@ -27,7 +27,7 @@ COLOR_FIRE = "IndianRed"
 
 def env_visualization(grid, pos, fire_seed):
     """
-    Local Global Approach
+    Local-Global Approach
     """
 
     colors = (COLOR_EMPTY, COLOR_BURNED, COLOR_TREE, COLOR_FIRE)

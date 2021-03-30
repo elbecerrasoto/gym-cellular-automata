@@ -4,12 +4,12 @@ from collections import Counter
 from gym import spaces
 import numpy as np
 
-from gym_cellular_automata.envs.forest_fire.operators import (
+from gym_cellular_automata.envs.forest_fire.v0.operators import (
     ForestFireCellularAutomaton,
     ForestFireModifier,
     ForestFireCoordinator,
 )
-from gym_cellular_automata.envs.forest_fire.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.v0.utils.config import CONFIG
 
 EMPTY = CONFIG["cell_symbols"]["empty"]
 TREE = CONFIG["cell_symbols"]["tree"]

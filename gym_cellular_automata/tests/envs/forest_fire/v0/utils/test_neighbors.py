@@ -1,12 +1,12 @@
 import pytest
 import numpy as np
 
-from gym_cellular_automata.envs.forest_fire.utils.neighbors import neighborhood_at
-from gym_cellular_automata.envs.forest_fire.utils.neighbors import (
+from gym_cellular_automata.envs.forest_fire.v0.utils.neighbors import neighborhood_at
+from gym_cellular_automata.envs.forest_fire.v0.utils.neighbors import (
     are_my_neighbors_a_boundary,
 )
 
-from gym_cellular_automata.envs.forest_fire.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.v0.utils.config import CONFIG
 
 ROW = CONFIG["grid_shape"]["n_row"]
 COL = CONFIG["grid_shape"]["n_row"]

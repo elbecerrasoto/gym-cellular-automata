@@ -1,1 +1,1 @@
-from .forest_fire_v1 import ForestFireEnv
+from .forest_fire_v0 import ForestFireEnv

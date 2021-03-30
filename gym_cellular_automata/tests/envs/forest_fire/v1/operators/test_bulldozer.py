@@ -4,8 +4,8 @@ from functools import reduce
 import pytest
 import numpy as np
 
-from gym_cellular_automata.envs.forest_fire_v1.operators.bulldozer import Bulldozer
-from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.v1.operators.bulldozer import Bulldozer
+from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
 
 
 TEST_ROW = 8

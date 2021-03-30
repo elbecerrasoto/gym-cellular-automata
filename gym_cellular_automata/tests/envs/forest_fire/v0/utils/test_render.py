@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 
 from gym import spaces
 
-from gym_cellular_automata.envs.forest_fire.utils.render import (
+from gym_cellular_automata.envs.forest_fire.v0.utils.render import (
     plot_grid,
     add_helicopter,
 )
-from gym_cellular_automata.envs.forest_fire.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.v0.utils.config import CONFIG
 
 CELL_STATES = CONFIG["cell_states"]
 

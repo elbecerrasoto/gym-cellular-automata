@@ -2,10 +2,9 @@ import re
 import numpy as np
 from pathlib import Path
 
-# Solves './gym_cellular_automata/envs/forest_fire/'
-forest_fire_dir = Path(__file__).parents[1]
 
-FOREST_FIRE_CONFIG_FILE = forest_fire_dir / "forest_fire_config.yaml"
+forest_fire_dir = Path(__file__).parents[1]
+FOREST_FIRE_CONFIG_FILE = forest_fire_dir / "forest_fire_v0.yaml"
 
 
 def get_config_dict(file):

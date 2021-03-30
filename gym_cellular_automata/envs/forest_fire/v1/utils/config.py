@@ -3,9 +3,8 @@ from pathlib import Path
 
 from gym import spaces
 
-# Solves './gym_cellular_automata/envs/forest_fire_v1/'
-forest_fire_dir = Path(__file__).parents[1]
 
+forest_fire_dir = Path(__file__).parents[1]
 FOREST_FIRE_CONFIG_FILE = forest_fire_dir / "forest_fire_v1.yaml"
 
 

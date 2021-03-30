@@ -1,8 +1,8 @@
 import pytest
 import numpy as np
 
-from gym_cellular_automata.envs.forest_fire.operators import ForestFireModifier
-from gym_cellular_automata.envs.forest_fire.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.v0.operators import ForestFireModifier
+from gym_cellular_automata.envs.forest_fire.v0.utils.config import CONFIG
 
 TEST_GRID = np.array([[2, 2, 2], [2, 2, 2], [2, 2, 2]], dtype=np.uint8)
 

@@ -5,7 +5,7 @@ from scipy.signal import convolve2d
 from gym import spaces
 
 from gym_cellular_automata import Operator
-from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
 
 # fmt: off
 EMPTY  = CONFIG["cell_symbols"]["empty"]
