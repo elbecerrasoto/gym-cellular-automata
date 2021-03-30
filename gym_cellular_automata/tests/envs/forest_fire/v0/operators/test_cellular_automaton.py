@@ -1,7 +1,9 @@
 import numpy as np
 from gym import spaces
 
-from gym_cellular_automata.envs.forest_fire.v0.operators import ForestFireCellularAutomaton
+from gym_cellular_automata.envs.forest_fire.v0.operators import (
+    ForestFireCellularAutomaton,
+)
 from gym_cellular_automata.envs.forest_fire.v0.utils.neighbors import neighborhood_at
 from gym_cellular_automata.envs.forest_fire.v0.utils.config import CONFIG
 
