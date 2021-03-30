@@ -12,7 +12,6 @@ from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
 
 class Bulldozer(Operator):
-    is_composition = False
 
     # fmt:off
     _effects = CONFIG["effects"]

@@ -1,25 +1,21 @@
 from math import modf
-import numpy as np
+
 from gym_cellular_automata import Operator
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
+
+
+# ------------ Forest Fire Operator Sequencer
 
 
 class Sequencer(Operator):
 
     # fmt: off
-    _t_none  = 1e-4
-    _t_move  = 0.024
-    _t_shoot = 0.120
+    _t_none   = CONFIG["time"]["none_action"]
+    _t_move   = CONFIG["time"]["move_action"]
+    _t_shoot  = CONFIG["time"]["shoot_action"]
   
-    _up_set    = CONFIG["actions"]["sets"]["up"]
-    _down_set  = CONFIG["actions"]["sets"]["down"]
-    
-    _left_set  = CONFIG["actions"]["sets"]["left"]
-    _right_set = CONFIG["actions"]["sets"]["right"]
-    
-    _shoot = CONFIG["actions"]["shooting"]["shoot"]
-    _none  = CONFIG["actions"]["shooting"]["none"]
-
+    _movement = CONFIG["actions"]["movement"]
+    _shooting = CONFIG["actions"]["shooting"]
     # fmt: on
 
     def __init__(
@@ -27,6 +23,8 @@ class Sequencer(Operator):
     ):
 
         self.suboperators = tuple(operators)
+
+        self._init_temporal_mappings()
 
     def update(self, grid, action, context):
 
@@ -65,9 +63,23 @@ class Sequencer(Operator):
         t_taken = t_move + t_shoot
 
         self.accumulated_time += t_taken
+
         # Decimal and Integer parts
+
         self.accumulated_time, ca_computations = modf(self.accumulated_time)
         # Assuming the following order:
         # operators = CA, Bulldozer
+
         operation_flow_idxs = int(ca_computations) * [0] + [1]
+
         return operation_flow_idxs
+
+    def _init_action_time_mappings(self):
+
+        self.movement_timings = {move: self._t_move for move in self._movement.values()}
+        self.shooting_timings = {
+            shoot: self._t_shoot for shoot in self._shooting.values()
+        }
+
+        self.movement_timings[self._shooting["not_move"]] = self._t_none
+        self.shooting_timings[self._shooting["none"]] = self._t_none

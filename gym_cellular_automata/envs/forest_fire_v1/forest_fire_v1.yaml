@@ -1,6 +1,6 @@
 cell_symbols:
-  burned: 1
   empty: 0
+  burned: 1
   tree:  3
   fire:  25
 
@@ -11,29 +11,35 @@ grid_shape:
 
 
 # Fire seed initialized to a single cell
-# Everything else is uniform sampled
+# Everything else is uniformly sampled
 p_tree: 0.90
 p_empty: 0.10
 
 
-# Idle CA steps.
-max_freeze: 31
+# Temporal Globals
+# Idle CA steps. Marked for elimination.
+max_freeze: 31 # Marked for elimination.
+# Time taken per action type on units of CA updates
+time:
+  none_action: !!float 1e-4
+  move_action: 0.024
+  shoot_action: 0.120
 
 
 # Probability of fire propagation into current tree cell
 wind_probs:
-  up_left:    0.60
-  up:         0.84
-  up_right:   0.96
-  left:       0.24
-  right:      0.84
-  down_left:  0.12
-  down:       0.24
-  down_right: 0.60
+  up_left:    0.48
+  up:         0.64
+  up_right:   0.98
+  left:       0.12
+  right:      0.64
+  down_left:  0.06
+  down:       0.12
+  down_right: 0.48
 
 
-# Bulldozer effects (optional)
-# Change TREE to EMPTY
+# Bulldozer effects
+# Change a TREE to EMPTY cell
 effects:
   tree: "empty"
 
