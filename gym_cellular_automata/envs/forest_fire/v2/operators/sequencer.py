@@ -28,28 +28,37 @@ class Sequencer(Operator):
 
     def update(self, grid, action, context):
 
-        op_contexts, temporal_params = context
+        operators_contexts, temporal_params = context
 
         # Operation sequence per step only depends on actions and temporal params
         operation_flow, new_temporal_params = self._get_operation_flow(
             grid, action, temporal_params
         )
 
+        # Apply the operations following the order given by operator flow
+        new_grid, new_operators_contexts = self._apply_operation_flow(
+            operation_flow, self.operators, grid, action, operators_contexts
+        )
+
+        new_context = new_operators_contexts, temporal_params
+
+        return new_grid, new_context
+
+    def _apply_operation_flow(self, operation_flow, operators, grid, action, contexts):
+
         # Apply Operator Sequence over grid
         # Assume the same action could be applied to each Operator
         for operation in operation_flow:
 
-            operator = self.operators[operation]
-            op_context = op_contexts[operation]
+            operator = operators[operation]
+            op_context = contexts[operation]
 
-            new_grid, new_context = operator(grid, action, op_context)
+            new_grid, new_context = operator(grid, action, context)
 
             grid = new_grid
-            op_contexts[operation] = new_context
+            contexts[operation] = new_context
 
-        new_context = op_contexts, temporal_params
-
-        return new_grid, new_context
+        return grid, contexts
 
     def _get_operation_flow(self, grid, action, context):
 
