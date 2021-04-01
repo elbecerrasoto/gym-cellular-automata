@@ -5,7 +5,7 @@
     <a href="pics/gym_automata_diagram.svg"><img src="pics/gym_automata_diagram.svg"></a>
     <br />
     <br />
-    <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-0.3.1-blue" alt="Semantic Versioning"></a>
+    <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-0.4.0-blue" alt="Semantic Versioning"></a>
     <a href="http://choosealicense.com/licenses/mit/"><img src="https://img.shields.io/badge/license-MIT-red.svg?style=flat" alt="MIT License"></a>
     <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a>
     <br />
@@ -61,11 +61,17 @@ print(gymca.RESGISTERED_CA_ENVS)
 
 ![Forest Fire](pics/forest_fire.svg)
 
+![FF Bulldozer](pics/ff_bulldozer_prototype.svg)
+
 ## Documentation
 
 :construction_worker: Documentation is in progress. 
 
 ## Contributing
+
+:evergreen_tree: :fire:
+
+For contributions with _Forest Fire CA Envs_ read [this!](./gym_cellular_automata/envs/forest_fire/CONTRIBUTING.md)
 
 Contributions to _Gym Cellular Automata_ are always welcome. Feel free to open _pull requests_ at will explaining your proposed change.
 

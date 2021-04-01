@@ -1,6 +1,8 @@
 # Adding _Forest Fire CA Envs_
 
-:evergreen_tree: :fire: :man_firefighter: :woman_firefighter:
+:evergreen_tree: :fire:
+
+:man_firefighter: :woman_firefighter:
 
 > How to add your own _Forest Fire CA Envs_?
 
@@ -72,9 +74,10 @@ black .
 ``` bash
 pytest
 ```
-3. Open a _pull request_
-4. Wait for your changes to be accepted
-5. :frog: Iterate all over again
+4. State your _dependencies_ on `setup.py`
+5. Open a _pull request_
+6. Wait for your changes to be accepted
+7. :frog: Iterate all over again
 
 
 #### Documentation
@@ -122,13 +125,6 @@ For inspiration on how to name your environment:
 # Print all gym registered envs
 print("\n".join(vars(registry)["env_specs"]))
 ```
-
-
-
-
-
-
-
 
 
 ## Directory Organization
