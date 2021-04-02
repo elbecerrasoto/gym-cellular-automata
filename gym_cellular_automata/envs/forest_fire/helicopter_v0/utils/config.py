@@ -18,24 +18,12 @@ def get_config_dict(file):
 def get_forest_fire_config_dict():
     config = get_config_dict(FOREST_FIRE_CONFIG_FILE)
 
-    config["actions"] = {**config["actions"], **parse_actions(config["actions"])}
-
     config["effects"] = parse_effects(config)
 
     config["cell_type"] = parse_type(config["cell_type"])
     config["action_type"] = parse_type(config["action_type"])
 
     return config
-
-
-def parse_actions(actions_dict):
-    actions = actions_dict.values()
-
-    n_actions = len(actions)
-    action_min = min(actions)
-    action_max = max(actions)
-
-    return {"n_actions": n_actions, "min": action_min, "max": action_max}
 
 
 def parse_effects(config):

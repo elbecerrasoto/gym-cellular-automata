@@ -21,9 +21,9 @@ from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
 class ForestFireEnv(gym.Env):
     metadata = {"render.modes": ["human"]}
 
-    # fmt:off
+    # fmt: off
     _max_freeze      = CONFIG["max_freeze"]
-    
+
     _n_moves         = len(CONFIG["actions"]["movement"])
     _n_shoots        = len(CONFIG["actions"]["shooting"])
 

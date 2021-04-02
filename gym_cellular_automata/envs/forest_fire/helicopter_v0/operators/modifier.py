@@ -23,9 +23,6 @@ DOWN_SET = {ACTION_DOWN_LEFT, ACTION_DOWN, ACTION_DOWN_RIGHT}
 LEFT_SET = {ACTION_UP_LEFT, ACTION_LEFT, ACTION_DOWN_LEFT}
 RIGHT_SET = {ACTION_UP_RIGHT, ACTION_RIGHT, ACTION_DOWN_RIGHT}
 
-ACTION_MIN = CONFIG["actions"]["min"]
-ACTION_MAX = CONFIG["actions"]["max"]
-
 ACTION_TYPE = CONFIG["action_type"]
 
 # ------------ Forest Fire Modifier
@@ -37,11 +34,6 @@ class ForestFireModifier(Operator):
     def __init__(self, effects, grid_space=None, action_space=None, context_space=None):
 
         self.effects = effects
-
-        if action_space is None:
-            action_space = spaces.Box(
-                ACTION_MIN, ACTION_MAX, shape=tuple(), dtype=ACTION_TYPE
-            )
 
         self.grid_space = grid_space
         self.action_space = action_space

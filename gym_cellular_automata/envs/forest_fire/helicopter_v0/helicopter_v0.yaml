@@ -20,15 +20,15 @@ effects:
   fire: "empty"
 
 actions:
-  up_left:    1
-  up:         2
-  up_right:   3
-  left:       4
-  not_move:   5
-  right:      6
-  down_left:  7
-  down:       8
-  down_right: 9
+  up_left:    0
+  up:         1
+  up_right:   2
+  left:       3
+  not_move:   4
+  right:      5
+  down_left:  6
+  down:       7
+  down_right: 8
 action_type: "uint8"
 
 # Steps that the Cellular Automaton remains idle.
