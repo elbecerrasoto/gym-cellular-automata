@@ -10,13 +10,13 @@ develop : install
 	pip install pytest-repeat
 	pip install pytest-cov
 	pip install pytest-randomly
-	npm i -g gitmoji-cli
+	sudo npm i -g gitmoji-cli
 
 style :
-	black .
+	black ./
 
 test :
-	pytest
+	pytest ./
 
 clean :
 	find ./ -type d -name "__pycache__" | xargs rm -rf
