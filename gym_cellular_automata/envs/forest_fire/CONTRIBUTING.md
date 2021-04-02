@@ -187,7 +187,7 @@ print("\n".join(vars(registry)["env_specs"]))
 
 ## Design considerations
 
-:art: :brush:
+:art: :paintbrush:
 
 ### Operator Framework
 
