@@ -6,7 +6,7 @@ from gym_cellular_automata import Operator
 # ------------ Forest Fire Coordinator
 
 
-class CoordinatorByFreeze(Operator):
+class Freezer(Operator):
     def __init__(
         self,
         cellular_automaton,

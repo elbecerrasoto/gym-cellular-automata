@@ -8,12 +8,10 @@ from gym.utils import seeding
 
 from gym_cellular_automata.grid_space import Grid
 
-from .operators import (
-    ForestFireCellularAutomaton,
-    ForestFireModifier,
-)
+from .operators import ForestFireModifier
 
-from gym_cellular_automata.envs.forest_fire.operators.coord_freeze import CoordinatorByFreeze as ForestFireCoordinator
+from gym_cellular_automata.envs.forest_fire.operators.coord_freezer import Freezer as ForestFireCoordinator
+from gym_cellular_automata.envs.forest_fire.operators.cella_drossel_schwabl import ForestFireCellularAutomaton
 
 from .utils.config import CONFIG
 from .utils.render import plot_grid, add_helicopter
@@ -66,7 +64,7 @@ class ForestFireEnv(gym.Env):
 
         self._set_spaces()        
 
-        self.cellular_automaton = ForestFireCellularAutomaton()
+        self.cellular_automaton = ForestFireCellularAutomaton(self._empty, self._tree, self._fire)
 
         self.modifier = ForestFireModifier(
             self._effects,
