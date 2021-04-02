@@ -5,8 +5,8 @@ import gym
 from gym import spaces
 
 import gym_cellular_automata
-from gym_cellular_automata.envs.forest_fire.v0 import ForestFireEnv
-from gym_cellular_automata.envs.forest_fire.v0.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.helicopter_v0 import ForestFireEnv
+from gym_cellular_automata.envs.forest_fire.helicopter_v0.utils.config import CONFIG
 
 RANDOM_POLICY_ITERATIONS = 12
 TEST_GRID_ROWS = 3
