@@ -10,7 +10,10 @@ develop : install
 	pip install pytest-repeat
 	pip install pytest-cov
 	pip install pytest-randomly
+	pip install pre-commit
+	pre-commit install
 	sudo npm i -g gitmoji-cli
+	gitmoji -i
 
 style :
 	black ./

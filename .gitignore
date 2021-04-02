@@ -1,6 +1,8 @@
 # Custom ignores
 # spyder's ipython console log
 ipython.html
+# isort configurations
+.isort.cfg
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
