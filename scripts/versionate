@@ -1,0 +1,163 @@
+#!/usr/bin/env python3
+
+import argparse
+import re
+import sys
+from os import getcwd, remove
+from pathlib import Path
+from shutil import copymode, move
+from tempfile import mkstemp
+
+PROGRAM = "versionate"
+
+GYMCA_REPO = Path(__file__).parents[1]
+
+sys.path.insert(0, str(GYMCA_REPO))
+from version import VERSION
+
+VERSION_FILE = GYMCA_REPO / "version.py"
+README = GYMCA_REPO / "README.md"
+
+# Files to edit
+FILES = [VERSION_FILE, README]
+
+# fmt: off
+RE_VERSION = re.compile(
+    r"""v  ([0-9] +) # major
+        \. ([0-9] +) # minor
+        \. ([0-9] +) # patch
+     """,
+    re.VERBOSE,
+)
+# fmt: on
+
+if not re.match(RE_VERSION, VERSION):
+    print("Malformed version string. Please check {VERSION_FILE}.")
+    sys.exit()
+
+
+parser = argparse.ArgumentParser()
+parser.prog = PROGRAM
+parser.description = f"Upgrade/Downgrade semantic version of GYMCA library. Current library version {VERSION}"
+
+parser.add_argument(
+    "--do",
+    "-d",
+    help="How to modify the library version.",
+    choices=[
+        "major_up",
+        "major_down",
+        "minor_up",
+        "minor_down",
+        "patch_up",
+        "patch_down",
+    ],
+)
+parser.add_argument("--set", "-s", help="Set the library version to a given string.")
+parser.add_argument(
+    "--files",
+    "-f",
+    nargs="*",
+    help=f"On which files to act. Default {FILES}",
+    default=FILES,
+)
+parser.add_argument("--verbose", "-v", action="store_true", help=f"Verbose flag.")
+
+args = parser.parse_args()
+DO = args.do
+SET = args.set
+FILES = args.files
+VERBOSE = args.verbose
+
+
+def get_new_version(sem_version, order):
+
+    if order == "major_up":
+
+        sem_version[0] += 1
+
+    elif order == "major_down":
+
+        sem_version[0] -= 1
+
+    elif order == "minor_up":
+
+        sem_version[1] += 1
+
+    elif order == "minor_down":
+
+        sem_version[1] -= 1
+
+    elif order == "patch_up":
+
+        sem_version[2] += 1
+
+    elif order == "patch_down":
+
+        sem_version[2] -= 1
+
+    else:
+        print("Unrecognized option.")
+        sys.exit()
+
+    major, minor, patch = sem_version
+
+    return f"v{major}.{minor}.{patch}"
+
+
+def version_to_int_list(version):
+    return list(map(int, re.match(RE_VERSION, version).groups()))
+
+
+def update_version_on_files(files, new_version):
+    tmp_descriptor, tmp_path = mkstemp()
+
+    for file_path in files:
+
+        with open(file_path) as f_in, open(tmp_path, "w") as f_out:
+
+            for line in f_in:
+
+                line = re.sub(RE_VERSION, new_version, line)
+
+                f_out.write(line)
+
+        # Copy permissions
+        copymode(file_path, tmp_path)
+        # Remove input file
+        remove(file_path)
+        # Rename output file
+        move(tmp_path, file_path)
+
+
+def verbose(old_v, new_v, files):
+    print(f"{old_v} -> {new_v}")
+    for file_path in files:
+        print(file_path)
+
+
+if __name__ == "__main__":
+
+    if DO is None and SET is None and not VERBOSE:
+
+        print("Check the help menu with")
+        print(f"\t{PROGRAM} --help", end="\n\n")
+        print(f"{VERSION} gym_cellular_automata version")
+
+    new_version = VERSION
+
+    if SET:
+
+        if re.match(RE_VERSION, SET):
+            new_version = SET
+        else:
+            print(r"Invalid string. It should be like: v[0-9]+\.[0-9]+\.[0-9]+")
+            sys.exit()
+
+    if DO:
+        version_int = version_to_int_list(new_version)
+        new_version = get_new_version(version_int, DO)
+        update_version_on_files(FILES, new_version)
+
+    if VERBOSE:
+        verbose(VERSION, new_version, FILES)
