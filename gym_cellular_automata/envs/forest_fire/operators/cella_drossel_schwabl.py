@@ -2,20 +2,22 @@ import numpy as np
 from gym import spaces
 
 from gym_cellular_automata import Operator
-
-from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.neighbors import neighborhood_at
+from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.neighbors import (
+    neighborhood_at,
+)
 
 # ------------ Forest Fire Cellular Automaton
 
 
 class ForestFireCellularAutomaton(Operator):
+    def __init__(
+        self, empty, tree, fire, grid_space=None, action_space=None, context_space=None
+    ):
 
-    def __init__(self, empty, tree, fire, grid_space=None, action_space=None, context_space=None):
-        
         self.empty = empty
         self.tree = tree
         self.fire = fire
-        
+
         if context_space is None:
             context_space = spaces.Box(0.0, 1.0, shape=(2,))
 

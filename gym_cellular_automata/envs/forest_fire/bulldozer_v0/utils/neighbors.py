@@ -1,5 +1,6 @@
-import numpy as np
 from collections import namedtuple
+
+import numpy as np
 
 
 def are_my_neighbors_a_boundary(grid, pos):

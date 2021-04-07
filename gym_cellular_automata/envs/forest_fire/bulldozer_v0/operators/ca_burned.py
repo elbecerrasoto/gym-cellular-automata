@@ -1,8 +1,8 @@
 from collections import namedtuple
 
 import numpy as np
-from scipy.signal import convolve2d
 from gym import spaces
+from scipy.signal import convolve2d
 
 from gym_cellular_automata import Operator
 from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG

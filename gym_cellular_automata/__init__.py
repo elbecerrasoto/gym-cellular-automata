@@ -1,4 +1,5 @@
 from gym.envs.registration import register
+
 from gym_cellular_automata.operator import Operator
 
 RESGISTERED_CA_ENVS = ("forest-fire-v0", "forest-fire-v1", "forest-fire-v1")
@@ -15,11 +16,11 @@ register(
 )
 
 
-"""
-register(
-    id=RESGISTERED_CA_ENVS[2],
-    entry_point="gym_cellular_automata.envs.forest_fire.v2:ForestFireEnv",
-)
-"""
+if False:
+    register(
+        id=RESGISTERED_CA_ENVS[2],
+        entry_point="gym_cellular_automata.envs.forest_fire.v2:ForestFireEnv",
+    )
+
 
 __all__ = ["Operator", "RESGISTERED_CA_ENVS"]

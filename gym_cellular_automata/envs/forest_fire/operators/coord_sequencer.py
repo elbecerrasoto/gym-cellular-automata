@@ -3,7 +3,6 @@ from math import modf
 from gym_cellular_automata import Operator
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 
-
 # ------------ Forest Fire Operator Sequencer
 
 
@@ -13,7 +12,7 @@ class Sequencer(Operator):
     _t_none   = CONFIG["time"]["none_action"]
     _t_move   = CONFIG["time"]["move_action"]
     _t_shoot  = CONFIG["time"]["shoot_action"]
-  
+
     _movement = CONFIG["actions"]["movement"]
     _shooting = CONFIG["actions"]["shooting"]
     # fmt: on

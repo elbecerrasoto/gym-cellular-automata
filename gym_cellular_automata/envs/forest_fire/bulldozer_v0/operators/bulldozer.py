@@ -2,11 +2,10 @@ import numpy as np
 from gym import spaces
 
 from gym_cellular_automata import Operator
+from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
 from gym_cellular_automata.envs.forest_fire.v1.utils.neighbors import (
     are_my_neighbors_a_boundary,
 )
-from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
-
 
 # ------------ Forest Fire Modifier
 
@@ -15,16 +14,16 @@ class Bulldozer(Operator):
 
     # fmt:off
     _effects = CONFIG["effects"]
-   
+
     _up_set    = CONFIG["actions"]["sets"]["up"]
     _down_set  = CONFIG["actions"]["sets"]["down"]
-    
+
     _left_set  = CONFIG["actions"]["sets"]["left"]
     _right_set = CONFIG["actions"]["sets"]["right"]
-    
+
     _shoot = CONFIG["actions"]["shooting"]["shoot"]
     _none  = CONFIG["actions"]["shooting"]["none"]
-    
+
     _n_moves         = len(CONFIG["actions"]["movement"])
     _n_shoots        = len(CONFIG["actions"]["shooting"])
     # fmt: on

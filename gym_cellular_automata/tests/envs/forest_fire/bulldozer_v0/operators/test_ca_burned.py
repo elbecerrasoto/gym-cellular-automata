@@ -1,13 +1,12 @@
 from math import isclose
+
 import pytest
-
-from gym_cellular_automata.grid_space import Grid
-from gym_cellular_automata.envs.forest_fire.v1.operators import WindyForestFireB
-from gym_cellular_automata.envs.forest_fire.v1.utils.neighbors import neighborhood_at
-from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
-
 from gym import spaces
 
+from gym_cellular_automata.envs.forest_fire.v1.operators import WindyForestFireB
+from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.v1.utils.neighbors import neighborhood_at
+from gym_cellular_automata.grid_space import Grid
 
 # Number of random grids to test
 TESTS = 32

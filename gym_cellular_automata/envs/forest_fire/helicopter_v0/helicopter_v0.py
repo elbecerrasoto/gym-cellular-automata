@@ -1,43 +1,45 @@
-import numpy as np
-from matplotlib import pyplot as plt
 from collections import Counter
 
 import gym
+import numpy as np
 from gym import spaces
 from gym.utils import seeding
+from matplotlib import pyplot as plt
 
+from gym_cellular_automata.envs.forest_fire.operators.cella_drossel_schwabl import (
+    ForestFireCellularAutomaton,
+)
+from gym_cellular_automata.envs.forest_fire.operators.coord_freezer import (
+    Freezer as ForestFireCoordinator,
+)
 from gym_cellular_automata.grid_space import Grid
 
 from .operators import ForestFireModifier
-
-from gym_cellular_automata.envs.forest_fire.operators.coord_freezer import Freezer as ForestFireCoordinator
-from gym_cellular_automata.envs.forest_fire.operators.cella_drossel_schwabl import ForestFireCellularAutomaton
-
 from .utils.config import CONFIG
-from .utils.render import plot_grid, add_helicopter
+from .utils.render import add_helicopter, plot_grid
 
 # ------------ Forest Fire Environment
 
 
 class ForestFireEnv(gym.Env):
     metadata = {"render.modes": ["human"]}
-    
+
     # fmt: off
     _empty           = CONFIG["cell_symbols"]["empty"]
     _tree            = CONFIG["cell_symbols"]["tree"]
     _fire            = CONFIG["cell_symbols"]["fire"]
 
-    
+
     _row              = CONFIG["grid_shape"]["n_row"]
     _col              = CONFIG["grid_shape"]["n_col"]
-    
+
     _p_fire           = CONFIG["ca_params"]["p_fire"]
     _p_tree           = CONFIG["ca_params"]["p_tree"]
-    
+
     _effects          = CONFIG["effects"]
-    
+
     _max_freeze       = CONFIG["max_freeze"]
-  
+
     _n_actions    = len(CONFIG["actions"])
 
     _reward_per_empty = CONFIG["rewards"]["per_empty"]
@@ -49,22 +51,26 @@ class ForestFireEnv(gym.Env):
         self.ca_params_space = spaces.Box(0.0, 1.0, shape=(2,))
         self.pos_space = spaces.MultiDiscrete([self._row, self._col])
         self.freeze_space = spaces.Discrete(self._max_freeze + 1)
-        
-        self.context_space = spaces.Tuple((self.ca_params_space, self.pos_space, self.freeze_space))
+
+        self.context_space = spaces.Tuple(
+            (self.ca_params_space, self.pos_space, self.freeze_space)
+        )
 
         self.grid_space = Grid(
             values=[self._empty, self._tree, self._fire],
             shape=(self._row, self._col),
         )
-        
+
         self.action_space = spaces.Discrete(self._n_actions)
         self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
 
     def __init__(self):
 
-        self._set_spaces()        
+        self._set_spaces()
 
-        self.cellular_automaton = ForestFireCellularAutomaton(self._empty, self._tree, self._fire)
+        self.cellular_automaton = ForestFireCellularAutomaton(
+            self._empty, self._tree, self._fire
+        )
 
         self.modifier = ForestFireModifier(
             self._effects,
@@ -76,8 +82,6 @@ class ForestFireEnv(gym.Env):
         self.coordinator = ForestFireCoordinator(
             self.cellular_automaton, self.modifier, max_freeze=self._max_freeze
         )
-
-
 
     def reset(self):
         self.grid = self.grid_space.sample()

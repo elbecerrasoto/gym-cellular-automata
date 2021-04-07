@@ -1,7 +1,6 @@
-import pytest
-import numpy as np
-
 import gym
+import numpy as np
+import pytest
 from gym import spaces
 
 import gym_cellular_automata

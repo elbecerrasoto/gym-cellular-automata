@@ -1,7 +1,7 @@
 import re
-import numpy as np
 from pathlib import Path
 
+import numpy as np
 
 forest_fire_dir = Path(__file__).parents[1]
 FOREST_FIRE_CONFIG_FILE = forest_fire_dir / "helicopter_v0.yaml"
@@ -10,7 +10,7 @@ FOREST_FIRE_CONFIG_FILE = forest_fire_dir / "helicopter_v0.yaml"
 def get_config_dict(file):
     import yaml
 
-    yaml_file = open(file, "r")
+    yaml_file = open(file)
     yaml_content = yaml.load(yaml_file, Loader=yaml.SafeLoader)
     return yaml_content
 
