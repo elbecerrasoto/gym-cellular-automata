@@ -1,13 +1,12 @@
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
 from gym import spaces
 
-from gym_cellular_automata.envs.forest_fire.v0.utils.render import (
-    plot_grid,
-    add_helicopter,
-)
 from gym_cellular_automata.envs.forest_fire.v0.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.v0.utils.render import (
+    add_helicopter,
+    plot_grid,
+)
 
 CELL_STATES = CONFIG["cell_states"]
 

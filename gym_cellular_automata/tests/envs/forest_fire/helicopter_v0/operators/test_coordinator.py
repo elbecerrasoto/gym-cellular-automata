@@ -1,13 +1,13 @@
-import pytest
-
 from collections import Counter
-from gym import spaces
+
 import numpy as np
+import pytest
+from gym import spaces
 
 from gym_cellular_automata.envs.forest_fire.v0.operators import (
     ForestFireCellularAutomaton,
-    ForestFireModifier,
     ForestFireCoordinator,
+    ForestFireModifier,
 )
 from gym_cellular_automata.envs.forest_fire.v0.utils.config import CONFIG
 

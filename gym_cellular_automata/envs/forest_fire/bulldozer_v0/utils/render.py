@@ -1,11 +1,10 @@
 """
 Visualization Prototype
 """
-import numpy as np
-
-import seaborn as sns
 import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap, BoundaryNorm
+import numpy as np
+import seaborn as sns
+from matplotlib.colors import BoundaryNorm, ListedColormap
 
 from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
 from gym_cellular_automata.envs.forest_fire.v1.utils.neighbors import moore_n

@@ -1,19 +1,18 @@
 from collections import Counter
-import numpy as np
 
 import gym
-from gym import spaces, logger
+import numpy as np
+from gym import logger, spaces
 from gym.utils import seeding
 
 from gym_cellular_automata.envs.forest_fire_v1.operators import (
-    WindyForestFireB,
     Bulldozer,
     Coordinator,
+    WindyForestFireB,
 )
-from gym_cellular_automata.grid_space import Grid
-from gym_cellular_automata.envs.forest_fire_v1.utils.render import env_visualization
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
-
+from gym_cellular_automata.envs.forest_fire_v1.utils.render import env_visualization
+from gym_cellular_automata.grid_space import Grid
 
 # ------------ Forest Fire Environment
 
@@ -23,7 +22,7 @@ class ForestFireEnv(gym.Env):
 
     # fmt:off
     _max_freeze      = CONFIG["max_freeze"]
-    
+
     _n_moves         = len(CONFIG["actions"]["movement"])
     _n_shoots        = len(CONFIG["actions"]["shooting"])
 

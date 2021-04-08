@@ -1,22 +1,27 @@
-help:
+help :
 	cat Makefile
 
-install:
+install :
 	pip install -e .
 
-develop:
-	pip install black
-	pip install pytest
-	pip install pytest-repeat
-	pip install pytest-cov
-	pip install pytest-randomly
+conda_env :
+	conda env create --file environment.yaml
 
-style:
-	black .
+develop :
+	pre-commit install
+	sudo npm i -g gitmoji-cli
+	gitmoji -i
+	pip install -e .
 
-test:
-	pytest
+style :
+	isort ./
+	black ./
 
-clean:
+test :
+	pytest ./
+
+clean :
 	find ./ -type d -name "__pycache__" | xargs rm -rf
 	find ./ -type d -name "*.egg-info" | xargs rm -rf
+
+.PHONY : help install conda_env develop style test clean

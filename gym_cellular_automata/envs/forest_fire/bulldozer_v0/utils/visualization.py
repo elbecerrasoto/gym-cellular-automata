@@ -3,17 +3,15 @@ Visualization Prototype
 """
 
 
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+from matplotlib.colors import BoundaryNorm, ListedColormap
+
 from gym_cellular_automata.envs.forest_fire_v1 import ForestFireEnv
 from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 from gym_cellular_automata.envs.forest_fire_v1.utils.grid import Grid
 from gym_cellular_automata.envs.forest_fire_v1.utils.neighbors import moore_n
-
-
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap, BoundaryNorm
-
 
 sns.set_style("whitegrid")
 # plt.style.use('fivethirtyeight')

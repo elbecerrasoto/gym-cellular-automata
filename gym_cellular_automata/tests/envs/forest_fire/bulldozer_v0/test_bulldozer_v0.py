@@ -1,14 +1,11 @@
-import pytest  # With plugin pytest-repeat
-import numpy as np
-
 import gym
+import numpy as np
+import pytest  # With plugin pytest-repeat
 from gym import spaces
 
 from gym_cellular_automata.envs.forest_fire.v1 import ForestFireEnv
-
-from gym_cellular_automata.grid_space import Grid
 from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
-
+from gym_cellular_automata.grid_space import Grid
 
 ROW = CONFIG["grid_shape"]["n_row"]
 COL = CONFIG["grid_shape"]["n_col"]

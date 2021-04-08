@@ -1,5 +1,5 @@
-import pytest
 import numpy as np
+import pytest
 
 from gym_cellular_automata.envs.forest_fire.v0.operators import ForestFireModifier
 from gym_cellular_automata.envs.forest_fire.v0.utils.config import CONFIG

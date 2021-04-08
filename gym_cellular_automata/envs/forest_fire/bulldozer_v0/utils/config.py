@@ -1,8 +1,7 @@
-import numpy as np
 from pathlib import Path
 
+import numpy as np
 from gym import spaces
-
 
 forest_fire_dir = Path(__file__).parents[1]
 FOREST_FIRE_CONFIG_FILE = forest_fire_dir / "forest_fire_v1.yaml"
@@ -11,7 +10,7 @@ FOREST_FIRE_CONFIG_FILE = forest_fire_dir / "forest_fire_v1.yaml"
 def get_config_dict(file):
     import yaml
 
-    yaml_file = open(file, "r")
+    yaml_file = open(file)
     yaml_content = yaml.load(yaml_file, Loader=yaml.SafeLoader)
     return yaml_content
 
@@ -60,7 +59,7 @@ def parse_wind(config):
     down_left  = config["wind_probs"]["down_left"]
     down       = config["wind_probs"]["down"]
     down_right = config["wind_probs"]["down_right"]
-    
+
     wind = np.array(
         [[up_left,   up,     up_right],
          [left,      0.0,      right],

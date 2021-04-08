@@ -1,13 +1,13 @@
 from operator import itemgetter
 
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import colors
+import numpy as np
 import seaborn as sns
+from matplotlib import colors
 from svgpath2mpl import parse_path
 
-from .helicopter_shape import SVG_PATH
 from .config import CONFIG
+from .helicopter_shape import SVG_PATH
 
 EMPTY = CONFIG["cell_symbols"]["empty"]
 TREE = CONFIG["cell_symbols"]["tree"]
