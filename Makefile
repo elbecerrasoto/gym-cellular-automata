@@ -4,18 +4,17 @@ help :
 install :
 	pip install -e .
 
-develop : install
-	pip install black
-	pip install pytest
-	pip install pytest-repeat
-	pip install pytest-cov
-	pip install pytest-randomly
-	pip install pre-commit
+conda_env :
+	conda env create --file environment.yaml
+
+develop :
 	pre-commit install
 	sudo npm i -g gitmoji-cli
 	gitmoji -i
+	pip install -e .
 
 style :
+	isort ./
 	black ./
 
 test :
@@ -25,4 +24,4 @@ clean :
 	find ./ -type d -name "__pycache__" | xargs rm -rf
 	find ./ -type d -name "*.egg-info" | xargs rm -rf
 
-.PHONY : help install develop style test clean
+.PHONY : help install conda_env develop style test clean
