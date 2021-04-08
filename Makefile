@@ -13,6 +13,10 @@ develop :
 	gitmoji -i
 	pip install -e .
 
+hooks :
+	pre-commit install
+	gitmoji -i
+
 style :
 	isort ./
 	black ./
@@ -24,4 +28,4 @@ clean :
 	find ./ -type d -name "__pycache__" | xargs rm -rf
 	find ./ -type d -name "*.egg-info" | xargs rm -rf
 
-.PHONY : help install conda_env develop style test clean
+.PHONY : help install conda_env develop hooks style test clean

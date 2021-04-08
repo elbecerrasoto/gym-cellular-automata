@@ -1,8 +1,7 @@
 # Adding _Forest Fire CA Envs_
 
-:evergreen_tree: :fire:
+:woman_firefighter: :evergreen_tree: :fire: :man_firefighter:
 
-:man_firefighter: :woman_firefighter:
 
 > How to add your own _Forest Fire CA Envs_?
 
@@ -36,7 +35,7 @@
   checkout -b my-awesome-env
 ```
 
-+ Create a directory under `./forest_fire/`. There goes your _Forest Fire Env_. The name does not follow any convention, besides the appending of the version suffix `_v[0-9]`. Thus the directory name does not need to coincide with its final _gym_ registered name, it even could be a little cryptic (just document about it). 
++ Create a directory under `./forest_fire/`. There goes your _Forest Fire Env_. The name does not follow any convention, besides the appending of the version suffix `_v[0-9]`. Thus the directory name does not need to coincide with its final _gym_ registered name, it even could be a little cryptic (just document about it).
 ```bash
   mkdir myAwesomeEnv_v0
 ```
@@ -111,9 +110,9 @@ Args from _gym_ [registration.py](https://github.com/openai/gym/blob/master/gym/
 The registration should look something like [this](https://github.com/openai/gym/blob/master/gym/envs/__init__.py):
 ```python
 register(
-    id='ReversedAddition-v0',
-    entry_point='gym.envs.algorithmic:ReversedAdditionEnv',
-    kwargs={'rows' : 2},
+    id="ReversedAddition-v0",
+    entry_point="gym.envs.algorithmic:ReversedAdditionEnv",
+    kwargs={"rows": 2},
     max_episode_steps=200,
     reward_threshold=25.0,
 )
@@ -146,12 +145,12 @@ print("\n".join(vars(registry)["env_specs"]))
         + `config.py` Common parser for global configurations.
         + `neighbors.py` Utility for getting cell neighborhoods.
         + `render_bulldozer.py` Shared utility for _Bulldozer-like Envs_.
-    + `helicopter_v0/` A _Forest Fire Env_. 
+    + `helicopter_v0/` A _Forest Fire Env_.
         + `helicopter_v0.py` _Env_ code.
         + `helicopter_v0.yaml`  _Env_ global configuration.
         + `helicopter_v0.md` _Env_ documentation.
         + `operators/` _Env_ specialized operators.
-            + `mod_helicopter.py` 
+            + `mod_helicopter.py`
         + `utils/` _Env_ specialized utility.
             + `render.py`
             + `helicopter_shape.py`
