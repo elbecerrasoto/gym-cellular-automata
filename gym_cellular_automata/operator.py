@@ -1,8 +1,8 @@
-from abc import ABC, abstractmethod
+from abc import ABC, Callable, abstractmethod
 from copy import copy
 
 
-class Operator(ABC):
+class Operator(ABC, Callable):
 
     # Set these in ALL subclasses
     suboperators = tuple()
@@ -14,7 +14,7 @@ class Operator(ABC):
     @abstractmethod
     def update(self, grid, action, context):
 
-        """Update a Cellular Automaton's Lattice (Grid) on base of provided action and context.
+        """Update a Cellular Automaton's Lattice (Grid) by using a provided action and context.
 
         Parameters
         ----------
@@ -24,11 +24,9 @@ class Operator(ABC):
 
         action : object
             Action influencing the operator output.
-            Some operators do not use an action thus in that case
-            this parameter would do nothing.
 
         context : object
-            Extra information needed to compute the new_grid and new_context.
+            Extra information.
 
 
         Returns
@@ -48,3 +46,11 @@ class Operator(ABC):
 
     def __call__(self, *args, **kwargs):
         return self.update(*args, **kwargs)
+
+
+class Identity(Operator):
+    def __init__(*args, **kwargs):
+        super.__init__(*args, **kwargs)
+
+    def update(self, grid, action, context):
+        return super.update(grid, action, context)
