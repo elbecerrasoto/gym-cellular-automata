@@ -6,11 +6,11 @@ from gym import spaces
 from gym.utils import seeding
 from matplotlib import pyplot as plt
 
-from gym_cellular_automata.envs.forest_fire.operators.cella_drossel_schwabl import (
-    ForestFireCellularAutomaton,
+from gym_cellular_automata.envs.forest_fire.operators.ca_DrosselSchwabl import (
+    ForestFire as ForestFireCellularAutomaton,
 )
-from gym_cellular_automata.envs.forest_fire.operators.coord_freezer import (
-    Freezer as ForestFireCoordinator,
+from gym_cellular_automata.envs.forest_fire.operators.freeze import (
+    Freeze as ForestFireCoordinator,
 )
 from gym_cellular_automata.grid_space import Grid
 

@@ -1,4 +1,5 @@
-from abc import ABC, Callable, abstractmethod
+from abc import ABC, abstractmethod
+from collections.abc import Callable
 from copy import copy
 
 

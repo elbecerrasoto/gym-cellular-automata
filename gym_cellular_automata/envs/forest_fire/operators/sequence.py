@@ -6,7 +6,7 @@ from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
 # ------------ Forest Fire Operator Sequencer
 
 
-class Sequencer(Operator):
+class Sequence(Operator):
 
     # fmt: off
     _t_none   = CONFIG["time"]["none_action"]

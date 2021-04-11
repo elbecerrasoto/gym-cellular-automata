@@ -4,6 +4,8 @@ from collections import namedtuple
 from gym_cellular_automata import Operator
 from gym_cellular_automata.operator import Identity
 
+Suboperators = namedtuple("Suboperators", ["move", "shoot"])
+
 
 class Modify(ABC, Operator):
     def __init__(
@@ -16,7 +18,9 @@ class Modify(ABC, Operator):
     ):
 
         if move is None or shoot is None:
-            self.suboperators = suboperators(move=Identity(), shoot=Identity())
+            self.suboperators = Suboperators(move=Identity(), shoot=Identity())
+        else:
+            self.suboperators = Suboperators(move=move, shoot=shoot)
 
         self.grid_space = grid_space
         self.action_space = action_space
