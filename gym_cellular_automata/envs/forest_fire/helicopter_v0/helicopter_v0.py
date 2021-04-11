@@ -14,7 +14,7 @@ from gym_cellular_automata.envs.forest_fire.operators.freeze import (
 )
 from gym_cellular_automata.grid_space import Grid
 
-from .operators.modifier import ForestFireModifier
+from .operators.modify_byHelicopter import ForestFireModifier
 from .utils.config import CONFIG
 from .utils.render import add_helicopter, plot_grid
 
