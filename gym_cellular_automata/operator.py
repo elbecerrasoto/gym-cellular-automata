@@ -8,6 +8,10 @@ class Operator(ABC, Callable):
     # Set these in ALL subclasses
     suboperators = tuple()
 
+    grid_dependant = None
+    action_dependant = None
+    context_dependant = None
+
     grid_space = None
     action_space = None
     context_space = None
@@ -50,8 +54,10 @@ class Operator(ABC, Callable):
 
 
 class Identity(Operator):
-    def __init__(*args, **kwargs):
-        super.__init__(*args, **kwargs)
+
+    grid_dependant = True
+    action_dependant = False
+    context_dependant = True
 
     def update(self, grid, action, context):
         return super.update(grid, action, context)

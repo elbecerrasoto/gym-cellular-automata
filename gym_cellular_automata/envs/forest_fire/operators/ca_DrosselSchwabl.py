@@ -8,6 +8,11 @@ from gym_cellular_automata.envs.forest_fire.utils.neighbors import neighborhood_
 
 
 class ForestFire(Operator):
+
+    grid_dependant = True
+    action_dependant = False
+    context_dependant = True
+
     def __init__(
         self, empty, tree, fire, grid_space=None, action_space=None, context_space=None
     ):

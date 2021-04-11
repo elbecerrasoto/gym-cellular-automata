@@ -1,26 +1,21 @@
-from abc import ABC
-from collections import namedtuple
-
 from gym_cellular_automata import Operator
-from gym_cellular_automata.operator import Identity
-
-Suboperators = namedtuple("Suboperators", ["move", "shoot"])
 
 
-class Modify(ABC, Operator):
+class Modify(Operator):
+
+    grid_dependant = True
+    action_dependant = True
+    context_dependant = True
+
     def __init__(
         self,
-        move=None,
-        shoot=None,
+        effects: dict,
         grid_space=None,
         action_space=None,
         context_space=None,
     ):
 
-        if move is None or shoot is None:
-            self.suboperators = Suboperators(move=Identity(), shoot=Identity())
-        else:
-            self.suboperators = Suboperators(move=move, shoot=shoot)
+        self.effects = effects
 
         self.grid_space = grid_space
         self.action_space = action_space
@@ -28,10 +23,14 @@ class Modify(ABC, Operator):
 
     def update(self, grid, action, context):
 
-        # Change position based on action
-        grid, context.position = self.suboperators.move(grid, action, context.position)
+        move_action, shoot_action = action
 
-        # Apply grid point modifications
-        grid, context = self.suboperators.shoot(grid, action, context)
+        row, col = context
+
+        if shoot_action:
+
+            for symbol in self.effects:
+                if grid[row, col] == symbol:
+                    grid[row, col] = self.effects[symbol]
 
         return grid, context
