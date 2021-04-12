@@ -29,8 +29,6 @@ class Modify(Operator):
 
         if shoot_action:
 
-            for symbol in self.effects:
-                if grid[row, col] == symbol:
-                    grid[row, col] = self.effects[symbol]
+            grid[row, col] = self.effects[grid[row, col]]
 
         return grid, context
