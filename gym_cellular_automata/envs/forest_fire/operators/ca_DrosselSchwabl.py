@@ -4,8 +4,6 @@ from gym import spaces
 from gym_cellular_automata import Operator
 from gym_cellular_automata.envs.forest_fire.utils.neighbors import neighborhood_at
 
-# ------------ Forest Fire Cellular Automaton
-
 
 class ForestFire(Operator):
 

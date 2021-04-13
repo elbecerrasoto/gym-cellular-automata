@@ -5,8 +5,6 @@ from gym import spaces
 
 from gym_cellular_automata import Operator
 
-# ------------ Forest Fire Coordinator
-
 
 class Coordinate(Operator):
 

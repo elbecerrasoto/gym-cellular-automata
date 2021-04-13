@@ -15,10 +15,6 @@ UP_LEFT, UP, UP_RIGHT, LEFT, NOT_MOVE, RIGHT, DOWN_LEFT, DOWN, DOWN_RIGHT = rang
     MOVE_ACTIONS
 )
 
-EMPTY = 0
-TREE = 3
-FIRE = 25
-
 ROW = 3
 COL = 3
 
@@ -41,7 +37,7 @@ def move(directions_sets):
 
 @pytest.fixture
 def grid_space():
-    return Grid(values=[EMPTY, TREE, EMPTY], shape=(ROW, COL))
+    return Grid(n=1, shape=(ROW, COL))
 
 
 @pytest.fixture
