@@ -60,4 +60,4 @@ class Identity(Operator):
     context_dependant = True
 
     def update(self, grid, action, context):
-        return super.update(grid, action, context)
+        return super().update(grid, action, context)

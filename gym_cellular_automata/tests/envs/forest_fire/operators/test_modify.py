@@ -18,8 +18,8 @@ TREE = 3
 FIRE = 25
 
 # Test Grid size
-ROW = 8
-COL = 8
+ROW = 3
+COL = 3
 
 
 @pytest.fixture
