@@ -34,12 +34,12 @@ def modify(effects):
 
 @pytest.fixture
 def grid_space():
-    return Grid(values=(EMPTY, TREE, FIRE), shape=(ROW, COL))
+    return Grid(values=[EMPTY, TREE, FIRE], shape=(ROW, COL))
 
 
 @pytest.fixture
 def position_space():
-    return spaces.MultiDiscrete((ROW, COL))
+    return spaces.MultiDiscrete([ROW, COL])
 
 
 @pytest.mark.repeat(TEST_REPETITIONS)

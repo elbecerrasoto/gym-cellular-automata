@@ -1,86 +1,121 @@
 import numpy as np
 import pytest
+from gym import spaces
 
-from gym_cellular_automata.envs.forest_fire.v0.operators import ForestFireModifier
-from gym_cellular_automata.envs.forest_fire.v0.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.operators.move import Move
+from gym_cellular_automata.grid_space import Grid
 
-TEST_GRID = np.array([[2, 2, 2], [2, 2, 2], [2, 2, 2]], dtype=np.uint8)
+TEST_REPETITIONS = 16
 
-EMPTY = CONFIG["cell_symbols"]["empty"]
-TREE = CONFIG["cell_symbols"]["tree"]
-FIRE = CONFIG["cell_symbols"]["fire"]
-
-CELL_STATES = CONFIG["cell_states"]
-
-ROW = CONFIG["grid_shape"]["n_row"]
-COL = CONFIG["grid_shape"]["n_col"]
-
-EFFECTS = CONFIG["effects"]
-
-ACTION_UP_LEFT = CONFIG["actions"]["up_left"]
-ACTION_UP = CONFIG["actions"]["up"]
-ACTION_UP_RIGHT = CONFIG["actions"]["up_right"]
-
-ACTION_LEFT = CONFIG["actions"]["left"]
-ACTION_NOT_MOVE = CONFIG["actions"]["not_move"]
-ACTION_RIGHT = CONFIG["actions"]["right"]
-
-ACTION_DOWN_LEFT = CONFIG["actions"]["down_left"]
-ACTION_DOWN = CONFIG["actions"]["down"]
-ACTION_DOWN_RIGHT = CONFIG["actions"]["down_right"]
+MOVE_ACTIONS = 9
+SHOOT_ACTIONS = 2
 
 
-def test_forest_fire_helicopter_movement():
-    grid = TEST_GRID
+UP_LEFT, UP, UP_RIGHT, LEFT, NOT_MOVE, RIGHT, DOWN_LEFT, DOWN, DOWN_RIGHT = range(
+    MOVE_ACTIONS
+)
 
-    pos = np.array([1, 1])
+EMPTY = 0
+TREE = 3
+FIRE = 25
 
-    modifier = ForestFireModifier(EFFECTS)
-
-    # Up
-    row, col = modifier._move(grid, ACTION_UP_LEFT, pos)
-    assert row == 0 and col == 0
-    row, col = modifier._move(grid, ACTION_UP, pos)
-    assert row == 0 and col == 1
-    row, col = modifier._move(grid, ACTION_UP_RIGHT, pos)
-    assert row == 0 and col == 2
-
-    # Middle
-    row, col = modifier._move(grid, ACTION_LEFT, pos)
-    assert row == 1 and col == 0
-    row, col = modifier._move(grid, ACTION_NOT_MOVE, pos)
-    assert row == 1 and col == 1
-    row, col = modifier._move(grid, ACTION_RIGHT, pos)
-    assert row == 1 and col == 2
-
-    # Down
-    row, col = modifier._move(grid, ACTION_DOWN_LEFT, pos)
-    assert row == 2 and col == 0
-    row, col = modifier._move(grid, ACTION_DOWN, pos)
-    assert row == 2 and col == 1
-    row, col = modifier._move(grid, ACTION_DOWN_RIGHT, pos)
-    assert row == 2 and col == 2
+ROW = 3
+COL = 3
 
 
-def test_ForestFireModifier_helicopter_movement_boundaries():
+@pytest.fixture
+def directions_sets():
+    return {
+        "up_set": {UP_LEFT, UP, UP_RIGHT},
+        "down_set": {DOWN_LEFT, DOWN, DOWN_RIGHT},
+        "left_set": {UP_LEFT, LEFT, DOWN_LEFT},
+        "right_set": {UP_RIGHT, RIGHT, DOWN_RIGHT},
+        "not_move_set": {NOT_MOVE},
+    }
 
-    grid = TEST_GRID
 
-    modifier = ForestFireModifier(EFFECTS)
+@pytest.fixture
+def move(directions_sets):
+    return Move(**directions_sets)
 
-    corner_up_left = np.array([0, 0])
-    corner_up_right = np.array([0, 2])
-    corner_down_left = np.array([2, 0])
-    corner_down_right = np.array([2, 2])
 
-    # Up Corners
-    row, col = modifier._move(grid, ACTION_UP_LEFT, corner_up_left)
-    assert row == 0 and col == 0
-    row, col = modifier._move(grid, ACTION_UP_RIGHT, corner_up_right)
-    assert row == 0 and col == 2
+@pytest.fixture
+def grid_space():
+    return Grid(values=[EMPTY, TREE, EMPTY], shape=(ROW, COL))
 
-    # Down Corners
-    row, col = modifier._move(grid, ACTION_DOWN_LEFT, corner_down_left)
-    assert row == 2 and col == 0
-    row, col = modifier._move(grid, ACTION_DOWN_RIGHT, corner_down_right)
-    assert row == 2 and col == 2
+
+@pytest.fixture
+def action_space():
+    return spaces.MultiDiscrete([MOVE_ACTIONS, SHOOT_ACTIONS])
+
+
+@pytest.fixture
+def position_space():
+    return spaces.MultiDiscrete([ROW, COL])
+
+
+@pytest.mark.repeat(TEST_REPETITIONS)
+def test_move(move, grid_space, action_space, position_space, directions_sets):
+
+    up_set = directions_sets["up_set"]
+    down_set = directions_sets["down_set"]
+    left_set = directions_sets["left_set"]
+    right_set = directions_sets["right_set"]
+
+    grid = grid_space.sample()
+    n_row, n_col = grid.shape
+
+    action = action_space.sample()
+    move_action, shoot_action = action
+
+    context = position_space.sample()
+    row, col = context
+
+    # fmt: off
+    if (move_action in up_set)    and (row > 0):
+        row -= 1
+
+    if (move_action in down_set)  and (row < (n_row-1)):
+        row += 1
+
+    if (move_action in left_set)  and (col > 0):
+        col -= 1
+
+    if (move_action in right_set) and (col < (n_col-1)):
+        col += 1
+    # fmt: on
+
+    expected_position = np.array([row, col])
+
+    grid, observed_position = move(grid, action, context)
+
+    assert np.all(observed_position == expected_position)
+
+
+def test_move_warnings(
+    move,
+    grid_space,
+    position_space,
+):
+    """
+    Move operator
+    White-box Warning Tests
+    """
+
+    # Magic Variables
+    unhashable = np.array(0)
+    out_of_action_space = "Arbitrary Object"
+    shoot_action = None
+
+    grid = grid_space.sample()
+
+    context = position_space.sample()
+
+    with pytest.warns(UserWarning):
+        # Unhashable Warning
+        action = unhashable, shoot_action
+        move(grid, action, context)
+
+        # Out of action space Warning
+        action = out_of_action_space, shoot_action
+        move(grid, action, context)
