@@ -1,1 +1,1 @@
-from .helicopter_v0 import ForestFireEnv
+from .helicopter_v0 import ForestFireHelicopterV0

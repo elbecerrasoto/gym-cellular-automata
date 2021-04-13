@@ -22,13 +22,17 @@ class Modify(Operator):
         self.context_space = context_space
 
     def update(self, grid, action, context):
+        self.hit = False
 
         move_action, shoot_action = action
 
         row, col = context
 
         if shoot_action:
-
-            grid[row, col] = self.effects[grid[row, col]]
+            print(f"row {row} row type {type(row)}")
+            print(f"col {col} col type {type(col)}")
+            if grid[row, col] in self.effects:
+                self.hit = True
+                grid[row, col] = self.effects[grid[row, col]]
 
         return grid, context

@@ -4,7 +4,7 @@ import pytest
 from gym import spaces
 
 import gym_cellular_automata
-from gym_cellular_automata.envs.forest_fire.helicopter_v0 import ForestFireEnv
+from gym_cellular_automata.envs.forest_fire.helicopter_v0 import ForestFireHelicopterV0
 from gym_cellular_automata.envs.forest_fire.helicopter_v0.utils.config import CONFIG
 
 RANDOM_POLICY_ITERATIONS = 12
@@ -38,7 +38,7 @@ P_TREE = CONFIG["ca_params"]["p_tree"]
 
 @pytest.fixture
 def env():
-    return ForestFireEnv()
+    return ForestFireHelicopterV0()
 
 
 @pytest.fixture
@@ -83,15 +83,6 @@ def test_forest_fire_env_private_methods(env, reward_space):
 
     assert hasattr(env, "_report")
     assert isinstance(env._report(), dict)
-
-
-def test_forest_fire_key_attributes(env):
-    env.reset()
-    hasattr(env, "grid")
-    isinstance(env.grid, np.ndarray)
-    hasattr(env, "context")
-    hasattr(env, "coordinator")
-    isinstance(env.coordinator, gym_cellular_automata.Operator)
 
 
 def test_forest_fire_env_step_output(env):

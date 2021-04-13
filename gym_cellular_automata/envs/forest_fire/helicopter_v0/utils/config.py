@@ -20,10 +20,42 @@ def get_forest_fire_config_dict():
 
     config["effects"] = parse_effects(config)
 
+    config["actions_sets"] = parse_actions(config)
+
     config["cell_type"] = parse_type(config["cell_type"])
     config["action_type"] = parse_type(config["action_type"])
 
     return config
+
+
+def parse_actions(config):
+    up_left = config["actions"]["up_left"]
+    up = config["actions"]["up"]
+    up_right = config["actions"]["up_right"]
+
+    left = config["actions"]["left"]
+    not_move = config["actions"]["not_move"]
+    right = config["actions"]["right"]
+
+    down_left = config["actions"]["down_left"]
+    down = config["actions"]["down"]
+    down_right = config["actions"]["down_right"]
+
+    up_set = {up_left, up, up_right}
+    down_set = {down_left, down, down_right}
+
+    left_set = {up_left, left, down_left}
+    right_set = {up_right, right, down_right}
+
+    not_move_set = {not_move}
+
+    return {
+        "up_set": up_set,
+        "down_set": down_set,
+        "left_set": left_set,
+        "right_set": right_set,
+        "not_move_set": not_move_set,
+    }
 
 
 def parse_effects(config):

@@ -7,21 +7,18 @@ from gym.utils import seeding
 from matplotlib import pyplot as plt
 
 from gym_cellular_automata.envs.forest_fire.operators.ca_DrosselSchwabl import (
-    ForestFire as ForestFireCellularAutomaton,
+    ForestFire,
 )
-from gym_cellular_automata.envs.forest_fire.operators.freeze import (
-    Freeze as ForestFireCoordinator,
-)
+from gym_cellular_automata.envs.forest_fire.operators.coordinate import Coordinate
+from gym_cellular_automata.envs.forest_fire.operators.modify import Modify
+from gym_cellular_automata.envs.forest_fire.operators.move import Move
 from gym_cellular_automata.grid_space import Grid
 
-from .operators.modify_byHelicopter import ForestFireModifier
 from .utils.config import CONFIG
 from .utils.render import add_helicopter, plot_grid
 
-# ------------ Forest Fire Environment
 
-
-class ForestFireEnv(gym.Env):
+class ForestFireHelicopterV0(gym.Env):
     metadata = {"render.modes": ["human"]}
 
     # fmt: off
@@ -68,19 +65,14 @@ class ForestFireEnv(gym.Env):
 
         self._set_spaces()
 
-        self.cellular_automaton = ForestFireCellularAutomaton(
-            self._empty, self._tree, self._fire
-        )
+        self.cellular_automaton = ForestFire(self._empty, self._tree, self._fire)
 
-        self.modifier = ForestFireModifier(
-            self._effects,
-            grid_space=self.grid_space,
-            action_space=self.action_space,
-            context_space=self.pos_space,
-        )
+        self.move = Move(**CONFIG["actions_sets"])
 
-        self.coordinator = ForestFireCoordinator(
-            self.cellular_automaton, self.modifier, max_freeze=self._max_freeze
+        self.modify = Modify(self._effects)
+
+        self.coordinate = Coordinate(
+            self.cellular_automaton, self.move, self.modify, self._max_freeze
         )
 
     def reset(self):
@@ -99,9 +91,13 @@ class ForestFireEnv(gym.Env):
     def step(self, action):
         done = self._is_done()
 
+        # Necesary to recycle the modify and move operators
+        shoot_action = True
+        action = action, shoot_action
+
         if not done:
 
-            new_grid, new_context = self.coordinator(self.grid, action, self.context)
+            new_grid, new_context = self.coordinate(self.grid, action, self.context)
 
             obs = new_grid, new_context
             reward = self._award()
@@ -129,7 +125,8 @@ class ForestFireEnv(gym.Env):
         return False
 
     def _report(self):
-        return {"hit": self.modifier.hit}
+        return {}
+        # return {"hit": self.modify.hit}
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)

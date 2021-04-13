@@ -33,6 +33,7 @@ class Coordinate(Operator):
     def update(self, grid, action, context):
 
         ca_params, position, freeze = context
+        # ca_action, move_action,  = action
 
         freeze = int(freeze)
 
@@ -48,8 +49,8 @@ class Coordinate(Operator):
 
         else:
 
-            grid, position = self.suboperators.move(grid, action, ca_params)
-            grid, mod_params = self.suboperators.modify(grid, action, ca_params)
+            grid, position = self.suboperators.move(grid, action, position)
+            grid, position = self.suboperators.modify(grid, action, position)
 
             freeze = np.array(freeze - 1)
 

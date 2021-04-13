@@ -1,11 +1,11 @@
 import numpy as np
 from gym import spaces
 
-from gym_cellular_automata.envs.forest_fire.v0.operators import (
-    ForestFireCellularAutomaton,
+from gym_cellular_automata.envs.forest_fire.helicopter_v0.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.operators.ca_DrosselSchwabl import (
+    ForestFire as ForestFireCellularAutomaton,
 )
-from gym_cellular_automata.envs.forest_fire.v0.utils.config import CONFIG
-from gym_cellular_automata.envs.forest_fire.v0.utils.neighbors import neighborhood_at
+from gym_cellular_automata.envs.forest_fire.utils.neighbors import neighborhood_at
 
 # Steps to check CA rules
 T_STEPS = 32
@@ -28,7 +28,7 @@ GRID_SPACE = spaces.Box(0, CELL_STATES - 1, shape=(ROW, COL), dtype=np.uint8)
 
 
 def test_forest_fire_cell_symbols():
-    ca_operator = ForestFireCellularAutomaton()
+    ca_operator = ForestFireCellularAutomaton(EMPTY, TREE, FIRE)
 
     assert ca_operator.empty == EMPTY
     assert ca_operator.tree == TREE
@@ -36,7 +36,7 @@ def test_forest_fire_cell_symbols():
 
 
 def test_forest_fire_update_on_tree_ring():
-    ca_operator = ForestFireCellularAutomaton()
+    ca_operator = ForestFireCellularAutomaton(EMPTY, TREE, FIRE)
 
     TREE_RING = np.array([[1, 1, 1], [1, 2, 1], [1, 1, 1]], dtype=np.uint8)
     grid = TREE_RING
@@ -97,7 +97,7 @@ def assert_forest_fire_update_at_position_row_col(grid, new_grid, row, col):
 
 
 def test_forest_fire_update():
-    ca_operator = ForestFireCellularAutomaton()
+    ca_operator = ForestFireCellularAutomaton(EMPTY, TREE, FIRE)
 
     grid = GRID_SPACE.sample()
     pos_space = spaces.MultiDiscrete([ROW, COL])
