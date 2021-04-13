@@ -4,9 +4,6 @@ import numpy as np
 from gym import logger
 
 from gym_cellular_automata import Operator
-from gym_cellular_automata.envs.forest_fire.utils.neighbors import (
-    are_my_neighbors_a_boundary,
-)
 
 
 def hashable(x):
@@ -59,24 +56,30 @@ class Move(Operator):
                 f"Movement Action {move_action} not in set {self.movement_set}.\nPosition will not change."
             )
 
-        row, col = context
+        def get_new_position(position: tuple) -> np.array:
+            row, col = position
 
-        is_boundary = are_my_neighbors_a_boundary(grid, (row, col))
-        # Change semantics for clarity
-        valid_up, valid_down, valid_left, valid_right = [
-            not boundary for boundary in is_boundary
-        ]
+            n_row, n_col = grid.shape
 
-        if valid_up and move_action in self.up_set:
-            row -= 1
+            valid_up = row > 0
+            valid_down = row < (n_row - 1)
+            valid_left = col > 0
+            valid_right = col < (n_col - 1)
 
-        if valid_down and move_action in self.down_set:
-            row += 1
+            # fmt: off
+            if (move_action in self.up_set)    and valid_up:
+                row -= 1
 
-        if valid_left and move_action in self.left_set:
-            col -= 1
+            if (move_action in self.down_set)  and valid_down:
+                row += 1
 
-        if valid_right and move_action in self.right_set:
-            col += 1
+            if (move_action in self.left_set)  and valid_left:
+                col -= 1
 
-        return grid, np.array([row, col])
+            if (move_action in self.right_set) and valid_right:
+                col += 1
+            # fmt: on
+
+            return np.array([row, col])
+
+        return grid, get_new_position(context)
