@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from gym_cellular_automata.envs.forest_fire.v0.utils.config import CONFIG
-from gym_cellular_automata.envs.forest_fire.v0.utils.neighbors import (
+from gym_cellular_automata.envs.forest_fire.helicopter_v0.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.utils.neighbors import (
     are_my_neighbors_a_boundary,
     neighborhood_at,
 )

@@ -3,8 +3,8 @@ import numpy as np
 import pytest  # With plugin pytest-repeat
 from gym import spaces
 
-from gym_cellular_automata.envs.forest_fire.v1 import ForestFireEnv
-from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.bulldozer_v0 import ForestFireEnvBulldozerV0
+from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.config import CONFIG
 from gym_cellular_automata.grid_space import Grid
 
 ROW = CONFIG["grid_shape"]["n_row"]
@@ -21,7 +21,7 @@ REWARD_PER_TREE = CONFIG["rewards"]["per_tree"]
 
 @pytest.fixture
 def env():
-    return ForestFireEnv()
+    return ForestFireEnvBulldozerV0()
 
 
 @pytest.fixture
@@ -147,9 +147,9 @@ def manual_assesment(steps=2048, verbose=False, wait=0.1, simulate_ff=False):
     done = False
 
     if simulate_ff:
-        ForestFireEnv._max_freeze = 0
+        ForestFireEnvBulldozerV0._max_freeze = 0
 
-    env = ForestFireEnv()
+    env = ForestFireEnvBulldozerV0()
 
     obs = env.reset()
 

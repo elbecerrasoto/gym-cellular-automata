@@ -3,8 +3,9 @@ import numpy as np
 import pytest
 from gym import spaces
 
-import gym_cellular_automata
-from gym_cellular_automata.envs.forest_fire.helicopter_v0 import ForestFireHelicopterV0
+from gym_cellular_automata.envs.forest_fire.helicopter_v0 import (
+    ForestFireEnvHelicopterV0,
+)
 from gym_cellular_automata.envs.forest_fire.helicopter_v0.utils.config import CONFIG
 
 RANDOM_POLICY_ITERATIONS = 12
@@ -38,7 +39,7 @@ P_TREE = CONFIG["ca_params"]["p_tree"]
 
 @pytest.fixture
 def env():
-    return ForestFireHelicopterV0()
+    return ForestFireEnvHelicopterV0()
 
 
 @pytest.fixture
@@ -174,7 +175,7 @@ def test_forest_fire_env_hit_info(env, all_fire_grid):
 def manual_assesment(verbose=False):
     from time import sleep
 
-    env = ForestFireEnv()
+    env = ForestFireEnvHelicopterV0()
 
     obs = env.reset()
 

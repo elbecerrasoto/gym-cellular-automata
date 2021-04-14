@@ -18,7 +18,7 @@ from .utils.config import CONFIG
 from .utils.render import add_helicopter, plot_grid
 
 
-class ForestFireHelicopterV0(gym.Env):
+class ForestFireEnvHelicopterV0(gym.Env):
     metadata = {"render.modes": ["human"]}
 
     # fmt: off
@@ -74,6 +74,9 @@ class ForestFireHelicopterV0(gym.Env):
         self.coordinate = Coordinate(
             self.cellular_automaton, self.move, self.modify, self._max_freeze
         )
+
+        # Gym spec method
+        self.seed()
 
     def reset(self):
         self.grid = self.grid_space.sample()

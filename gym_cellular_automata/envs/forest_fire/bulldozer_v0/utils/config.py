@@ -33,6 +33,7 @@ def parse_actions(config):
     up_right = config["actions"]["movement"]["up_right"]
 
     left = config["actions"]["movement"]["left"]
+    not_move = config["actions"]["movement"]["not_move"]
     right = config["actions"]["movement"]["right"]
 
     down_left = config["actions"]["movement"]["down_left"]
@@ -45,7 +46,15 @@ def parse_actions(config):
     left_set = {up_left, left, down_left}
     right_set = {up_right, right, down_right}
 
-    return {"up": up_set, "down": down_set, "left": left_set, "right": right_set}
+    not_move_set = {not_move}
+
+    return {
+        "up": up_set,
+        "down": down_set,
+        "left": left_set,
+        "right": right_set,
+        "not_move": not_move_set,
+    }
 
 
 def parse_wind(config):

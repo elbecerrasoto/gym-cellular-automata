@@ -5,20 +5,20 @@ import numpy as np
 from gym import logger, spaces
 from gym.utils import seeding
 
-from gym_cellular_automata.envs.forest_fire.operators.ca_DrosselSchwabl import (
-    WindyForestFire,
+from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.render import (
+    env_visualization,
 )
+from gym_cellular_automata.envs.forest_fire.operators.ca_windy import WindyForestFire
 from gym_cellular_automata.envs.forest_fire.operators.coordinate import Coordinate
 from gym_cellular_automata.envs.forest_fire.operators.modify import Modify
 from gym_cellular_automata.envs.forest_fire.operators.move import Move
-from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
-from gym_cellular_automata.envs.forest_fire.v1.utils.render import env_visualization
 from gym_cellular_automata.grid_space import Grid
 
 # ------------ Forest Fire Environment
 
 
-class ForestFireEnv(gym.Env):
+class ForestFireEnvBulldozerV0(gym.Env):
     metadata = {"render.modes": ["human"]}
 
     # fmt: off
@@ -41,6 +41,7 @@ class ForestFireEnv(gym.Env):
     _p_empty         = CONFIG["p_empty"]
 
     _wind            = CONFIG["wind"]
+    _effects            = CONFIG["effects"]
     # fmt: on
 
     def __init__(self):
@@ -49,15 +50,15 @@ class ForestFireEnv(gym.Env):
 
         self.cellular_automaton = WindyForestFire(**self._ca_kwargs)
 
-        self.modifier = Bulldozer(**self._mod_kwargs)
+        self.move = Move(CONFIG["actions"]["sets"])
 
-        self.coordinator = Coordinator(
-            self.cellular_automaton,
-            self.modifier,
-            max_freeze=self._max_freeze,
-            **self._coord_kwargs,
+        self.modify = Modify(self._effects)
+
+        self.coordinate = Coordinate(
+            self.cellular_automaton, self.move, self.modify, self._max_freeze
         )
 
+        # Gym spec method
         self.seed()
 
     def reset(self):
@@ -72,10 +73,26 @@ class ForestFireEnv(gym.Env):
 
     def step(self, action):
 
+        # Action pre-processing to reuse the defined Operator machinery
+        ca_action = None
+        move_action = action[0]
+        modify_action = action[1]
+        coordinate_action = None
+
+        action = ca_action, move_action, modify_action, coordinate_action
+
         if not self.done:
 
+            # Context Pre-Processing
+            ca_context, move_context, coordinate_context = self.context
+            context = ca_context, move_context, move_context, coordinate_context
+
             # MDP Transition
-            new_grid, new_context = self.coordinator(self.grid, action, self.context)
+            new_grid, new_context = self.coordinate(self.grid, action, context)
+
+            # Context Post-processing
+            ca_context, move_context, modify_context, coordinate_context = new_context
+            new_context = ca_context, move_context, coordinate_context
 
             # New State
             self.grid = new_grid
@@ -139,7 +156,7 @@ class ForestFireEnv(gym.Env):
         self.done = not bool(np.any(self.grid == self._fire))
 
     def _report(self):
-        return {}
+        return {"hit": self.modify.hit}
 
     def _initial_grid_distribution(self):
         # fmt: off

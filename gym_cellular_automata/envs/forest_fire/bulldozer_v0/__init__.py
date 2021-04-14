@@ -1,1 +1,1 @@
-# from .bulldozer_v0 import ForestFireEnv
+from .bulldozer_v0 import ForestFireEnvBulldozerV0
