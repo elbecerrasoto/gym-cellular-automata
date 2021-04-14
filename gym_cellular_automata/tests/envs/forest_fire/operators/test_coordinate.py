@@ -16,16 +16,25 @@ def coordinate():
     return Coordinate(cellular_automaton, move, modify, MAX_FREEZE)
 
 
-def test_coordinator(coordinate):
+@pytest.fixture
+def action():
+    ca_action = None
+    move_action = None
+    modify_action = None
+    coordinate_action = None
+
+    return ca_action, move_action, modify_action, coordinate_action
+
+
+def test_coordinator(coordinate, action):
 
     for freeze in range(MAX_FREEZE):
 
         grid = None
-        action = None
-        context = None, None, freeze
+        context = None, None, None, freeze
 
         __, observed_context = coordinate(grid, action, context)
-        __, __, observed_freeze = observed_context
+        __, __, __, observed_freeze = observed_context
 
     if freeze != 0:
 

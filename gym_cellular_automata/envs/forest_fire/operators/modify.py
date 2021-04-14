@@ -7,32 +7,22 @@ class Modify(Operator):
     action_dependant = True
     context_dependant = True
 
-    def __init__(
-        self,
-        effects: dict,
-        grid_space=None,
-        action_space=None,
-        context_space=None,
-    ):
+    def __init__(self, effects: dict, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
 
         self.effects = effects
-
-        self.grid_space = grid_space
-        self.action_space = action_space
-        self.context_space = context_space
 
     def update(self, grid, action, context):
         self.hit = False
 
-        move_action, shoot_action = action
-
         row, col = context
 
-        if shoot_action:
-            print(f"row {row} row type {type(row)}")
-            print(f"col {col} col type {type(col)}")
+        if action:
+
             if grid[row, col] in self.effects:
-                self.hit = True
+
                 grid[row, col] = self.effects[grid[row, col]]
+                self.hit = True
 
         return grid, context
