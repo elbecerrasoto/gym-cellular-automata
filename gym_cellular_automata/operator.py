@@ -12,9 +12,14 @@ class Operator(ABC, Callable):
     action_dependant = None
     context_dependant = None
 
-    grid_space = None
-    action_space = None
-    context_space = None
+    @abstractmethod
+    def __init__(self, grid_space=None, action_space=None, context_space=None):
+
+        # fmt: off
+        self.grid_space    = grid_space    if grid_space    is not None else None
+        self.action_space  = action_space  if action_space  is not None else None
+        self.context_space = context_space if context_space is not None else None
+        # fmt: on
 
     @abstractmethod
     def update(self, grid, action, context):
@@ -54,10 +59,25 @@ class Operator(ABC, Callable):
 
 
 class Identity(Operator):
+    """The identity operator.
+    It returns a hard copy grid and context.
+
+    Shows the minimal implementation of an grid Operator.
+
+    Useful for mocking grid Operators during testing.
+
+        Example::
+
+            >>> Identity()
+
+    """
 
     grid_dependant = True
     action_dependant = False
     context_dependant = True
+
+    def __init__(self):
+        super().__init__()
 
     def update(self, grid, action, context):
         return super().update(grid, action, context)
