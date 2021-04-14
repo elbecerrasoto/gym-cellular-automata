@@ -5,7 +5,7 @@ from gym import spaces
 from scipy.signal import convolve2d
 
 from gym_cellular_automata import Operator
-from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.config import CONFIG
 
 # fmt: off
 EMPTY  = CONFIG["cell_symbols"]["empty"]
@@ -106,7 +106,7 @@ BREAKS = get_breaks()
 # ------------ Forest Fire Cellular Automaton
 
 
-class WindyForestFireB(Operator):
+class WindyForestFire(Operator):
     def __init__(self, grid_space=None, action_space=None, context_space=None):
 
         if context_space is None:

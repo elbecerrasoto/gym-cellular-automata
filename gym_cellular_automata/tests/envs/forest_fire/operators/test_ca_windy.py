@@ -3,9 +3,9 @@ from math import isclose
 import pytest
 from gym import spaces
 
-from gym_cellular_automata.envs.forest_fire.v1.operators import WindyForestFireB
-from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
-from gym_cellular_automata.envs.forest_fire.v1.utils.neighbors import neighborhood_at
+from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.operators.ca_windy import WindyForestFire
+from gym_cellular_automata.envs.forest_fire.utils.neighbors import neighborhood_at
 from gym_cellular_automata.grid_space import Grid
 
 # Number of random grids to test
@@ -41,7 +41,7 @@ FIRE   = CONFIG["cell_symbols"]["fire"]
 
 @pytest.fixture
 def ca():
-    return WindyForestFireB()
+    return WindyForestFire()
 
 
 # Deterministic Wind
@@ -125,7 +125,7 @@ def test_windy_forest_fire_update(ca, grid_space, pos_space, wind):
 def visual_inspection(steps: int = 12, sleep: int = 1) -> None:
     import time
 
-    ca = WindyForestFireB()
+    ca = WindyForestFire()
 
     grid_space = Grid(
         values=[EMPTY, BURNED, TREE, FIRE],

@@ -5,11 +5,12 @@ import numpy as np
 from gym import logger, spaces
 from gym.utils import seeding
 
-from gym_cellular_automata.envs.forest_fire.v1.operators import (
-    Bulldozer,
-    Coordinator,
-    WindyForestFireB,
+from gym_cellular_automata.envs.forest_fire.operators.ca_DrosselSchwabl import (
+    WindyForestFire,
 )
+from gym_cellular_automata.envs.forest_fire.operators.coordinate import Coordinate
+from gym_cellular_automata.envs.forest_fire.operators.modify import Modify
+from gym_cellular_automata.envs.forest_fire.operators.move import Move
 from gym_cellular_automata.envs.forest_fire.v1.utils.config import CONFIG
 from gym_cellular_automata.envs.forest_fire.v1.utils.render import env_visualization
 from gym_cellular_automata.grid_space import Grid
@@ -46,7 +47,7 @@ class ForestFireEnv(gym.Env):
 
         self._set_spaces()
 
-        self.cellular_automaton = WindyForestFireB(**self._ca_kwargs)
+        self.cellular_automaton = WindyForestFire(**self._ca_kwargs)
 
         self.modifier = Bulldozer(**self._mod_kwargs)
 

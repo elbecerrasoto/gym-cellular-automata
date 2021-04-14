@@ -4,7 +4,7 @@ cell_symbols:
   empty: 0
   tree:  1
   fire:  2
-cell_type: "uint8"
+cell_type: "uint8" # Used for testing, pending removal
 
 grid_shape:
   n_row: 5
@@ -29,7 +29,7 @@ actions:
   down_left:  6
   down:       7
   down_right: 8
-action_type: "uint8"
+action_type: "uint8" # Used for testing, pending removal
 
 # Steps that the Cellular Automaton remains idle.
 max_freeze: 2

@@ -4,7 +4,7 @@ import numpy as np
 from gym import spaces
 
 forest_fire_dir = Path(__file__).parents[1]
-FOREST_FIRE_CONFIG_FILE = forest_fire_dir / "forest_fire_v1.yaml"
+FOREST_FIRE_CONFIG_FILE = forest_fire_dir / "bulldozer_v0.yaml"
 
 
 def get_config_dict(file):
