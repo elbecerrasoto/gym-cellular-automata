@@ -74,6 +74,8 @@ def test_forest_fire_env_is_a_gym_env(env):
 
 def test_forest_fire_env_private_methods(env, reward_space):
     env.reset()
+    action = env.action_space.sample()
+    env.step(action)
 
     assert hasattr(env, "_award")
     assert reward_space.contains(env._award())

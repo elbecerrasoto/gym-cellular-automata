@@ -50,11 +50,11 @@ def parse_actions(config):
     not_move_set = {not_move}
 
     return {
-        "up_set": up_set,
-        "down_set": down_set,
-        "left_set": left_set,
-        "right_set": right_set,
-        "not_move_set": not_move_set,
+        "up": up_set,
+        "down": down_set,
+        "left": left_set,
+        "right": right_set,
+        "not_move": not_move_set,
     }
 
 

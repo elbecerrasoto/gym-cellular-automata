@@ -67,7 +67,7 @@ class ForestFireHelicopterV0(gym.Env):
 
         self.cellular_automaton = ForestFire(self._empty, self._tree, self._fire)
 
-        self.move = Move(**CONFIG["actions_sets"])
+        self.move = Move(CONFIG["actions_sets"])
 
         self.modify = Modify(self._effects)
 
@@ -91,13 +91,25 @@ class ForestFireHelicopterV0(gym.Env):
     def step(self, action):
         done = self._is_done()
 
-        # Necesary to recycle the modify and move operators
-        shoot_action = True
-        action = action, shoot_action
+        # Action pre-processing to reuse the defined Operator machinery
+        ca_action = None
+        move_action = action
+        modify_action = True
+        coordinate_action = None
+
+        action = ca_action, move_action, modify_action, coordinate_action
 
         if not done:
 
-            new_grid, new_context = self.coordinate(self.grid, action, self.context)
+            # Context Pre-Processing
+            ca_context, move_context, coordinate_context = self.context
+            context = ca_context, move_context, move_context, coordinate_context
+
+            new_grid, new_context = self.coordinate(self.grid, action, context)
+
+            # Context Post-processing
+            ca_context, move_context, modify_context, coordinate_context = new_context
+            new_context = ca_context, move_context, coordinate_context
 
             obs = new_grid, new_context
             reward = self._award()
@@ -125,8 +137,7 @@ class ForestFireHelicopterV0(gym.Env):
         return False
 
     def _report(self):
-        return {}
-        # return {"hit": self.modify.hit}
+        return {"hit": self.modify.hit}
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
