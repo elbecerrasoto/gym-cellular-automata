@@ -1,16 +1,31 @@
-help:
+help :
 	cat Makefile
 
-install:
+install :
 	pip install -e .
 
-style:
-	black .
+conda_env :
+	conda env create --file environment.yaml
 
-test:
-	pytest
+develop :
+	pre-commit install
+	sudo npm i -g gitmoji-cli
+	gitmoji -i
+	pip install -e .
 
-clean:
+hooks :
+	pre-commit install
+	gitmoji -i
+
+style :
+	isort ./
+	black ./
+
+test :
+	pytest ./
+
+clean :
 	find ./ -type d -name "__pycache__" | xargs rm -rf
 	find ./ -type d -name "*.egg-info" | xargs rm -rf
-	find ./ -type f -name "ipython.html" | xargs rm -f
+
+.PHONY : help install conda_env develop hooks style test clean

@@ -1,41 +1,49 @@
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from copy import copy
 
 
-class Operator(ABC):
+class Operator(ABC, Callable):
 
     # Set these in ALL subclasses
     suboperators = tuple()
 
-    grid_space = None
-    action_space = None
-    context_space = None
+    grid_dependant = None
+    action_dependant = None
+    context_dependant = None
+
+    @abstractmethod
+    def __init__(self, grid_space=None, action_space=None, context_space=None):
+
+        # fmt: off
+        self.grid_space    = grid_space    if grid_space    is not None else None
+        self.action_space  = action_space  if action_space  is not None else None
+        self.context_space = context_space if context_space is not None else None
+        # fmt: on
 
     @abstractmethod
     def update(self, grid, action, context):
 
-        """Update a Cellular Automaton's Lattice (Grid) on base of provided action and context.
-        
+        """Update a Cellular Automaton's Lattice (Grid) by using a provided action and context.
+
         Parameters
         ----------
-        
+
         grid : array-like
             Cellular Automaton lattice.
-        
+
         action : object
             Action influencing the operator output.
-            Some operators do not use an action thus in that case
-            this parameter would do nothing.
-        
+
         context : object
-            Extra information needed to compute the new_grid and new_context. 
+            Extra information.
 
 
         Returns
         -------
         new_grid : array-like
-            Modified grid. 
-        
+            Modified grid.
+
         new_context : object
             Modified context.
 
@@ -48,3 +56,28 @@ class Operator(ABC):
 
     def __call__(self, *args, **kwargs):
         return self.update(*args, **kwargs)
+
+
+class Identity(Operator):
+    """The identity operator.
+    It returns a hard copy grid and context.
+
+    Shows the minimal implementation of an grid Operator.
+
+    Useful for mocking grid Operators during testing.
+
+        Example::
+
+            >>> Identity()
+
+    """
+
+    grid_dependant = True
+    action_dependant = False
+    context_dependant = True
+
+    def __init__(self):
+        super().__init__()
+
+    def update(self, grid, action, context):
+        return super().update(grid, action, context)

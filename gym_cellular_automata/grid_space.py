@@ -1,5 +1,5 @@
-from operator import mul
 from functools import reduce
+from operator import mul
 
 import numpy as np
 from gym.spaces import Space
@@ -71,3 +71,31 @@ class Grid(Space):
             and (self.shape == other.shape)
             and np.all(self.values == other.values)
         )
+
+
+class ZeroSpace(Space):
+    r"""A Zero space. Used to represent a NoneSpace value.
+    Samples to int 0
+
+    Useful for mocking Spaces during testing.
+
+    Example::
+
+        >>> ZeroSpace()
+
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def sample(self):
+        return 0
+
+    def contains(self, x):
+        return 0 == int(x)
+
+    def __repr__(self):
+        return "ZeroSpace()"
+
+    def __eq__(self, other):
+        return isinstance(other, ZeroSpace)

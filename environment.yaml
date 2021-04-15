@@ -1,0 +1,25 @@
+name: gymca
+channels:
+  - conda-forge
+dependencies:
+# Dependencies
+  - gym
+  - numpy
+  - matplotlib
+  - scipy
+  - seaborn
+  - pyyaml
+# Development
+  - pip
+  - black
+  - isort
+  - mypy
+  - pytest
+  - pytest-repeat
+  - pytest-cov
+  - pre-commit
+  - pip:
+    # Dependencies
+    - svgpath2mpl
+    # Development
+    - pytest-randomly

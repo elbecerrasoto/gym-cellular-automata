@@ -5,9 +5,10 @@
     <a href="pics/gym_automata_diagram.svg"><img src="pics/gym_automata_diagram.svg"></a>
     <br />
     <br />
-    <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-0.3.1-blue" alt="Semantic Versioning"></a>
+    <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-v0.4.0-blue" alt="Semantic Versioning"></a>
     <a href="http://choosealicense.com/licenses/mit/"><img src="https://img.shields.io/badge/license-MIT-red.svg?style=flat" alt="MIT License"></a>
     <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a>
+    <a href="https://gitmoji.dev"><img src="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg" alt="Gitmoji"></a>
     <br />
     <br />
     <h2 align="center">Cellular Automata Environments for Reinforcement Learning</h2>
@@ -29,21 +30,25 @@ pip install -e gym-cellular-automata
 
 ### Random Policy
 
+:game_die:
+
 ```python
 import gym
 
-env = gym.make("gym_cellular_automata:forest-fire-v0")
+env = gym.make("gym_cellular_automata:forest-fire-helicopter-v0")
 obs = env.reset()
 
 total_reward = 0.0
 done = False
+step = 0
+threshold = 12
 
-# Random Policy
-for i in range(12):
-    if not done:
-        action = env.action_space.sample()
-        obs, reward, done, info = env.step(action)
-        total_reward += reward
+# Random Policy for at most "threshold" steps
+while not done and step < threshold:
+    action = env.action_space.sample()  # Your agent goes here!
+    obs, reward, done, info = env.step(action)
+    total_reward += reward
+    step += 1
 
 print(f"Total Reward: {total_reward}")
 ```
@@ -61,11 +66,17 @@ print(gymca.RESGISTERED_CA_ENVS)
 
 ![Forest Fire](pics/forest_fire.svg)
 
+![FF Bulldozer](pics/ff_bulldozer_prototype.svg)
+
 ## Documentation
 
-:construction_worker: Documentation is in progress. 
+:construction_worker: Documentation is in progress.
 
 ## Contributing
+
+:evergreen_tree: :fire:
+
+For contributions with _Forest Fire CA Envs_ read [this!](./gym_cellular_automata/envs/forest_fire/CONTRIBUTING.md)
 
 Contributions to _Gym Cellular Automata_ are always welcome. Feel free to open _pull requests_ at will explaining your proposed change.
 
