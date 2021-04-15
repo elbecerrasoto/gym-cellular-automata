@@ -30,21 +30,25 @@ pip install -e gym-cellular-automata
 
 ### Random Policy
 
+:game_die:
+
 ```python
 import gym
 
-env = gym.make("gym_cellular_automata:forest-fire-v0")
+env = gym.make("gym_cellular_automata:forest-fire-helicopter-v0")
 obs = env.reset()
 
 total_reward = 0.0
 done = False
+step = 0
+threshold = 12
 
-# Random Policy
-for i in range(12):
-    if not done:
-        action = env.action_space.sample()
-        obs, reward, done, info = env.step(action)
-        total_reward += reward
+# Random Policy for at most "threshold" steps
+while not done and step < threshold:
+    action = env.action_space.sample()  # Your agent goes here!
+    obs, reward, done, info = env.step(action)
+    total_reward += reward
+    step += 1
 
 print(f"Total Reward: {total_reward}")
 ```

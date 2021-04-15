@@ -13,38 +13,54 @@
 
 ### Set-Up
 
-+ Download and Install
++ Download.
 ```bash
   git clone https://github.com/elbecerrasoto/gym-cellular-automata
+```
+
++ Set-up the development environment.
+```bash
   cd gym-cellular-automata
-  make install
-```
-
-+ Set-Up the development environment
-```bash
   make develop
+  conda activate gymca
 ```
 
-+ Check that everything is fine
+> For Development GYMCA should be installed after creating the Conda Environment, as `pip` messes up `conda` packages.
+
++ Install.
 ```bash
-  pytest
+make install
 ```
 
-+ :octocat: Checkout a new development branch
++ Create hooks for `git`.
+```bash
+make hooks
+```
+
+
++ Check that everything is fine.
+```bash
+  make test
+```
+
++ :octocat: Checkout a new development branch.
 ```
   checkout -b my-awesome-env
 ```
 
-+ Create a directory under `./forest_fire/`. There goes your _Forest Fire Env_. The name does not follow any convention, besides the appending of the version suffix `_v[0-9]`. Thus the directory name does not need to coincide with its final _gym_ registered name, it even could be a little cryptic (just document about it).
++ Create a directory under `./gym_cellular_automata/envs/forest_fire/`. There goes your _Forest Fire Env_. The name does not follow any convention, besides the appending of the version suffix `_v[0-9]`.
 ```bash
+  cd ./gym_cellular_automata/envs/forest_fire/
   mkdir myAwesomeEnv_v0
 ```
 
 
 ### Code
 
-+ Code your _Forest Fire Env_. You know what this means.
-+  Pull and merge to get the latest hotness from _main_.
+:space_invader:
+
++ Code your _Forest Fire Env_. Yei :tada:!!!
++ Across coding sessions, pull and merge to get the latest hotness from _main_.
 ```bash
   git pull
   git checkout my-awesome-env
@@ -55,7 +71,7 @@
   + [Design considerations](#design-considerations)
 + Now and then format your code, it is just _one simple command_.
     + ``` bash
-        black .
+        make style
       ```
 
 ### Integrate
@@ -65,18 +81,18 @@
 
 > You should be merging into _main_ often, even if your _Forest Fire Env_ is somewhat functional.
 
-1. Format the code
+1. Format the code.
 ``` bash
-black .
+make style
 ```
-2. Test the code
+2. Test the code.
 ``` bash
-pytest
+make test
 ```
-4. State your _dependencies_ on `setup.py`
-5. Open a _pull request_
-6. Wait for your changes to be accepted
-7. :frog: Iterate all over again
+4. State your _dependencies_ on `setup.py`.
+5. Open a _pull request_.
+6. Wait for your changes to be accepted.
+7. :frog: Iterate all over again.
 
 
 #### Documentation
@@ -222,12 +238,12 @@ Improvements or suggestions for the _architecture_ and _framework_ are always we
 
 + Format your code, it is just _one simple command_.
   ``` bash
-    black .
+    make style
   ```
 
 + Do not break the build, easy check by running the test suite.
   ```bash
-    pytest
+    make test
   ```
 
 + Test your code, _it is good for your sanity_.
