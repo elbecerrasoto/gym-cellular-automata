@@ -144,13 +144,9 @@ class ForestFireEnvBulldozerV0(gym.Env):
 
     def _award(self):
 
-        if not self.done:
-
-            return 0.0
-
-        else:
-
-            return self._reward_per_tree * self._count_cells()[self._tree]
+        # Reward is tree ratio at all times.
+        # Easy to interpret and immediate also includes the cost of bulldozer acting.
+        return self._count_cells()[self._tree] / (self._row * self._col)
 
     def _is_done(self):
         self.done = not bool(np.any(self.grid == self._fire))

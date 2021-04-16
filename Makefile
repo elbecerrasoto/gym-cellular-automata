@@ -5,7 +5,7 @@ install :
 	pip install -e .
 
 conda_env :
-	conda env create --file environment.yaml
+	conda env create --file "environment.yaml"
 
 develop :
 	pre-commit install
@@ -24,8 +24,11 @@ style :
 test :
 	pytest ./
 
+patch :
+	./scripts/versionate -v --do "patch_up"
+
 clean :
 	find ./ -type d -name "__pycache__" | xargs rm -rf
 	find ./ -type d -name "*.egg-info" | xargs rm -rf
 
-.PHONY : help install conda_env develop hooks style test clean
+.PHONY : help install conda_env develop hooks style test patch clean

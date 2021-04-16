@@ -126,7 +126,7 @@ def test_termination_behavior(env, all_trees):
         values, counts = np.unique(grid, return_counts=True)
         return dict(zip(values, counts))
 
-    assert reward == REWARD_PER_TREE * get_dict_of_counts(grid)[TREE]
+    assert env._count_cells()[TREE] == get_dict_of_counts(grid)[TREE]
 
 
 def test_single_fire_seed(env):
