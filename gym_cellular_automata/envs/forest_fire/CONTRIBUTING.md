@@ -25,7 +25,7 @@
   conda activate gymca
 ```
 
-> For Development GYMCA should be installed after creating the Conda Environment, as `pip` messes up `conda` packages.
+> For Development, GYMCA should be installed after creating the Conda Environment, as `pip` messes up `conda` packages.
 
 + Install.
 ```bash
@@ -206,7 +206,7 @@ print("\n".join(vars(registry)["env_specs"]))
 
 ### Operator Framework
 
-You are by no means constrained to follow this, but at least you should consider it, as the _framework_ was built with this design choices.
+You are by no means constrained to follow this, but at least you should consider it.
 
 > Everything is an Operator.
 
@@ -232,7 +232,7 @@ You are by no means constrained to follow this, but at least you should consider
 + _Operators_ enable code recycling and modularity.
 + It defines a common API and enables collaboration.
 
-Improvements or suggestions for the _architecture_ and _framework_ are always welcome, as development is on an early stage.
+Improvements or suggestions for the _architecture_ and _framework_ are always welcome.
 
 ## Good Citizen Practices
 
