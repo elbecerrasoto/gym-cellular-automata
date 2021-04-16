@@ -138,6 +138,8 @@ register(
 For inspiration on how to name your environment:
 ```python
 # Print all gym registered envs
+from gym.envs import registry
+
 print("\n".join(vars(registry)["env_specs"]))
 ```
 

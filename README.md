@@ -35,7 +35,7 @@ pip install -e gym-cellular-automata
 ```python
 import gym
 
-env = gym.make("gym_cellular_automata:forest-fire-helicopter-v0")
+env = gym.make("gym_cellular_automata:ForestFireHelicopter-v0")
 obs = env.reset()
 
 total_reward = 0.0

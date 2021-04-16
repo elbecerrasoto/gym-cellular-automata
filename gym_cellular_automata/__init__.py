@@ -2,7 +2,7 @@ from gym.envs.registration import register
 
 from gym_cellular_automata.operator import Operator
 
-RESGISTERED_CA_ENVS = ("forest-fire-helicopter-v0", "forest-fire-bulldozer-v0")
+RESGISTERED_CA_ENVS = ("ForestFireHelicopter-v0", "ForestFireBulldozer-v0")
 
 register(
     id=RESGISTERED_CA_ENVS[0],
