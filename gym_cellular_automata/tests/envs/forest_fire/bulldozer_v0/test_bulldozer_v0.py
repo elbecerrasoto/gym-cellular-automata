@@ -122,11 +122,21 @@ def test_termination_behavior(env, all_trees):
 
     assert done
 
+
+def test_counts(env):
+    obs = env.reset()
+    grid, context = obs
+
     def get_dict_of_counts(grid):
         values, counts = np.unique(grid, return_counts=True)
         return dict(zip(values, counts))
 
-    assert env._count_cells()[TREE] == get_dict_of_counts(grid)[TREE]
+    observed_counts = env._count_cells()
+    expected_counts = get_dict_of_counts(grid)
+
+    assert all(
+        [observed_counts[cell] == expected_counts[cell] for cell in expected_counts]
+    )
 
 
 def test_single_fire_seed(env):
