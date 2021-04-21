@@ -48,7 +48,7 @@ make hooks
   checkout -b my-awesome-env
 ```
 
-+ Create a directory under `./gym_cellular_automata/envs/forest_fire/`. There goes your _Forest Fire Env_. The name does not follow any convention, besides the appending of the version suffix `_v[0-9]`.
++ Create a directory under `./gym_cellular_automata/envs/forest_fire/`. There goes your _Forest Fire Env_. The name does not follow any convention, besides the appending of the version suffix `_v[0-9]+`.
 ```bash
   cd ./gym_cellular_automata/envs/forest_fire/
   mkdir myAwesomeEnv_v0
