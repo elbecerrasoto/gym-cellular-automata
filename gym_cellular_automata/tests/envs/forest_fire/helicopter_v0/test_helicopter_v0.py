@@ -7,6 +7,7 @@ from gym_cellular_automata.envs.forest_fire.helicopter_v0 import (
     ForestFireEnvHelicopterV0,
 )
 from gym_cellular_automata.envs.forest_fire.helicopter_v0.utils.config import CONFIG
+from gym_cellular_automata.grid_space import Grid
 
 RANDOM_POLICY_ITERATIONS = 12
 TEST_GRID_ROWS = 3
@@ -28,9 +29,9 @@ REWARD_PER_TREE = CONFIG["rewards"]["per_tree"]
 REWARD_PER_FIRE = CONFIG["rewards"]["per_fire"]
 
 REWARD_TYPE = np.float32
-CELL_TYPE = CONFIG["cell_type"]
-ACTION_TYPE = CONFIG["action_type"]
 
+EMPTY = CONFIG["cell_symbols"]["empty"]
+TREE = CONFIG["cell_symbols"]["tree"]
 FIRE = CONFIG["cell_symbols"]["fire"]
 
 P_FIRE = CONFIG["ca_params"]["p_fire"]
@@ -44,10 +45,11 @@ def env():
 
 @pytest.fixture
 def all_fire_grid():
-    fire = np.array(FIRE, dtype=CELL_TYPE)
-    return np.repeat(fire, TEST_GRID_ROWS * TEST_GRID_COLS).reshape(
-        (TEST_GRID_ROWS, TEST_GRID_COLS)
-    )
+    return Grid(
+        values=[EMPTY, TREE, FIRE],
+        shape=(TEST_GRID_ROWS, TEST_GRID_COLS),
+        probs=[0.0, 0.0, 1.0],
+    ).sample()
 
 
 def set_env_with_custom_state(env, grid, context):
