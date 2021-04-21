@@ -41,11 +41,15 @@ class Grid(Space):
         uniform = np.repeat(1.0, self.n) / self.n
         self.probs = uniform if probs is None else probs
 
+        assert len(self.values) == len(
+            self.probs
+        ), "Unique values do NOT MATCH with assigned probabilities."
+
         self.size = reduce(mul, self.shape)
 
     def sample(self):
 
-        return np.random.choice(self.values, self.size, p=self.probs).reshape(
+        return np.random.choice(a=self.values, size=self.size, p=self.probs).reshape(
             self.shape
         )
 
