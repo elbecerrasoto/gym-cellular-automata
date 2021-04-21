@@ -44,23 +44,6 @@ class ForestFireEnvHelicopterV0(gym.Env):
     _reward_per_fire  = CONFIG["rewards"]["per_fire"]
     # fmt: on
 
-    def _set_spaces(self):
-        self.ca_params_space = spaces.Box(0.0, 1.0, shape=(2,))
-        self.pos_space = spaces.MultiDiscrete([self._row, self._col])
-        self.freeze_space = spaces.Discrete(self._max_freeze + 1)
-
-        self.context_space = spaces.Tuple(
-            (self.ca_params_space, self.pos_space, self.freeze_space)
-        )
-
-        self.grid_space = Grid(
-            values=[self._empty, self._tree, self._fire],
-            shape=(self._row, self._col),
-        )
-
-        self.action_space = spaces.Discrete(self._n_actions)
-        self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
-
     def __init__(self):
 
         self._set_spaces()
@@ -94,27 +77,24 @@ class ForestFireEnvHelicopterV0(gym.Env):
     def step(self, action):
         done = self._is_done()
 
-        # Action pre-processing to reuse the defined Operator machinery
-        ca_action = None
-        move_action = action
-        modify_action = True
-        coordinate_action = None
-
-        action = ca_action, move_action, modify_action, coordinate_action
+        # Process the action to reuse shared Operator Machinery
+        action = self._action_processing(action)
 
         if not done:
 
-            # Context Pre-Processing
-            ca_context, move_context, coordinate_context = self.context
-            context = ca_context, move_context, move_context, coordinate_context
+            # Pre-Process the context to reuse shared Operator Machinery
+            context = self._context_preprocessing(self.context)
 
+            # MDP Transition
             new_grid, new_context = self.coordinate(self.grid, action, context)
 
-            # Context Post-processing
-            ca_context, move_context, modify_context, coordinate_context = new_context
-            new_context = ca_context, move_context, coordinate_context
+            # Post-Process the context shown to the user
+            new_context = self._context_postprocessing(new_context)
 
+            # Gym API Formatting
+            # Necessary condition for MDP, its New State is public
             obs = new_grid, new_context
+            # Reward as a function of New State, dependence NOT necessary for MDP
             reward = self._award()
             info = self._report()
 
@@ -152,4 +132,42 @@ class ForestFireEnvHelicopterV0(gym.Env):
         figure = add_helicopter(plot_grid(self.grid), pos)
         plt.show()
 
+        # Formally on the Gym API env.render(mode=human) returns nothing
+        # Returning figure for convenience
         return figure
+
+    def _set_spaces(self):
+        self.ca_params_space = spaces.Box(0.0, 1.0, shape=(2,))
+        self.pos_space = spaces.MultiDiscrete([self._row, self._col])
+        self.freeze_space = spaces.Discrete(self._max_freeze + 1)
+
+        self.context_space = spaces.Tuple(
+            (self.ca_params_space, self.pos_space, self.freeze_space)
+        )
+
+        self.grid_space = Grid(
+            values=[self._empty, self._tree, self._fire],
+            shape=(self._row, self._col),
+        )
+
+        self.action_space = spaces.Discrete(self._n_actions)
+        self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
+
+    def _action_processing(self, action):
+        # Correct size and Modify is always active
+        ca_action = None
+        move_action = action
+        modify_action = True
+        coordinate_action = None
+
+        return ca_action, move_action, modify_action, coordinate_action
+
+    def _context_preprocessing(self, context):
+        ca_context, move_context, coordinate_context = context
+        # Only repeats the Move Context
+        return ca_context, move_context, move_context, coordinate_context
+
+    def _context_postprocessing(self, new_context):
+        # Only un-repeats the Move Context
+        ca_context, move_context, modify_context, coordinate_context = new_context
+        return ca_context, move_context, coordinate_context

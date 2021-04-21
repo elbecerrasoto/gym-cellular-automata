@@ -73,26 +73,19 @@ class ForestFireEnvBulldozerV0(gym.Env):
 
     def step(self, action):
 
-        # Action pre-processing to reuse the defined Operator machinery
-        ca_action = None
-        move_action = action[0]
-        modify_action = action[1]
-        coordinate_action = None
-
-        action = ca_action, move_action, modify_action, coordinate_action
+        # Process the action to reuse shared Operator Machinery
+        action = self._action_processing(action)
 
         if not self.done:
 
-            # Context Pre-Processing
-            ca_context, move_context, coordinate_context = self.context
-            context = ca_context, move_context, move_context, coordinate_context
+            # Pre-Process the context to reuse shared Operator Machinery
+            context = self._context_preprocessing(self.context)
 
             # MDP Transition
             new_grid, new_context = self.coordinate(self.grid, action, context)
 
-            # Context Post-processing
-            ca_context, move_context, modify_context, coordinate_context = new_context
-            new_context = ca_context, move_context, coordinate_context
+            # Post-Process the context shown to the user
+            new_context = self._context_postprocessing(new_context)
 
             # New State
             self.grid = new_grid
@@ -101,10 +94,10 @@ class ForestFireEnvBulldozerV0(gym.Env):
             # Termination as a function of New State
             self._is_done()
 
-            # API Formatting
+            # Gym API Formatting
             # Necessary condition for MDP, its New State is public
             obs = new_grid, new_context
-            # Reward as a function of New State
+            # Reward as a function of New State, dependence NOT necessary for MDP
             reward = self._award()
             info = self._report()
 
@@ -134,7 +127,10 @@ class ForestFireEnvBulldozerV0(gym.Env):
         if mode == "human":
 
             wind, pos, freeze = self.context
-            env_visualization(self.grid, pos, self._fire_seed)
+
+            # Formally on the Gym API env.render(mode=human) returns nothing
+            # Returning figure for convenience
+            return env_visualization(self.grid, pos, self._fire_seed)
 
         else:
 
@@ -224,3 +220,22 @@ class ForestFireEnvBulldozerV0(gym.Env):
         self.ca_space = spaces.Dict(spaces=self._ca_kwargs)
         self.mod_space = spaces.Dict(spaces=self._mod_kwargs)
         self.coord_space = spaces.Dict(spaces=self._coord_kwargs)
+
+    def _action_processing(self, action):
+        # Correct size and separates the sub-actions
+        ca_action = None
+        move_action = action[0]
+        modify_action = action[1]
+        coordinate_action = None
+
+        return ca_action, move_action, modify_action, coordinate_action
+
+    def _context_preprocessing(self, context):
+        ca_context, move_context, coordinate_context = context
+        # Only repeats the Move Context
+        return ca_context, move_context, move_context, coordinate_context
+
+    def _context_postprocessing(self, new_context):
+        # Only un-repeats the Move Context
+        ca_context, move_context, modify_context, coordinate_context = new_context
+        return ca_context, move_context, coordinate_context

@@ -92,3 +92,4 @@ def env_visualization(grid, pos, fire_seed):
     ax_hood.plot(mid_col, mid_row, marker="$B$", markersize=12, color="1.0")
 
     plt.show()
+    return plt.gcf()
