@@ -10,7 +10,7 @@ def get_config_dict(file):
     return yaml_content
 
 
-def get_path(file, pwd):
+def get_path(file, pwd, behind=1):
     """
     Absolute Path of file,
     expected to be found 1 directory behind of Current Working Directory
@@ -19,7 +19,7 @@ def get_path(file, pwd):
     """
     from pathlib import Path
 
-    dir = Path(pwd).parents[1]
+    dir = Path(pwd).parents[behind]
     return dir / file
 
 
@@ -37,7 +37,7 @@ def translate(mapping: dict, translation: dict) -> dict:
     return {f[x]: f[m[x]] for x in m}
 
 
-# Group movement actions, useful for instantiate a "move operator"
+# Group movement actions, useful to instantiate a "move operator"
 def group_actions(actions: dict) -> dict:
     import re
 

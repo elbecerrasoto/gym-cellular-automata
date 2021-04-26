@@ -31,4 +31,7 @@ clean :
 	find ./ -type d -name "__pycache__" | xargs rm -rf
 	find ./ -type d -name "*.egg-info" | xargs rm -rf
 
-.PHONY : help install conda_env develop hooks style test patch clean
+count :
+	find ./ -name '*.py' -print | xargs cat | sed '/^$$/ d' | wc -l
+
+.PHONY : help install conda_env develop hooks style test patch clean count
