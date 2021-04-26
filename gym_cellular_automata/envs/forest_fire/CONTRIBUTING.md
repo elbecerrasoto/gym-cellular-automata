@@ -238,6 +238,10 @@ Improvements or suggestions for the _architecture_ and _framework_ are always we
 
 ## Good Citizen Practices
 
++ :pray: Use type annotations.
+  + [python type hints](https://docs.python.org/3/library/typing.html)
+  + The code of the library is statically checked by [mypy](https://mypy.readthedocs.io/en/stable/)
+
 + Format your code, it is just _one simple command_.
   ``` bash
     make style
