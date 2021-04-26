@@ -22,6 +22,7 @@ style :
 	black ./
 
 test :
+	mypy --config-file mypy.ini ./
 	pytest ./
 
 patch :

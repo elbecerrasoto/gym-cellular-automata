@@ -1,19 +1,27 @@
 from abc import ABC, abstractmethod
-from collections.abc import Callable
 from copy import copy
+from typing import Any, Optional
+
+import numpy as np
+from gym.spaces import Space
 
 
-class Operator(ABC, Callable):
+class Operator(ABC):
 
     # Set these in ALL subclasses
-    suboperators = tuple()
+    suboperators: tuple = tuple()
 
-    grid_dependant = None
-    action_dependant = None
-    context_dependant = None
+    grid_dependant: Optional[bool] = None
+    action_dependant: Optional[bool] = None
+    context_dependant: Optional[bool] = None
 
     @abstractmethod
-    def __init__(self, grid_space=None, action_space=None, context_space=None):
+    def __init__(
+        self,
+        grid_space: Optional[Space] = None,
+        action_space: Optional[Space] = None,
+        context_space: Optional[Space] = None,
+    ) -> None:
 
         # fmt: off
         self.grid_space    = grid_space    if grid_space    is not None else None
@@ -22,7 +30,9 @@ class Operator(ABC, Callable):
         # fmt: on
 
     @abstractmethod
-    def update(self, grid, action, context):
+    def update(
+        self, grid: np.ndarray, action: Any, context: Any
+    ) -> tuple[np.ndarray, Any]:
 
         """Update a Cellular Automaton's Lattice (Grid) by using a provided action and context.
 

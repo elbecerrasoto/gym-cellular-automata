@@ -18,6 +18,7 @@ dependencies:
   - pytest-repeat
   - pytest-cov
   - pre-commit
+  - MonkeyType
   - pip:
     # Dependencies
     - svgpath2mpl
