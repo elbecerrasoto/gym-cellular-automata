@@ -24,6 +24,7 @@ class ForestFireEnvBulldozerV0(gym.Env):
 
     _n_moves         = len(CONFIG["actions"]["movement"])
     _n_shoots        = len(CONFIG["actions"]["shooting"])
+    _action_sets     = CONFIG["actions"]["sets"]
 
     _reward_per_tree = CONFIG["rewards"]["per_tree"]
 
@@ -46,9 +47,9 @@ class ForestFireEnvBulldozerV0(gym.Env):
 
         self._set_spaces()
 
-        self.cellular_automaton = WindyForestFire(**self._ca_kwargs)
+        self.cellular_automaton = WindyForestFire()
 
-        self.move = Move(CONFIG["actions"]["sets"])
+        self.move = Move(self._action_sets)
 
         self.modify = Modify(self._effects)
 
@@ -199,27 +200,6 @@ class ForestFireEnvBulldozerV0(gym.Env):
         # RL Spaces
         self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
         self.action_space = spaces.MultiDiscrete([self._n_moves, self._n_shoots])
-
-        # Operator Spaces
-        self._ca_kwargs = {
-            "grid_space": self.grid_space,
-            "action_space": self.action_space,
-            "context_space": self.ca_params_space,
-        }
-        self._mod_kwargs = {
-            "grid_space": self.grid_space,
-            "action_space": self.action_space,
-            "context_space": self.mod_params_space,
-        }
-        self._coord_kwargs = {
-            "grid_space": self.grid_space,
-            "action_space": self.action_space,
-            "context_space": self.coord_params_space,
-        }
-
-        self.ca_space = spaces.Dict(spaces=self._ca_kwargs)
-        self.mod_space = spaces.Dict(spaces=self._mod_kwargs)
-        self.coord_space = spaces.Dict(spaces=self._coord_kwargs)
 
     def _action_processing(self, action):
         # Correct size and separates the sub-actions

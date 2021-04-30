@@ -37,7 +37,8 @@ class ForestFireEnvHelicopterV0(gym.Env):
 
     _max_freeze       = CONFIG["max_freeze"]
 
-    _n_actions    = len(CONFIG["actions"])
+    _n_actions        = len(CONFIG["actions"])
+    _action_sets      = CONFIG["actions_sets"]
 
     _reward_per_empty = CONFIG["rewards"]["per_empty"]
     _reward_per_tree  = CONFIG["rewards"]["per_tree"]
@@ -50,7 +51,7 @@ class ForestFireEnvHelicopterV0(gym.Env):
 
         self.cellular_automaton = ForestFire(self._empty, self._tree, self._fire)
 
-        self.move = Move(CONFIG["actions_sets"])
+        self.move = Move(self._action_sets)
 
         self.modify = Modify(self._effects)
 
