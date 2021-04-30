@@ -34,6 +34,9 @@ patch :
 clean :
 	find ./ -type d -name "__pycache__" | xargs rm -rf
 	find ./ -type d -name "*.egg-info" | xargs rm -rf
+	find ./ -type f -name "monkeytype.sqlite3" | xargs rm -f
+	git clean -d -n # To remove them change -n to -f
+	echo "\n\nTo remove git untracked files run:\ngit clean -d -f"
 
 count :
 	find ./ -name '*.py' -print | xargs cat | sed '/^$$/ d' | wc -l

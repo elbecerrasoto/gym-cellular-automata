@@ -1,4 +1,6 @@
 # Custom ignores
+# monkeytype DB
+monkeytype.sqlite3
 # spyder's ipython console log
 ipython.html
 # isort configurations
