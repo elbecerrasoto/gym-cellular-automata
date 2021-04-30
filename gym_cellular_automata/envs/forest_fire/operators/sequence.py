@@ -1,7 +1,7 @@
 from math import modf
 
 from gym_cellular_automata import Operator
-from gym_cellular_automata.envs.forest_fire_v1.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.config import CONFIG
 
 
 class Sequence(Operator):

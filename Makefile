@@ -22,11 +22,13 @@ style :
 	black ./
 
 test :
-	mypy --config-file mypy.ini ./
 	pytest ./
 
 test-coverage :
 	pytest --cov=gym_cellular_automata gym_cellular_automata/tests
+
+linter :
+		mypy --config-file mypy.ini ./
 
 patch :
 	./scripts/versionate -v --do "patch_up"
@@ -41,4 +43,4 @@ clean :
 count :
 	find ./ -name '*.py' -print | xargs cat | sed '/^$$/ d' | wc -l
 
-.PHONY : help install conda_env develop hooks style test test-coverage patch clean count
+.PHONY : help install conda_env develop hooks style test test-coverage linter patch clean count
