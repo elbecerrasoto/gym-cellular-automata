@@ -1,10 +1,10 @@
 from collections import Counter
 
 import gym
+import matplotlib.pyplot as plt
 import numpy as np
-from gym import spaces
+from gym import logger, spaces
 from gym.utils import seeding
-from matplotlib import pyplot as plt
 
 from gym_cellular_automata.envs.forest_fire.operators.ca_DrosselSchwabl import (
     ForestFire,
@@ -127,14 +127,22 @@ class ForestFireEnvHelicopterV0(gym.Env):
         return [seed]
 
     def render(self, mode="human"):
-        ca_params, pos, freeze = self.context
 
-        figure = add_helicopter(plot_grid(self.grid), pos)
-        plt.show()
+        if mode == "human":
 
-        # Formally on the Gym API env.render(mode=human) returns nothing
-        # Returning figure for convenience
-        return figure
+            ca_params, pos, freeze = self.context
+
+            figure = add_helicopter(plot_grid(self.grid), pos)
+            plt.show()
+
+            # Returning figure for convenience, formally render mode=human returns None
+            return figure
+
+        else:
+
+            logger.warn(
+                f"Undefined mode.\nAvailable modes {self.metadata['render.modes']}"
+            )
 
     def _set_spaces(self):
         self.ca_params_space = spaces.Box(0.0, 1.0, shape=(2,))

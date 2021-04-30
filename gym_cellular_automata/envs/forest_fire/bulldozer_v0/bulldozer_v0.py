@@ -15,8 +15,6 @@ from gym_cellular_automata.envs.forest_fire.operators.modify import Modify
 from gym_cellular_automata.envs.forest_fire.operators.move import Move
 from gym_cellular_automata.grid_space import Grid
 
-# ------------ Forest Fire Environment
-
 
 class ForestFireEnvBulldozerV0(gym.Env):
     metadata = {"render.modes": ["human"]}
@@ -80,12 +78,15 @@ class ForestFireEnvBulldozerV0(gym.Env):
 
             # Pre-Process the context to reuse shared Operator Machinery
             context = self._context_preprocessing(self.context)
+            print(f"preprocessed context: {context}")
 
             # MDP Transition
             new_grid, new_context = self.coordinate(self.grid, action, context)
+            print(f"coord context: {new_context}")
 
             # Post-Process the context shown to the user
             new_context = self._context_postprocessing(new_context)
+            print(f"postprocessed context: {new_context}")
 
             # New State
             self.grid = new_grid
@@ -128,8 +129,7 @@ class ForestFireEnvBulldozerV0(gym.Env):
 
             wind, pos, freeze = self.context
 
-            # Formally on the Gym API env.render(mode=human) returns nothing
-            # Returning figure for convenience
+            # Returning figure for convenience, formally render mode=human returns None
             return env_visualization(self.grid, pos, self._fire_seed)
 
         else:
@@ -193,7 +193,7 @@ class ForestFireEnvBulldozerV0(gym.Env):
         self.coord_params_space = spaces.Discrete(self._max_freeze + 1)
 
         self.context_space = spaces.Tuple(
-            (self.ca_params_space, self.mod_params_space, self.ca_params_space)
+            (self.ca_params_space, self.mod_params_space, self.coord_params_space)
         )
 
         # RL Spaces
