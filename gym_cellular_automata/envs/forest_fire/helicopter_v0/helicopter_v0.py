@@ -45,7 +45,10 @@ class ForestFireEnvHelicopterV0(gym.Env):
     _reward_per_fire  = CONFIG["rewards"]["per_fire"]
     # fmt: on
 
-    def __init__(self):
+    def __init__(self, rows=None, cols=None):
+
+        self._row = self._row if rows is None else rows
+        self._col = self._col if cols is None else cols
 
         self._set_spaces()
 

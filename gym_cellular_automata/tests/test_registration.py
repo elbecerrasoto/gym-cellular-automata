@@ -1,13 +1,13 @@
 import gym
 from gym.spaces import Space
 
-from gym_cellular_automata import RESGISTERED_CA_ENVS
+from gym_cellular_automata import REGISTERED_CA_ENVS
 
 LIBRARY = "gym_cellular_automata"
 
 
 def test_gym_api():
-    for ca_env in RESGISTERED_CA_ENVS:
+    for ca_env in REGISTERED_CA_ENVS:
 
         calling_string = LIBRARY + ":" + ca_env
         env = gym.make(calling_string)

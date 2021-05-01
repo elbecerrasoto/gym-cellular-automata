@@ -2,18 +2,29 @@ from gym.envs.registration import register
 
 from gym_cellular_automata.operator import Operator
 
-RESGISTERED_CA_ENVS = ("ForestFireHelicopter-v0", "ForestFireBulldozer-v0")
+REGISTERED_CA_ENVS = (
+    "ForestFireHelicopter-v0",
+    "ForestFireBulldozer-v0",
+    "ForestFireBulldozerEasy-v0",
+)
 
 register(
-    id=RESGISTERED_CA_ENVS[0],
+    id=REGISTERED_CA_ENVS[0],
     entry_point="gym_cellular_automata.envs.forest_fire.helicopter_v0:ForestFireEnvHelicopterV0",
 )
 
 
 register(
-    id=RESGISTERED_CA_ENVS[1],
+    id=REGISTERED_CA_ENVS[1],
     entry_point="gym_cellular_automata.envs.forest_fire.bulldozer_v0:ForestFireEnvBulldozerV0",
 )
 
 
-__all__ = ["Operator", "RESGISTERED_CA_ENVS"]
+register(
+    id=REGISTERED_CA_ENVS[2],
+    entry_point="gym_cellular_automata.envs.forest_fire.bulldozer_v0:ForestFireEnvBulldozerV0",
+    kwargs={"rows": 16, "cols": 16},
+)
+
+
+__all__ = ["Operator", "REGISTERED_CA_ENVS"]
