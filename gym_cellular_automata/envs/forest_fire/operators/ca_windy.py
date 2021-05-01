@@ -34,7 +34,7 @@ class WindyForestFire(Operator):
 
     def update(self, grid, action, wind):
 
-        # Sample which FIREs fail to propagate only on this update
+        # Sample which FIREs fail to propagate this update
         fail_to_propagate = self._get_failed_propagations_mask(wind)
 
         kernel = self._get_kernel(fail_to_propagate)
@@ -105,30 +105,31 @@ class WindyForestFire(Operator):
         # 5 Rules to carry out:
 
         # 1. Unborn
-        # self._empty -> self._empty
-
+        # EMPTY -> EMPTY
         # Implicitly defined by default values
-        # unborn_mask = grid < breaks.dead
-        # new_grid[unborn_mask] = self._empty
+
+        less_keep = grid < breaks.keep
+        less_propagate = grid < breaks.propagate
+        less_consume = grid < breaks.consume
 
         # 2. Dead
         # BURNED -> BURNED
-        dead_mask = np.logical_and(grid >= breaks.dead, grid < breaks.keep)
+        dead_mask = np.logical_and(grid >= breaks.dead, less_keep)
         new_grid[dead_mask] = self._burned
 
         # 3. Keep
         # TREE -> TREE
-        keep_mask = np.logical_and(grid >= breaks.keep, grid < breaks.propagate)
+        keep_mask = np.logical_and(np.logical_not(less_keep), less_propagate)
         new_grid[keep_mask] = self._tree
 
         # 4. Propagate
         # TREE -> FIRE
-        propagate_mask = np.logical_and(grid >= breaks.propagate, grid < breaks.consume)
+        propagate_mask = np.logical_and(np.logical_not(less_propagate), less_consume)
         new_grid[propagate_mask] = self._fire
 
         # 4. Consume
         # FIRE -> BURNED
-        propagate_mask = grid >= breaks.consume
+        propagate_mask = np.logical_not(less_consume)
         new_grid[propagate_mask] = self._burned
 
         return new_grid
