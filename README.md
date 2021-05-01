@@ -60,7 +60,7 @@ print(f"Total Reward: {total_reward}")
 import gym_cellular_automata as gymca
 
 # Print available CA envs
-print(gymca.RESGISTERED_CA_ENVS)
+print(gymca.REGISTERED_CA_ENVS)
 ```
 
 ## Gallery

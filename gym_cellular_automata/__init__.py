@@ -20,11 +20,4 @@ register(
 )
 
 
-register(
-    id=REGISTERED_CA_ENVS[2],
-    entry_point="gym_cellular_automata.envs.forest_fire.bulldozer_v0:ForestFireEnvBulldozerV0",
-    kwargs={"rows": 16, "cols": 16},
-)
-
-
 __all__ = ["Operator", "REGISTERED_CA_ENVS"]
