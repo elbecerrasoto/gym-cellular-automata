@@ -5,194 +5,170 @@ from gym import spaces
 from scipy.signal import convolve2d
 
 from gym_cellular_automata import Operator
-from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.config import CONFIG
-
-# fmt: off
-EMPTY  = CONFIG["cell_symbols"]["empty"]
-BURNED = CONFIG["cell_symbols"]["burned"]
-TREE   = CONFIG["cell_symbols"]["tree"]
-FIRE   = CONFIG["cell_symbols"]["fire"]
-# fmt: on
-
-# Signal Weights
-BASE = 2
-
-I_EXP = 11
-P_EXP = 3
-
-IDENTITY = BASE ** I_EXP
-PROPAGATION = BASE ** P_EXP
-
-# Kernel Size
-ROW_K = 3
-COL_K = 3
-
-
-# ------------ Correctness
-
-
-def assert_correctness():
-
-    assert ROW_K == 3, "Only Moore's neighborhood"
-    assert COL_K == 3, "Only Moore's neighborhood"
-
-    # Neighbors without including the current cell
-    n = 8
-
-    # Weights
-    i = IDENTITY
-    p = PROPAGATION
-
-    # Values
-    E = EMPTY
-    B = BURNED
-    T = TREE
-    F = FIRE
-
-    # Ordering of cell values
-    assert E < B
-    assert B < T
-    assert T < F
-
-    # Ordering of Weights
-    assert p < i
-
-    # Test the boundaries of the 5 intervals
-    # Interval Names:
-    # Unborn, Dead, Keep, Propagate, Consume
-
-    worst = n * p * F
-
-    assert i * E + worst < i * B, "Unborn / Dead"
-    assert i * B + worst < i * T, "Dead / Keep"
-
-    # Key Assert, a TREE cell is subject to two different rules
-    assert i * T + n * p * T < i * T + p * F, "Keep / Propagate"
-
-    assert i * T + worst < i * F, "Propagate / Consume"
-
-
-assert_correctness()
-
-
-# ------------ Breaks
-
-
-def get_breaks():
-    """
-    4 breaks needed for 5 rules.
-    """
-
-    # "Unborn / Dead"
-    dead_break = IDENTITY * BURNED
-
-    # "Dead / Keep"
-    keep_break = IDENTITY * TREE
-
-    # "Keep / Propagate"
-    propagate_break = IDENTITY * TREE + PROPAGATION * FIRE
-
-    # "Propagate / Consume"
-    consume_break = IDENTITY * FIRE
-
-    Breaks = namedtuple("Breaks", ["dead", "keep", "propagate", "consume"])
-
-    return Breaks(dead_break, keep_break, propagate_break, consume_break)
-
-
-BREAKS = get_breaks()
-
-
-# ------------ Forest Fire Cellular Automaton
 
 
 class WindyForestFire(Operator):
-    def __init__(self, grid_space=None, action_space=None, context_space=None):
 
-        if context_space is None:
-            context_space = spaces.Box(0.0, 1.0, shape=(3, 3))
+    # Convolution Weights, magic variables
+    _identity = 2 ** 11
+    _propagation = 2 ** 3
 
-        self.grid_space = grid_space
-        self.action_space = action_space
-        self.context_space = context_space
+    # Kernel Size
+    _row_k = 3
+    _col_k = 3
 
-    def update(self, grid, action, context):
-        # Context contains Wind parameters
-        # Sample which FIREs fail to propagate this update
-        fail_to_propagate = get_failed_propagations_mask(context)
+    def __init__(self, empty=0, burned=1, tree=3, fire=25, *args, **kwargs):
 
-        kernel = get_kernel(fail_to_propagate)
+        super().__init__(*args, **kwargs)
 
-        grid_signal = convolve(grid, kernel)
+        # Cell Values
+        self._empty = empty
+        self._burned = burned
+        self._tree = tree
+        self._fire = fire
 
-        new_grid = translate_analogic_to_discrete(grid_signal, BREAKS)
+        self._assert_correctness()
 
-        return new_grid, context
+        if self.context_space is None:
+            self.context_space = spaces.Box(0.0, 1.0, shape=(3, 3))
 
+    def update(self, grid, action, wind):
 
-# ------------ Utils
+        # Sample which FIREs fail to propagate only on this update
+        fail_to_propagate = self._get_failed_propagations_mask(wind)
 
+        kernel = self._get_kernel(fail_to_propagate)
 
-def get_failed_propagations_mask(wind):
-    """
-    Here goes the only sampling of the step.
-    """
-    uniform_space = spaces.Box(low=0.0, high=1.0, shape=(ROW_K, COL_K))
-    uniform_roll = uniform_space.sample()
+        grid_signal = self._convolve(grid, kernel)
 
-    failed_propagations = np.repeat(False, ROW_K * COL_K).reshape(ROW_K, COL_K)
-    failed_propagations = wind <= uniform_roll
+        new_grid = self._translate_analogic_to_discrete(grid_signal, self._get_breaks())
 
-    return failed_propagations
+        return new_grid, wind
 
+    def _get_failed_propagations_mask(self, wind):
+        """
+        Here goes the only sampling of the step.
+        """
+        uniform_space = spaces.Box(low=0.0, high=1.0, shape=(self._row_k, self._col_k))
+        uniform_roll = uniform_space.sample()
 
-def get_kernel(failed_propagations):
-    kernel = np.repeat(PROPAGATION, ROW_K * COL_K).reshape(ROW_K, COL_K)
+        failed_propagations = np.repeat(False, self._row_k * self._col_k).reshape(
+            self._row_k, self._col_k
+        )
+        failed_propagations = wind <= uniform_roll
 
-    kernel[failed_propagations] = EMPTY
-    kernel[1, 1] = IDENTITY
+        return failed_propagations
 
-    return kernel
+    def _get_kernel(self, failed_propagations):
+        kernel = np.repeat(self._propagation, self._row_k * self._col_k).reshape(
+            self._row_k, self._col_k
+        )
 
+        kernel[failed_propagations] = self._empty
+        kernel[1, 1] = self._identity
 
-def convolve(grid, kernel):
-    return convolve2d(grid, kernel, mode="same", boundary="fill", fillvalue=EMPTY)
+        return kernel
 
+    def _convolve(self, grid, kernel):
+        return convolve2d(
+            grid, kernel, mode="same", boundary="fill", fillvalue=self._empty
+        )
 
-def translate_analogic_to_discrete(grid, breaks):
-    row, col = grid.shape
+    def _get_breaks(self):
+        """
+        4 breaks needed for 5 rules.
+        """
 
-    # Init on empty by default
-    empty = np.array(EMPTY)
-    new_grid = np.repeat(empty, row * col).reshape(row, col)
+        # "Unborn / Dead"
+        dead_break = self._identity * self._burned
 
-    # 5 Rules to carry out:
+        # "Dead / Keep"
+        keep_break = self._identity * self._tree
 
-    # 1. Unborn
-    # EMPTY -> EMPTY
+        # "Keep / Propagate"
+        propagate_break = self._identity * self._tree + self._propagation * self._fire
 
-    # Implicitly defined by default values
-    # unborn_mask = grid < breaks.dead
-    # new_grid[unborn_mask] = EMPTY
+        # "Propagate / Consume"
+        consume_break = self._identity * self._fire
 
-    # 2. Dead
-    # BURNED -> BURNED
-    dead_mask = np.logical_and(grid >= breaks.dead, grid < breaks.keep)
-    new_grid[dead_mask] = BURNED
+        Breaks = namedtuple("Breaks", ["dead", "keep", "propagate", "consume"])
 
-    # 3. Keep
-    # TREE -> TREE
-    keep_mask = np.logical_and(grid >= breaks.keep, grid < breaks.propagate)
-    new_grid[keep_mask] = TREE
+        return Breaks(dead_break, keep_break, propagate_break, consume_break)
 
-    # 4. Propagate
-    # TREE -> FIRE
-    propagate_mask = np.logical_and(grid >= breaks.propagate, grid < breaks.consume)
-    new_grid[propagate_mask] = FIRE
+    def _translate_analogic_to_discrete(self, grid, breaks):
+        row, col = grid.shape
 
-    # 4. Consume
-    # FIRE -> BURNED
-    propagate_mask = grid >= breaks.consume
-    new_grid[propagate_mask] = BURNED
+        # Init on empty by default
+        empty = np.array(self._empty)
+        new_grid = np.repeat(empty, row * col).reshape(row, col)
 
-    return new_grid
+        # 5 Rules to carry out:
+
+        # 1. Unborn
+        # self._empty -> self._empty
+
+        # Implicitly defined by default values
+        # unborn_mask = grid < breaks.dead
+        # new_grid[unborn_mask] = self._empty
+
+        # 2. Dead
+        # BURNED -> BURNED
+        dead_mask = np.logical_and(grid >= breaks.dead, grid < breaks.keep)
+        new_grid[dead_mask] = self._burned
+
+        # 3. Keep
+        # TREE -> TREE
+        keep_mask = np.logical_and(grid >= breaks.keep, grid < breaks.propagate)
+        new_grid[keep_mask] = self._tree
+
+        # 4. Propagate
+        # TREE -> FIRE
+        propagate_mask = np.logical_and(grid >= breaks.propagate, grid < breaks.consume)
+        new_grid[propagate_mask] = self._fire
+
+        # 4. Consume
+        # FIRE -> BURNED
+        propagate_mask = grid >= breaks.consume
+        new_grid[propagate_mask] = self._burned
+
+        return new_grid
+
+    def _assert_correctness(self):
+
+        assert self._row_k == 3, "Only Moore's neighborhood"
+        assert self._col_k == 3, "Only Moore's neighborhood"
+
+        # Neighbors without including the current cell
+        n = 8
+
+        # Weights
+        i = self._identity
+        p = self._propagation
+
+        # Values
+        E = self._empty
+        B = self._burned
+        T = self._tree
+        F = self._fire
+
+        # Ordering of cell values
+        assert E < B
+        assert B < T
+        assert T < F
+
+        # Ordering of Weights
+        assert p < i
+
+        # Test the boundaries of the 5 intervals
+        # Interval Names:
+        # Unborn, Dead, Keep, Propagate, Consume
+
+        worst = n * p * F
+
+        assert i * E + worst < i * B, "Unborn / Dead"
+        assert i * B + worst < i * T, "Dead / Keep"
+
+        # Key Assert, a TREE cell is subject to two different rules
+        assert i * T + n * p * T < i * T + p * F, "Keep / Propagate"
+
+        assert i * T + worst < i * F, "Propagate / Consume"
