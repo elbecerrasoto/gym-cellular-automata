@@ -28,7 +28,9 @@ test-coverage :
 	pytest --cov=gym_cellular_automata gym_cellular_automata/tests
 
 linter :
-		mypy --config-file mypy.ini ./
+	# Finds debugging prints
+	find ./gym_cellular_automata/ -type f -name "*.py" | sed '/test/ d' | xargs grep -n 'print(' | cat
+	mypy --config-file mypy.ini ./
 
 patch :
 	./scripts/versionate -v --do "patch_up"
@@ -41,6 +43,7 @@ clean :
 	echo "\n\nTo remove git untracked files run:\ngit clean -d -f"
 
 count :
-	find ./ -name '*.py' -print | xargs cat | sed '/^$$/ d' | wc -l
+	# Counts the lines of Code
+	find ./ -name '*.py' -print | xargs cat | sed '/^$$/ d' | perl -ne 'if(not /^ *?#/){print $$_}' | wc -l
 
 .PHONY : help install conda_env develop hooks style test test-coverage linter patch clean count

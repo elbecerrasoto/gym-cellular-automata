@@ -86,8 +86,8 @@ class Identity(Operator):
     action_dependant = False
     context_dependant = True
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def update(self, grid, action, context):
         return super().update(grid, action, context)

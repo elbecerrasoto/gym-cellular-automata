@@ -29,7 +29,7 @@ class Coordinate(Operator):
         ca_context, move_context, modify_context, coordinate_context = context
 
         freeze = int(coordinate_context)
-        assert np.all(move_context == modify_context)
+        # assert np.all(move_context == modify_context) # Gets in the way of sampling from context_space
         position = move_context
 
         def move_then_modify(grid, move_action, modify_action, position):

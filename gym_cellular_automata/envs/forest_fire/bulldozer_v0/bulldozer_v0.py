@@ -82,15 +82,12 @@ class ForestFireEnvBulldozerV0(gym.Env):
 
             # Pre-Process the context to reuse shared Operator Machinery
             context = self._context_preprocessing(self.context)
-            print(f"preprocessed context: {context}")
 
             # MDP Transition
             new_grid, new_context = self.coordinate(self.grid, action, context)
-            print(f"coord context: {new_context}")
 
             # Post-Process the context shown to the user
             new_context = self._context_postprocessing(new_context)
-            print(f"postprocessed context: {new_context}")
 
             # New State
             self.grid = new_grid
