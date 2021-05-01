@@ -5,7 +5,6 @@ from gym_cellular_automata.operator import Operator
 REGISTERED_CA_ENVS = (
     "ForestFireHelicopter-v0",
     "ForestFireBulldozer-v0",
-    "ForestFireBulldozerEasy-v0",
 )
 
 register(

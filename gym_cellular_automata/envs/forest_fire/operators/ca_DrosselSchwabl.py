@@ -11,20 +11,16 @@ class ForestFire(Operator):
     action_dependant = False
     context_dependant = True
 
-    def __init__(
-        self, empty, tree, fire, grid_space=None, action_space=None, context_space=None
-    ):
+    def __init__(self, empty, tree, fire, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
 
         self.empty = empty
         self.tree = tree
         self.fire = fire
 
-        if context_space is None:
-            context_space = spaces.Box(0.0, 1.0, shape=(2,))
-
-        self.grid_space = grid_space
-        self.action_space = action_space
-        self.context_space = context_space
+        if self.context_space is None:
+            self.context_space = spaces.Box(0.0, 1.0, shape=(2,))
 
     def update(self, grid, action, context):
         # A copy is needed for the sequential update of a CA

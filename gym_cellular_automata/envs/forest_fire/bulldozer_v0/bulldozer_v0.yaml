@@ -17,13 +17,8 @@ p_empty: 0.10
 
 
 # Temporal Globals
-# Idle CA steps. Marked for elimination.
-max_freeze: 31 # Marked for elimination.
-# Time taken per action type on units of CA updates
-time:
-  none_action: !!float 1e-4
-  move_action: 0.024
-  shoot_action: 0.120
+# Idle CA steps.
+max_freeze: 31
 
 
 # Probability of fire propagation into current tree cell

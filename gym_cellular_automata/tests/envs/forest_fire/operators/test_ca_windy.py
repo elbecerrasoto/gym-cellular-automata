@@ -9,17 +9,17 @@ from gym_cellular_automata.envs.forest_fire.utils.neighbors import neighborhood_
 from gym_cellular_automata.grid_space import Grid
 
 # Number of random grids to test
-TESTS = 32
+TESTS = 16
 
 # Steps to check CA rules per test grid
-STEPS = 8
+STEPS = 4
 
 # Cells checked per step
-CHECKS_PER_STEP = 8
+CHECKS_PER_STEP = 4
 
 # Test Grid Size
-ROW = 8
-COL = 8
+ROW = 4
+COL = 4
 
 # fmt: off
 # Random grid init probabilities
