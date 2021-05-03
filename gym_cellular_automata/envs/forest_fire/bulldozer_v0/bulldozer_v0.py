@@ -26,8 +26,6 @@ class ForestFireEnvBulldozerV0(gym.Env):
     _n_shoots        = len(CONFIG["actions"]["shooting"])
     _action_sets     = CONFIG["actions"]["sets"]
 
-    _reward_per_tree = CONFIG["rewards"]["per_tree"]
-
     _row             = CONFIG["grid_shape"]["n_row"]
     _col             = CONFIG["grid_shape"]["n_col"]
 
@@ -40,7 +38,7 @@ class ForestFireEnvBulldozerV0(gym.Env):
     _p_empty         = CONFIG["p_empty"]
 
     _wind            = CONFIG["wind"]
-    _effects            = CONFIG["effects"]
+    _effects         = CONFIG["effects"]
     # fmt: on
 
     def __init__(self, rows=None, cols=None):
