@@ -1,25 +1,55 @@
-def _get_operation_flow(self, action):
-    import math
+import math
+from operator import mul
+from typing import Callable
 
-    movement, shooting = action
+from collection import namedtuple
 
-    # Mapping of actions ---> to time (on units of CA updates)
-    time_move = self._movement_timings[movement]
-    time_shoot = self._shooting_timings[shooting]
-    time_environment = self._t_env_any
+from gym_cellular_automata import Operator
 
-    # The time taken on a step is the time taken doing the actions
-    # plus some enviromental (internal) time.
-    time_taken = time_move + time_shoot + time_environment
 
-    self.accumulated_time += time_taken
+class RepeatCA(Operator):
 
-    # Decimal and Integer parts
-    self.accumulated_time, ca_repeats = math.modf(self.accumulated_time)
+    grid_dependant = True
+    action_dependant = True
+    context_dependant = True
 
-    ica, imove, imodify = range(3)
+    SubOperators = namedtuple("SubOperators", ["sequence"])
 
-    # Operartors order is: CA, Modifier
-    operation_flow = int(ca_repeats) * [ica] + [imove] + [imodify]
+    def __init__(
+        self,
+        sequence,
+        tacting: Callable,
+        tperception: Callable,
+        get_subactions: Callable = mul,
+        *args,
+        **kwargs
+    ):
 
-    return operation_flow
+        super().__init__(*args, **kwargs)
+
+        self.suboperators = self.SubOperators(sequence)
+
+    def update(self, grid, action, context):
+        nops = len(self.suboperators.sequence)
+
+        subcontexts, accu_time = context
+
+        # Repeat the same action
+        subactions = self.get_subactions(action)
+
+        time_action = self.tacting(action)
+        time_state = self.tperception((grid, context))
+
+        time_taken = time_action + time_state
+
+        accu_time += time_taken
+        accu_time, car = math.modf(accu_time)
+
+        # Operartors order is: Apply CA 'car' times, then the others only once
+        opsflow = int(car) * [0] + [i for i in range(1, nops)]
+
+        subcontexts_opsflow = subcontexts, opsflow
+
+        grid, subcontexts = self.sequence(grid, subactions, subcontexts_opsflow)
+
+        return grid, (subcontexts, accu_time)
