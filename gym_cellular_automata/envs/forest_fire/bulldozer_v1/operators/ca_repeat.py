@@ -76,7 +76,7 @@ class CAThenOps(Operator):
 
         super().__init__(*args, **kwargs)
 
-        self.suboperators = tuple(repeat_ca, single_pass)
+        self.suboperators = repeat_ca, single_pass
 
         self.repeat_ca = repeat_ca
         self.single_pass = single_pass
@@ -86,7 +86,7 @@ class CAThenOps(Operator):
         rep_action, sin_action = subactions
         rep_context, sin_context = subcontexts
 
-        grid, rep_context = self.repeat_ca(grid, rep_actions, rep_context)
-        grid, sin_context = self.single_pass(grid, sin_context)
+        grid, rep_context = self.repeat_ca(grid, rep_action, rep_context)
+        grid, sin_context = self.single_pass(grid, sin_action, sin_context)
 
         return grid, (rep_context, sin_context)
