@@ -64,3 +64,29 @@ class RepeatCA(Operator):
             grid, ca_params = grid, icontext = self.ca(grid, action, ca_params)
 
         return grid, (ca_params, accu_time)
+
+
+class CAThenOps(Operator):
+
+    grid_dependant = True
+    action_dependant = True
+    context_dependant = True
+
+    def __init__(self, repeat_ca, single_pass, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.suboperators = tuple(repeat_ca, single_pass)
+
+        self.repeat_ca = repeat_ca
+        self.single_pass = single_pass
+
+    def update(self, grid, subactions, subcontexts):
+
+        rep_action, sin_action = subactions
+        rep_context, sin_context = subcontexts
+
+        grid, rep_context = self.repeat_ca(grid, rep_actions, rep_context)
+        grid, sin_context = self.single_pass(grid, sin_context)
+
+        return grid, (rep_context, sin_context)

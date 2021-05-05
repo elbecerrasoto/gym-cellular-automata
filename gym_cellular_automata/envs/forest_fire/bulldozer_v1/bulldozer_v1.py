@@ -3,11 +3,13 @@ import numpy as np
 from gym import logger, spaces
 from gym.utils import seeding
 
-from gym_cellular_automata.envs.forest_fire.bulldozer_v1.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.render import (
+    env_visualization,
+)
+from gym_cellular_automata.envs.forest_fire.bulldozer_v1.config import CONFIG
 from gym_cellular_automata.envs.forest_fire.operators import (
     Modify,
     Move,
-    Sequence,
     WindyForestFire,
 )
 from gym_cellular_automata.grid_space import Grid
@@ -58,9 +60,6 @@ class ForestFireEnvBulldozerV1(gym.Env):
         )
         self.move = Move(self._action_sets, **self._move_spaces)
         self.modify = Modify(self._effects, **self._modify_spaces)
-        self.sequence = Sequence(
-            (self.cellular_automaton, self.move, self.modify), **self._seq_spaces
-        )
 
         # Gym spec method
         self.seed()
@@ -149,7 +148,18 @@ class ForestFireEnvBulldozerV1(gym.Env):
         return [seed]
 
     def render(self, mode="human"):
-        pass
+        if mode == "human":
+
+            wind, pos, freeze = self.context
+
+            # Returning figure for convenience, formally render mode=human returns None
+            return env_visualization(self.grid, pos, self._fire_seed)
+
+        else:
+
+            logger.warn(
+                f"Undefined mode.\nAvailable modes {self.metadata['render.modes']}"
+            )
 
     def _award(self):
 
@@ -178,7 +188,7 @@ class ForestFireEnvBulldozerV1(gym.Env):
 
         grid = grid_space.sample()
 
-        row, col = self._fire_seed = 100, 100
+        row, col = self._fire_seed = (3 * _row // 4), _col // 2
 
         grid[row, col] = self._fire
 
@@ -207,28 +217,6 @@ class ForestFireEnvBulldozerV1(gym.Env):
         # RL Spaces
         self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
         self.action_space = spaces.MultiDiscrete([len(self._moves), len(self._shoots)])
-
-        # Operator spaces
-        self._ca_spaces = {
-            "grid_space": None,
-            "action_space": None,
-            "context_space": None,
-        }
-        self._move_spaces = {
-            "grid_space": None,
-            "action_space": None,
-            "context_space": None,
-        }
-        self._modify_spaces = {
-            "grid_space": None,
-            "action_space": None,
-            "context_space": None,
-        }
-        self._seq_spaces = {
-            "grid_space": None,
-            "action_space": None,
-            "context_space": None,
-        }
 
     def _init_action_time_mappings(self):
 

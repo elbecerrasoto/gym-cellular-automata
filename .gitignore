@@ -1,4 +1,8 @@
 # Custom ignores
+# npm
+node_modules/
+package-lock.json
+package.json
 # monkeytype DB
 monkeytype.sqlite3
 # spyder's ipython console log

@@ -69,8 +69,23 @@ def operators(grid_space):
     return move, modify
 
 
-def test_single_pass(operators, grid_space):
-    single_pass = SinglePass(operators)
+@pytest.fixture
+def repeat_ca(ca):
+    def time_per_action(action):
+        return 1.0
+
+    def time_per_state(state):
+        return 1.0
+
+    return RepeatCA(ca, time_per_action, time_per_state)
+
+
+@pytest.fixture
+def single_pass(operators):
+    return SinglePass(operators)
+
+
+def test_single_pass(single_pass, operators, grid_space):
 
     grid = grid_space.sample()
     grid02 = copy(grid)
@@ -100,7 +115,7 @@ def test_single_pass(operators, grid_space):
     assert np.all(obserseved == expected)
 
 
-def test_repeat_ca(ca):
+def test_repeat_ca(ca, repeat_ca):
 
     grid = ca.grid_space.sample()
     grid02 = copy(grid)
@@ -110,14 +125,6 @@ def test_repeat_ca(ca):
     accu = 0.0
 
     context = params, accu
-
-    def time_per_action(action):
-        return 1.0
-
-    def time_per_state(state):
-        return 1.0
-
-    repeat_ca = RepeatCA(ca, time_per_action, time_per_state)
 
     observed, new_context = repeat_ca(grid, None, context)
 
@@ -132,3 +139,7 @@ def test_repeat_ca(ca):
 
     assert np.all(observed == expected)
     assert observedc == 0.0
+
+
+def test_repeat_ca_then_ops():
+    pass
