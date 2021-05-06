@@ -5,7 +5,6 @@ import pytest
 from gym import spaces
 
 from gym_cellular_automata.envs.forest_fire.bulldozer_v1.operators.ca_repeat import (
-    CAThenOps,
     RepeatCA,
     SinglePass,
 )
@@ -142,38 +141,38 @@ def test_repeat_ca(ca, repeat_ca):
     assert observedc == 0.0
 
 
-def test_repeat_ca_then_ops(repeat_ca, single_pass, grid_space, operators, ca):
-
-    move, modify = operators
-
-    ca_then_ops = CAThenOps(repeat_ca, single_pass)
-
-    grid = grid_space.sample()
-    grid02 = copy(grid)
-
-    rep_actions = None
-    single_actions = move.action_space.sample(), modify.action_space.sample()
-
-    ca_params = repeat_ca.ca.context_space.high
-    accu_time = 0.0
-
-    rep_contexts = ca_params, accu_time
-    single_contexts = move.context_space.sample(), modify.context_space.sample()
-
-    subcontexts = (rep_contexts, single_contexts)
-    subactions = (rep_actions, single_actions)
-
-    observed, __ = ca_then_ops(grid, subactions, subcontexts)
-
-    def get_expected(grid, ca, operations, oactions, ocontexts):
-
-        grid, __ = ca(grid, None, ca_params)
-        grid, __ = ca(grid, None, ca_params)
-
-        for i, f in enumerate(operations):
-            grid, __ = f(grid, oactions[i], ocontexts[i])
-        return grid
-
-    expected = get_expected(grid02, ca, operators, single_actions, single_contexts)
-
-    assert np.all(observed == expected)
+# def test_repeat_ca_then_ops(repeat_ca, single_pass, grid_space, operators, ca):
+#
+#     move, modify = operators
+#
+#     ca_then_ops = CAThenOps(repeat_ca, single_pass)
+#
+#     grid = grid_space.sample()
+#     grid02 = copy(grid)
+#
+#     rep_actions = None
+#     single_actions = move.action_space.sample(), modify.action_space.sample()
+#
+#     ca_params = repeat_ca.ca.context_space.high
+#     accu_time = 0.0
+#
+#     rep_contexts = ca_params, accu_time
+#     single_contexts = move.context_space.sample(), modify.context_space.sample()
+#
+#     subcontexts = (rep_contexts, single_contexts)
+#     subactions = (rep_actions, single_actions)
+#
+#     observed, __ = ca_then_ops(grid, subactions, subcontexts)
+#
+#     def get_expected(grid, ca, operations, oactions, ocontexts):
+#
+#         grid, __ = ca(grid, None, ca_params)
+#         grid, __ = ca(grid, None, ca_params)
+#
+#         for i, f in enumerate(operations):
+#             grid, __ = f(grid, oactions[i], ocontexts[i])
+#         return grid
+#
+#     expected = get_expected(grid02, ca, operators, single_actions, single_contexts)
+#
+#     assert np.all(observed == expected)

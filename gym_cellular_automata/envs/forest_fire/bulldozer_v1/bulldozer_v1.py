@@ -8,10 +8,9 @@ from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.render import (
 )
 from gym_cellular_automata.envs.forest_fire.bulldozer_v1.config import CONFIG
 from gym_cellular_automata.envs.forest_fire.bulldozer_v1.operators.ca_repeat import (
-    CAThenOps,
     RepeatCA,
-    SinglePass,
 )
+from gym_cellular_automata.envs.forest_fire.bulldozer_v1.operators.mdp import MDP
 from gym_cellular_automata.envs.forest_fire.operators import (
     Modify,
     Move,
@@ -59,18 +58,17 @@ class ForestFireEnvBulldozerV1(gym.Env):
         self._set_spaces()
         self._init_time_mappings()
 
-        self.cellular_automaton = WindyForestFire(
-            self._empty, self._burned, self._tree, self._fire
+        self.ca = WindyForestFire(
+            self._empty, self._burned, self._tree, self._fire, **self.ca_space
         )
-        self.move = Move(self._action_sets)
-        self.modify = Modify(self._effects)
+        self.move = Move(self._action_sets, **self.move_space)
+        self.modify = Modify(self._effects, **self.modify_space)
 
         # Composite Operators
-        self.single_pass = SinglePass((self.move, self.modify))
-        self.repeat_ca = RepeatCA(
-            self.cellular_automaton, self.time_per_action, self.time_per_state
+        self.repeater = RepeatCA(
+            self.ca, self.time_per_action, self.time_per_state, **self.repeater_space
         )
-        self.MDP = CAThenOps(self.repeat_ca, self.single_pass)
+        self.MDP = MDP(self.repeater, self.move, self.modify, **self.MDP_space)
 
         # Gym spec method
         self.seed()
@@ -126,10 +124,10 @@ class ForestFireEnvBulldozerV1(gym.Env):
     def render(self, mode="human"):
         if mode == "human":
 
-            wind, pos, freeze = self.context
+            wind, time, position = self.context
 
             # Returning figure for convenience, formally render mode=human returns None
-            return env_visualization(self.grid, pos, self._fire_seed)
+            return env_visualization(self.grid, position, self._fire_seed)
 
         else:
 
@@ -159,26 +157,53 @@ class ForestFireEnvBulldozerV1(gym.Env):
             shape=(self._row, self._col),
         )
 
-        ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3))
-        accu_space = spaces.Box(0.0, float("inf"), shape=tuple())
+        self.ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3))
+        self.time_space = spaces.Box(0.0, float("inf"), shape=tuple())
+        self.position_space = spaces.MultiDiscrete([self._row, self._col])
 
-        rep_space = spaces.Tuple((ca_params_space, accu_space))
+        self.context_space = spaces.Tuple(
+            (self.ca_params_space, self.time_space, self.position_space)
+        )
 
-        pos_space = spaces.MultiDiscrete([self._row, self._col])
-        logic_space = spaces.Discrete(2)
-
-        single_space = spaces.Tuple((pos_space, logic_space))
-
-        self.context_space = spaces.Tuple((rep_space, single_space))
-
-        self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
-
-        dummy_space = spaces.Discrete(1)
+        # RL spaces
 
         m, n = len(self._moves), len(self._shoots)
-        move_shoot_space = spaces.MultiDiscrete([m, n])
+        self.action_space = spaces.MultiDiscrete([m, n])
+        self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
 
-        self.action_space = spaces.Tuple((move_shoot_space, move_shoot_space))
+        # Suboperators Spaces
+
+        self.ca_space = {
+            "grid_space": self.grid_space,
+            "context_space": self.ca_params_space,
+        }
+
+        self.move_space = {
+            "grid_space": self.grid_space,
+            "action_space": spaces.Discrete(m),
+            "context_space": self.position_space,
+        }
+
+        self.modify_space = {
+            "grid_space": self.grid_space,
+            "action_space": spaces.Discrete(n),
+            "context_space": self.position_space,
+        }
+
+        self.repeater_space = {
+            "grid_space": self.grid_space,
+            "context_space": spaces.Tuple((self.ca_params_space, self.time_space)),
+        }
+
+        self.MDP_space = {
+            "grid_space": self.grid_space,
+            "action_space": self.action_space,
+            "context_space": self.context_space,
+        }
+
+    def _noise(self):
+        l = ((self._row + self._col) // 2) // 12
+        return int(np.random.choice(range(l), size=1))
 
     def _initial_grid_distribution(self):
         # fmt: off
@@ -191,23 +216,32 @@ class ForestFireEnvBulldozerV1(gym.Env):
 
         grid = grid_space.sample()
 
-        row, col = self._fire_seed = (3 * self._row // 4), (1 * self._col // 4)
+        r, c = (3 * self._row // 4), (1 * self._col // 4)
+        row, col = self._fire_seed = r + self._noise(), c + self._noise()
 
         grid[row, col] = self._fire
 
         return grid
 
     def _initial_context_distribution(self):
-        # Wind, Initial Accumulated Time
-        rep_contexts = self._wind, 0.0
-        # Initial Position
-        init_row = 1 * self._row // 4
-        init_col = 3 * self._col // 4
+        init_time = np.array(0.0)
 
-        # Position and Active effects 0 = False
-        single_contexts = (init_row, init_col), 0
+        r, c = (1 * self._row // 4), (3 * self._col // 4)
 
-        return rep_contexts, single_contexts
+        init_row = r + self._noise()
+        init_col = c + self._noise()
+
+        init_position = np.array([init_row, init_col])
+
+        # assert self.ca_params_space.contains(self._wind)
+        # assert self.time_space.contains(init_time)
+        # assert self.position_space.contains(init_position)
+
+        init_context = self._wind, init_time, init_position
+
+        # assert self.context_space.contains(init_context)
+
+        return init_context
 
     def _count_cells(self):
         """Returns dict of cell counts"""

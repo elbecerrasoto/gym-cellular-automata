@@ -5,8 +5,8 @@ from gym_cellular_automata.operator import Operator
 REGISTERED_CA_ENVS = (
     "ForestFireHelicopter-v0",
     "ForestFireBulldozer-v0",
+    "ForestFireBulldozer-v1",
 )
-# "ForestFireBulldozer-v1"
 
 ff_dir = "gym_cellular_automata.envs.forest_fire"
 
@@ -22,9 +22,9 @@ register(
 )
 
 
-# register(
-#     id=REGISTERED_CA_ENVS[2],
-#     entry_point=ff_dir + ".bulldozer_v1:ForestFireEnvBulldozerV1",
-# )
+register(
+    id=REGISTERED_CA_ENVS[2],
+    entry_point=ff_dir + ".bulldozer_v1:ForestFireEnvBulldozerV1",
+)
 
 __all__ = ["Operator", "REGISTERED_CA_ENVS"]
