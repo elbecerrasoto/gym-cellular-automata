@@ -7,6 +7,11 @@ from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.render import (
     env_visualization,
 )
 from gym_cellular_automata.envs.forest_fire.bulldozer_v1.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.bulldozer_v1.operators.ca_repeat import (
+    CAThenOps,
+    RepeatCA,
+    SinglePass,
+)
 from gym_cellular_automata.envs.forest_fire.operators import (
     Modify,
     Move,
@@ -52,14 +57,20 @@ class ForestFireEnvBulldozerV1(gym.Env):
         self._col = self._col if cols is None else cols
 
         self._set_spaces()
-
-        self._init_action_time_mappings()
+        self._init_time_mappings()
 
         self.cellular_automaton = WindyForestFire(
-            self._empty, self._burned, self._tree, self._fire, **self._ca_spaces
+            self._empty, self._burned, self._tree, self._fire
         )
-        self.move = Move(self._action_sets, **self._move_spaces)
-        self.modify = Modify(self._effects, **self._modify_spaces)
+        self.move = Move(self._action_sets)
+        self.modify = Modify(self._effects)
+
+        # Composite Operators
+        self.single_pass = SinglePass((self.move, self.modify))
+        self.repeat_ca = RepeatCA(
+            self.cellular_automaton, self.time_per_action, self.time_per_state
+        )
+        self.MDP = CAThenOps(self.repeat_ca, self.single_pass)
 
         # Gym spec method
         self.seed()
@@ -72,25 +83,16 @@ class ForestFireEnvBulldozerV1(gym.Env):
         self.grid = self._initial_grid_distribution()
         self.context = self._initial_context_distribution()
 
-        self.accumulated_time = 0.0
-
         return self.grid, self.context
 
     def step(self, action):
 
         if not self.done:
 
-            # Action processing
-            actions = None, action[0], action[1]
-
-            # Context preprocessing
-            operation_flow = self._get_operation_flow(action)
-            context = self.context[0], operation_flow
-
             # MDP Transition
-            self.grid, self.context = self.sequence(self.grid, actions, context)
+            self.grid, self.context = self.MDP(self.grid, action, self.context)
 
-            # Check for termination based on New State
+            # Check for termination
             self._is_done()
 
             # Gym API Formatting
@@ -116,32 +118,6 @@ class ForestFireEnvBulldozerV1(gym.Env):
 
             # Graceful after termination
             return (self.grid, self.context), 0.0, True, self._report()
-
-    def _get_operation_flow(self, action):
-        import math
-
-        movement, shooting = action
-
-        # Mapping of actions ---> to time (on units of CA updates)
-        time_move = self._movement_timings[movement]
-        time_shoot = self._shooting_timings[shooting]
-        time_environment = self._t_env_any
-
-        # The time taken on a step is the time taken doing the actions
-        # plus some enviromental (internal) time.
-        time_taken = time_move + time_shoot + time_environment
-
-        self.accumulated_time += time_taken
-
-        # Decimal and Integer parts
-        self.accumulated_time, ca_repeats = math.modf(self.accumulated_time)
-
-        ica, imove, imodify = range(3)
-
-        # Operartors order is: CA, Modifier
-        operation_flow = int(ca_repeats) * [ica] + [imove] + [imodify]
-
-        return operation_flow
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -177,6 +153,33 @@ class ForestFireEnvBulldozerV1(gym.Env):
     def _report(self):
         return {"hit": self.modify.hit}
 
+    def _set_spaces(self):
+        self.grid_space = Grid(
+            values=[self._empty, self._burned, self._tree, self._fire],
+            shape=(self._row, self._col),
+        )
+
+        ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3))
+        accu_space = spaces.Box(0.0, float("inf"), shape=tuple())
+
+        rep_space = spaces.Tuple((ca_params_space, accu_space))
+
+        pos_space = spaces.MultiDiscrete([self._row, self._col])
+        logic_space = spaces.Discrete(2)
+
+        single_space = spaces.Tuple((pos_space, logic_space))
+
+        self.context_space = spaces.Tuple((rep_space, single_space))
+
+        self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
+
+        dummy_space = spaces.Discrete(1)
+
+        m, n = len(self._moves), len(self._shoots)
+        move_shoot_space = spaces.MultiDiscrete([m, n])
+
+        self.action_space = spaces.Tuple((move_shoot_space, move_shoot_space))
+
     def _initial_grid_distribution(self):
         # fmt: off
         grid_space = Grid(
@@ -188,14 +191,23 @@ class ForestFireEnvBulldozerV1(gym.Env):
 
         grid = grid_space.sample()
 
-        row, col = self._fire_seed = (3 * _row // 4), _col // 2
+        row, col = self._fire_seed = (3 * self._row // 4), (1 * self._col // 4)
 
         grid[row, col] = self._fire
 
         return grid
 
     def _initial_context_distribution(self):
-        return self._wind, 42, 42, [0]
+        # Wind, Initial Accumulated Time
+        rep_contexts = self._wind, 0.0
+        # Initial Position
+        init_row = 1 * self._row // 4
+        init_col = 3 * self._col // 4
+
+        # Position and Active effects 0 = False
+        single_contexts = (init_row, init_col), 0
+
+        return rep_contexts, single_contexts
 
     def _count_cells(self):
         """Returns dict of cell counts"""
@@ -203,22 +215,7 @@ class ForestFireEnvBulldozerV1(gym.Env):
 
         return Counter(self.grid.flatten().tolist())
 
-    def _set_spaces(self):
-
-        self.grid_space = Grid(
-            values=[self._empty, self._burned, self._tree, self._fire],
-            shape=(self._row, self._col),
-        )
-
-        operation_flow_space = Grid(values=[1], shape=(3,))
-
-        self.context_space = spaces.Tuple((operation_flow_space,))
-
-        # RL Spaces
-        self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
-        self.action_space = spaces.MultiDiscrete([len(self._moves), len(self._shoots)])
-
-    def _init_action_time_mappings(self):
+    def _init_time_mappings(self):
 
         self._movement_timings = {
             move: self._t_act_move for move in self._moves.values()
@@ -229,3 +226,14 @@ class ForestFireEnvBulldozerV1(gym.Env):
 
         self._movement_timings[self._moves["not_move"]] = self._t_act_none
         self._shooting_timings[self._shoots["none"]] = self._t_act_none
+
+        def time_per_action(action):
+            move, shoot = action
+
+            time_on_move = self._movement_timings[int(move)]
+            time_on_shoot = self._shooting_timings[int(shoot)]
+
+            return time_on_move + time_on_shoot
+
+        self.time_per_action = time_per_action
+        self.time_per_state = lambda s: self._t_env_any

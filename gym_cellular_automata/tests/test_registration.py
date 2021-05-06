@@ -27,6 +27,8 @@ def test_gym_api():
 
         # Step test
         action = env.action_space.sample()
+        assert env.action_space.contains(action)
+
         obs, reward, done, info = env.step(action)
 
         assert env.observation_space.contains(obs)
