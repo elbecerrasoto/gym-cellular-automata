@@ -16,6 +16,10 @@ class CAEnv(ABC, gym.Env):
     def initial_state(self):
         self._resample_initial = False
 
+    def __init__(self):
+        # Gym spec method
+        self.seed()
+
     def step(self, action):
 
         if not self.done:
@@ -57,14 +61,29 @@ class CAEnv(ABC, gym.Env):
         self.done = False
         self.steps_beyond_done = 0
         self._resample_initial = True
-        self.state = self.grid, self.context = self.initial_state
+        obs = self.state = self.grid, self.context = self.initial_state
+
+        return obs
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
-    def _count_cells(self):
+    @abstractmethod
+    def _award(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def _is_done(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def _report(self):
+        raise NotImplementedError
+
+    @staticmethod
+    def count_cells(grid):
         """Returns dict of cell counts"""
         from collections import Counter
 
-        return Counter(self.grid.flatten().tolist())
+        return Counter(grid.flatten().tolist())

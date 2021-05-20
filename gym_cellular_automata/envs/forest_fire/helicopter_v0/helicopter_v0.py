@@ -1,15 +1,12 @@
-from collections import Counter
-
-import gym
 import matplotlib.pyplot as plt
 import numpy as np
 from gym import logger, spaces
-from gym.utils import seeding
 
+from gym_cellular_automata import Operator
+from gym_cellular_automata.ca_env import CAEnv
 from gym_cellular_automata.envs.forest_fire.operators.ca_DrosselSchwabl import (
     ForestFire,
 )
-from gym_cellular_automata.envs.forest_fire.operators.coordinate import Coordinate
 from gym_cellular_automata.envs.forest_fire.operators.modify import Modify
 from gym_cellular_automata.envs.forest_fire.operators.move import Move
 from gym_cellular_automata.grid_space import Grid
@@ -18,7 +15,7 @@ from .utils.config import CONFIG
 from .utils.render import add_helicopter, plot_grid
 
 
-class ForestFireEnvHelicopterV0(gym.Env):
+class ForestFireEnvHelicopterV0(CAEnv):
     metadata = {"render.modes": ["human"]}
 
     # fmt: off
@@ -58,57 +55,34 @@ class ForestFireEnvHelicopterV0(gym.Env):
 
         self.modify = Modify(self._effects)
 
-        self.coordinate = Coordinate(
+        self._MDP = MDP(
             self.cellular_automaton, self.move, self.modify, self._max_freeze
         )
 
-        # Gym spec method
-        self.seed()
+    @property
+    def MDP(self):
+        return self._MDP
 
-    def reset(self):
-        self.grid = self.grid_space.sample()
+    @property
+    def initial_state(self):
 
-        ca_params = np.array([self._p_fire, self._p_tree])
-        pos = np.array([self._row // 2, self._col // 2])
-        freeze = np.array(self._max_freeze)
+        if self._resample_initial:
 
-        self.context = ca_params, pos, freeze
+            self.grid = self.grid_space.sample()
 
-        obs = self.grid, self.context
+            ca_params = np.array([self._p_fire, self._p_tree])
+            pos = np.array([self._row // 2, self._col // 2])
+            freeze = np.array(self._max_freeze)
+            self.context = ca_params, pos, freeze
 
-        return obs
+            self._initial_state = self.grid, self.context
 
-    def step(self, action):
-        done = self._is_done()
+        self._resample_initial = False
 
-        # Process the action to reuse shared Operator Machinery
-        action = self._action_processing(action)
-
-        if not done:
-
-            # Pre-Process the context to reuse shared Operator Machinery
-            context = self._context_preprocessing(self.context)
-
-            # MDP Transition
-            new_grid, new_context = self.coordinate(self.grid, action, context)
-
-            # Post-Process the context shown to the user
-            new_context = self._context_postprocessing(new_context)
-
-            # Gym API Formatting
-            # Necessary condition for MDP, its New State is public
-            obs = new_grid, new_context
-            # Reward as a function of New State, dependence NOT necessary for MDP
-            reward = self._award()
-            info = self._report()
-
-            self.grid = new_grid
-            self.context = new_context
-
-            return obs, reward, done, info
+        return self._initial_state
 
     def _award(self):
-        dict_counts = Counter(self.grid.flatten().tolist())
+        dict_counts = self.count_cells(self.grid)
 
         cell_counts = np.array(
             [dict_counts[self._empty], dict_counts[self._tree], dict_counts[self._fire]]
@@ -125,10 +99,6 @@ class ForestFireEnvHelicopterV0(gym.Env):
 
     def _report(self):
         return {"hit": self.modify.hit}
-
-    def seed(self, seed=None):
-        self.np_random, seed = seeding.np_random(seed)
-        return [seed]
 
     def render(self, mode="human"):
 
@@ -165,21 +135,52 @@ class ForestFireEnvHelicopterV0(gym.Env):
         self.action_space = spaces.Discrete(self._n_actions)
         self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
 
-    def _action_processing(self, action):
-        # Correct size and Modify is always active
-        ca_action = None
-        move_action = action
-        modify_action = True
-        coordinate_action = None
 
-        return ca_action, move_action, modify_action, coordinate_action
+class MDP(Operator):
+    from collections import namedtuple
 
-    def _context_preprocessing(self, context):
-        ca_context, move_context, coordinate_context = context
-        # Only repeats the Move Context
-        return ca_context, move_context, move_context, coordinate_context
+    Suboperators = namedtuple("Suboperators", ["cellular_automaton", "move", "modify"])
 
-    def _context_postprocessing(self, new_context):
-        # Only un-repeats the Move Context
-        ca_context, move_context, modify_context, coordinate_context = new_context
-        return ca_context, move_context, coordinate_context
+    grid_dependant = True
+    action_dependant = True
+    context_dependant = True
+
+    def __init__(self, cellular_automaton, move, modify, max_freeze, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.suboperators = self.Suboperators(cellular_automaton, move, modify)
+
+        self.max_freeze = max_freeze
+        self.freeze_space = spaces.Discrete(max_freeze + 1)
+
+    def update(self, grid, action, context):
+
+        ca_params, position, freeze = context
+
+        def move_then_modify(grid, move_action, modify_action, position):
+
+            grid, position = self.suboperators.move(grid, move_action, position)
+            grid, position = self.suboperators.modify(grid, modify_action, position)
+
+            return grid, position
+
+        if freeze == 0:
+
+            grid, ca_params = self.suboperators.cellular_automaton(
+                grid, None, ca_params
+            )
+
+            grid, position = move_then_modify(grid, action, True, position)
+
+            freeze = np.array(self.max_freeze)
+
+        else:
+
+            grid, position = move_then_modify(grid, action, True, position)
+
+            freeze = np.array(freeze - 1)
+
+        context = ca_params, position, freeze
+
+        return grid, context
