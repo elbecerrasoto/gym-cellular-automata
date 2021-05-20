@@ -19,8 +19,8 @@ class ForestFireEnvBulldozerV0(CAEnv):
     # fmt: off
     _max_freeze      = CONFIG["max_freeze"]
 
-    _n_moves         = len(CONFIG["actions"]["movement"])
-    _n_shoots        = len(CONFIG["actions"]["shooting"])
+    _moves           = CONFIG["actions"]["movement"]
+    _shoots          = CONFIG["actions"]["shooting"]
     _action_sets     = CONFIG["actions"]["sets"]
 
     _row             = CONFIG["grid_shape"]["n_row"]
@@ -145,7 +145,7 @@ class ForestFireEnvBulldozerV0(CAEnv):
 
         # RL Spaces
         self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
-        self.action_space = spaces.MultiDiscrete([self._n_moves, self._n_shoots])
+        self.action_space = spaces.MultiDiscrete([len(self._moves), len(self._shoots)])
 
 
 class MDP(Operator):

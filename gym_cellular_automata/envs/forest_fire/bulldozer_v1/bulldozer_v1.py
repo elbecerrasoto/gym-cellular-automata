@@ -1,8 +1,8 @@
-import gym
 import numpy as np
 from gym import logger, spaces
-from gym.utils import seeding
 
+from gym_cellular_automata import Operator
+from gym_cellular_automata.ca_env import CAEnv
 from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.render import (
     env_visualization,
 )
@@ -10,7 +10,6 @@ from gym_cellular_automata.envs.forest_fire.bulldozer_v1.config import CONFIG
 from gym_cellular_automata.envs.forest_fire.bulldozer_v1.operators.ca_repeat import (
     RepeatCA,
 )
-from gym_cellular_automata.envs.forest_fire.bulldozer_v1.operators.mdp import MDP
 from gym_cellular_automata.envs.forest_fire.operators import (
     Modify,
     Move,
@@ -19,7 +18,7 @@ from gym_cellular_automata.envs.forest_fire.operators import (
 from gym_cellular_automata.grid_space import Grid
 
 
-class ForestFireEnvBulldozerV1(gym.Env):
+class ForestFireEnvBulldozerV1(CAEnv):
     metadata = {"render.modes": ["human"]}
 
     # fmt: off
@@ -52,6 +51,8 @@ class ForestFireEnvBulldozerV1(gym.Env):
 
     def __init__(self, rows=None, cols=None):
 
+        self.seed()
+
         self._row = self._row if rows is None else rows
         self._col = self._col if cols is None else cols
 
@@ -68,72 +69,25 @@ class ForestFireEnvBulldozerV1(gym.Env):
         self.repeater = RepeatCA(
             self.ca, self.time_per_action, self.time_per_state, **self.repeater_space
         )
-        self.MDP = MDP(self.repeater, self.move, self.modify, **self.MDP_space)
+        self._MDP = MDP(self.repeater, self.move, self.modify, **self.MDP_space)
 
-        # Gym spec method
-        self.seed()
+    @property
+    def MDP(self):
+        return self._MDP
 
-    def reset(self):
+    @property
+    def initial_state(self):
 
-        self.done = False
-        self.steps_beyond_done = 0
+        if self._resample_initial:
 
-        self.grid = self._initial_grid_distribution()
-        self.context = self._initial_context_distribution()
+            self.grid = self._initial_grid_distribution()
+            self.context = self._initial_context_distribution()
 
-        return self.grid, self.context
+            self._initial_state = self.grid, self.context
 
-    def step(self, action):
+        self._resample_initial = False
 
-        if not self.done:
-
-            # MDP Transition
-            self.grid, self.context = self.MDP(self.grid, action, self.context)
-
-            # Check for termination
-            self._is_done()
-
-            # Gym API Formatting
-            obs = self.grid, self.context
-            reward = self._award()
-            done = self.done
-            info = self._report()
-
-            return obs, reward, done, info
-
-        else:
-
-            if self.steps_beyond_done == 0:
-
-                logger.warn(
-                    "You are calling 'step()' even though this "
-                    "environment has already returned done = True. You "
-                    "should always call 'reset()' once you receive 'done = "
-                    "True' -- any further steps are undefined behavior."
-                )
-
-            self.steps_beyond_done += 1
-
-            # Graceful after termination
-            return (self.grid, self.context), 0.0, True, self._report()
-
-    def seed(self, seed=None):
-        self.np_random, seed = seeding.np_random(seed)
-        return [seed]
-
-    def render(self, mode="human"):
-        if mode == "human":
-
-            wind, time, position = self.context
-
-            # Returning figure for convenience, formally render mode=human returns None
-            return env_visualization(self.grid, position, self._fire_seed)
-
-        else:
-
-            logger.warn(
-                f"Undefined mode.\nAvailable modes {self.metadata['render.modes']}"
-            )
+        return self._initial_state
 
     def _award(self):
 
@@ -142,7 +96,7 @@ class ForestFireEnvBulldozerV1(gym.Env):
         # 1. Easy to interpret
         # 2. Communicates the desire to terminate as fast as possible
         # 3. Internalizes the cost of Bulldozer actions
-        counts = self._count_cells()
+        counts = self.count_cells(self.grid)
         return -(counts[self._fire] / (counts[self._fire] + counts[self._tree]))
 
     def _is_done(self):
@@ -150,6 +104,20 @@ class ForestFireEnvBulldozerV1(gym.Env):
 
     def _report(self):
         return {"hit": self.modify.hit}
+
+    def render(self, mode="human"):
+        if mode == "human":
+
+            wind, pos, freeze = self.context
+
+            # Returning figure for convenience, formally render mode=human returns None
+            return env_visualization(self.grid, pos, self._fire_seed)
+
+        else:
+
+            logger.warn(
+                f"Undefined mode.\nAvailable modes {self.metadata['render.modes']}"
+            )
 
     def _set_spaces(self):
         self.grid_space = Grid(
@@ -233,21 +201,9 @@ class ForestFireEnvBulldozerV1(gym.Env):
 
         init_position = np.array([init_row, init_col])
 
-        # assert self.ca_params_space.contains(self._wind)
-        # assert self.time_space.contains(init_time)
-        # assert self.position_space.contains(init_position)
-
         init_context = self._wind, init_time, init_position
 
-        # assert self.context_space.contains(init_context)
-
         return init_context
-
-    def _count_cells(self):
-        """Returns dict of cell counts"""
-        from collections import Counter
-
-        return Counter(self.grid.flatten().tolist())
 
     def _init_time_mappings(self):
 
@@ -271,3 +227,32 @@ class ForestFireEnvBulldozerV1(gym.Env):
 
         self.time_per_action = time_per_action
         self.time_per_state = lambda s: self._t_env_any
+
+
+class MDP(Operator):
+
+    grid_dependant = True
+    action_dependant = True
+    context_dependant = True
+
+    def __init__(self, repeat_ca, move, modify, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.suboperators = repeat_ca, move, modify
+
+        self.repeat_ca = repeat_ca
+        self.move = move
+        self.modify = modify
+
+    def update(self, grid, action, context):
+
+        amove, ashoot = action
+        ca_params, time, position = context
+
+        grid, (ca_params, time) = self.repeat_ca(grid, action, (ca_params, time))
+
+        grid, position = self.move(grid, amove, position)
+        grid, position = self.modify(grid, ashoot, position)
+
+        return grid, (ca_params, time, position)
