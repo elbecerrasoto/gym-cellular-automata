@@ -42,7 +42,9 @@ class ForestFireEnvHelicopterV0(CAEnv):
     _reward_per_fire  = CONFIG["rewards"]["per_fire"]
     # fmt: on
 
-    def __init__(self, rows=None, cols=None):
+    def __init__(self, rows=None, cols=None, *args, **kwargs):
+
+        self.seed()
 
         self._row = self._row if rows is None else rows
         self._col = self._col if cols is None else cols

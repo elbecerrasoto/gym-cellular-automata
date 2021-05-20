@@ -2,6 +2,7 @@ from gym_cellular_automata import Operator
 
 
 class Modify(Operator):
+    hit = False
 
     grid_dependant = True
     action_dependant = True

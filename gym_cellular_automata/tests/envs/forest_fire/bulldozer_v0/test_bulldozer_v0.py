@@ -131,7 +131,7 @@ def test_counts(env):
         values, counts = np.unique(grid, return_counts=True)
         return dict(zip(values, counts))
 
-    observed_counts = env._count_cells()
+    observed_counts = env.count_cells(grid)
     expected_counts = get_dict_of_counts(grid)
 
     assert all(

@@ -1,22 +1,19 @@
-from collections import Counter
-
-import gym
 import numpy as np
 from gym import logger, spaces
-from gym.utils import seeding
 
+from gym_cellular_automata import Operator
+from gym_cellular_automata.ca_env import CAEnv
 from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.config import CONFIG
 from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.render import (
     env_visualization,
 )
 from gym_cellular_automata.envs.forest_fire.operators.ca_windy import WindyForestFire
-from gym_cellular_automata.envs.forest_fire.operators.coordinate import Coordinate
 from gym_cellular_automata.envs.forest_fire.operators.modify import Modify
 from gym_cellular_automata.envs.forest_fire.operators.move import Move
 from gym_cellular_automata.grid_space import Grid
 
 
-class ForestFireEnvBulldozerV0(gym.Env):
+class ForestFireEnvBulldozerV0(CAEnv):
     metadata = {"render.modes": ["human"]}
 
     # fmt: off
@@ -43,6 +40,8 @@ class ForestFireEnvBulldozerV0(gym.Env):
 
     def __init__(self, rows=None, cols=None):
 
+        self.seed()
+
         self._row = self._row if rows is None else rows
         self._col = self._col if cols is None else cols
 
@@ -54,74 +53,27 @@ class ForestFireEnvBulldozerV0(gym.Env):
 
         self.modify = Modify(self._effects)
 
-        self.coordinate = Coordinate(
+        self._MDP = MDP(
             self.cellular_automaton, self.move, self.modify, self._max_freeze
         )
 
-        # Gym spec method
-        self.seed()
+    @property
+    def MDP(self):
+        return self._MDP
 
-    def reset(self):
+    @property
+    def initial_state(self):
 
-        self.done = False
-        self.steps_beyond_done = 0
+        if self._resample_initial:
 
-        self.grid = self._initial_grid_distribution()
-        self.context = self._initial_context_distribution()
+            self.grid = self._initial_grid_distribution()
+            self.context = self._initial_context_distribution()
 
-        return self.grid, self.context
+            self._initial_state = self.grid, self.context
 
-    def step(self, action):
+        self._resample_initial = False
 
-        # Process the action to reuse shared Operator Machinery
-        action = self._action_processing(action)
-
-        if not self.done:
-
-            # Pre-Process the context to reuse shared Operator Machinery
-            context = self._context_preprocessing(self.context)
-
-            # MDP Transition
-            new_grid, new_context = self.coordinate(self.grid, action, context)
-
-            # Post-Process the context shown to the user
-            new_context = self._context_postprocessing(new_context)
-
-            # New State
-            self.grid = new_grid
-            self.context = new_context
-
-            # Termination as a function of New State
-            self._is_done()
-
-            # Gym API Formatting
-            # Necessary condition for MDP, its New State is public
-            obs = new_grid, new_context
-            # Reward as a function of New State, dependence NOT necessary for MDP
-            reward = self._award()
-            info = self._report()
-
-            return obs, reward, self.done, info
-
-        else:
-
-            if self.steps_beyond_done == 0:
-
-                logger.warn(
-                    "You are calling 'step()' even though this "
-                    "environment has already returned done = True. You "
-                    "should always call 'reset()' once you receive 'done = "
-                    "True' -- any further steps are undefined behavior."
-                )
-
-            self.steps_beyond_done += 1
-
-            # Graceful after termination
-            return (self.grid, self.context), 0.0, True, {}
-
-    def seed(self, seed=None):
-        self.np_random, seed = seeding.np_random(seed)
-        return [seed]
+        return self._initial_state
 
     def render(self, mode="human"):
         if mode == "human":
@@ -144,7 +96,7 @@ class ForestFireEnvBulldozerV0(gym.Env):
         # 1. Easy to interpret
         # 2. Communicates the desire to terminate as fast as possible
         # 3. Internalizes the cost of Bulldozer actions
-        counts = self._count_cells()
+        counts = self.count_cells(self.grid)
         return -(counts[self._fire] / (counts[self._fire] + counts[self._tree]))
 
     def _is_done(self):
@@ -176,10 +128,6 @@ class ForestFireEnvBulldozerV0(gym.Env):
 
         return self._wind, position, freeze
 
-    def _count_cells(self):
-        """Returns dict of cell counts"""
-        return Counter(self.grid.flatten().tolist())
-
     def _set_spaces(self):
 
         self.grid_space = Grid(
@@ -199,21 +147,57 @@ class ForestFireEnvBulldozerV0(gym.Env):
         self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
         self.action_space = spaces.MultiDiscrete([self._n_moves, self._n_shoots])
 
-    def _action_processing(self, action):
-        # Correct size and separates the sub-actions
-        ca_action = None
-        move_action = action[0]
-        modify_action = action[1]
-        coordinate_action = None
 
-        return ca_action, move_action, modify_action, coordinate_action
+class MDP(Operator):
+    from collections import namedtuple
 
-    def _context_preprocessing(self, context):
-        ca_context, move_context, coordinate_context = context
-        # Only repeats the Move Context
-        return ca_context, move_context, move_context, coordinate_context
+    Suboperators = namedtuple("Suboperators", ["cellular_automaton", "move", "modify"])
 
-    def _context_postprocessing(self, new_context):
-        # Only un-repeats the Move Context
-        ca_context, move_context, modify_context, coordinate_context = new_context
-        return ca_context, move_context, coordinate_context
+    grid_dependant = True
+    action_dependant = True
+    context_dependant = True
+
+    def __init__(self, cellular_automaton, move, modify, max_freeze, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.suboperators = self.Suboperators(cellular_automaton, move, modify)
+
+        self.max_freeze = max_freeze
+        self.freeze_space = spaces.Discrete(max_freeze + 1)
+
+    def update(self, grid, action, context):
+
+        ca_params, position, freeze = context
+        move_action, modify_action = action
+
+        def move_then_modify(grid, move_action, modify_action, position):
+
+            grid, position = self.suboperators.move(grid, move_action, position)
+            grid, position = self.suboperators.modify(grid, modify_action, position)
+
+            return grid, position
+
+        if freeze == 0:
+
+            grid, ca_params = self.suboperators.cellular_automaton(
+                grid, None, ca_params
+            )
+
+            grid, position = move_then_modify(
+                grid, move_action, modify_action, position
+            )
+
+            freeze = np.array(self.max_freeze)
+
+        else:
+
+            grid, position = move_then_modify(
+                grid, move_action, modify_action, position
+            )
+
+            freeze = np.array(freeze - 1)
+
+        context = ca_params, position, freeze
+
+        return grid, context
