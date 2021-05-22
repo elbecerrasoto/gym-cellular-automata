@@ -34,37 +34,6 @@ def neighborhood_at(grid, pos, invariant=0):
             left, middle, right,
             down_left, down, down_right
     """
-    row, col = pos
-
-    is_boundary = are_my_neighbors_a_boundary(grid, pos)
-
-    up_left = (
-        grid[row - 1, col - 1]
-        if not (is_boundary.up or is_boundary.left)
-        else invariant
-    )
-    up = grid[row - 1, col] if not is_boundary.up else invariant
-    up_right = (
-        grid[row - 1, col + 1]
-        if not (is_boundary.up or is_boundary.right)
-        else invariant
-    )
-
-    left = grid[row, col - 1] if not is_boundary.left else invariant
-    self = grid[row, col]
-    right = grid[row, col + 1] if not is_boundary.right else invariant
-
-    down_left = (
-        grid[row + 1, col - 1]
-        if not (is_boundary.down or is_boundary.left)
-        else invariant
-    )
-    down = grid[row + 1, col] if not is_boundary.down else invariant
-    down_right = (
-        grid[row + 1, col + 1]
-        if not (is_boundary.down or is_boundary.right)
-        else invariant
-    )
 
     Neighbors = namedtuple(
         "Neighbors",
@@ -80,6 +49,37 @@ def neighborhood_at(grid, pos, invariant=0):
             "down_right",
         ],
     )
+
+    def neighbor_value(roffset, coffset):
+        """Easier to Ask for Forgiveness than Permission."""
+        trow, tcol = row + roffset, col + coffset
+
+        try:
+
+            if trow < 0 or tcol < 0:
+                raise IndexError
+
+            return grid[trow, tcol]
+
+        except IndexError:
+
+            return invariant
+
+    row, col = pos
+
+    # fmt: off
+    up_left    = neighbor_value(-1, -1)
+    up         = neighbor_value(-1, 0)
+    up_right   = neighbor_value(-1, +1)
+
+    left       = neighbor_value(0, -1)
+    self       = neighbor_value(0, 0)
+    right      = neighbor_value(0, +1)
+
+    down_left  = neighbor_value(+1, -1)
+    down       = neighbor_value(+1, 0)
+    down_right = neighbor_value(+1, +1)
+    # fmt: on
 
     return Neighbors(
         up_left, up, up_right, left, self, right, down_left, down, down_right
