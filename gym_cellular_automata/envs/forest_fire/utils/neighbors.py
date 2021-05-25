@@ -3,6 +3,53 @@ from collections import namedtuple
 import numpy as np
 
 
+def moore_n(grid, position, n=1, invariant=0):
+    row, col = position
+    nrow, ncol = grid.shape
+
+    # Target Positions on Original Grid
+    tax0 = row + np.array([-n, +n])
+    tax1 = col + np.array([-n, +n])
+    targets = tup, tdown, tleft, tright = np.concatenate((tax0, tax1))
+
+    try:
+
+        # Down and Right targets already are IndexError.
+        if tup < 0 or tleft < 0:
+            raise IndexError
+
+        return grid[tup : tdown + 1, tleft : tright + 1]
+
+    except IndexError:
+
+        borders = 0, (nrow - 1), 0, (ncol - 1)
+        origins = row, row, col, col
+
+        d = lambda a, b: abs(b - a)
+
+        distances_bt = [d(b, t) for b, t in zip(borders, targets)]
+        distances_ob = [d(o, b) for o, b in zip(origins, borders)]
+
+        distances_rows = distances_bt[:2] + distances_ob[:2]
+        distances_cols = distances_bt[2:] + distances_ob[2:]
+
+        rows, cols = map(lambda l: sum(l) + 1, (distances_rows, distances_cols))
+
+        invariant = np.array(invariant, dtype=grid.dtype)
+        extended_grid = np.repeat(invariant, rows * cols).reshape(rows, cols)
+
+        # fmt: off
+        a0 =        distances_bt[0]
+        e0 = rows - distances_bt[1]
+        a1 =        distances_bt[2]
+        e1 = cols - distances_bt[3]
+        # fmt: on
+
+        extended_grid[a0:e0, a1:e1] = grid[:, :]
+        return extended_grid
+
+
+# Depracated
 def are_my_neighbors_a_boundary(grid, pos):
     """
     Check if the neighbors of target position are a boundary.
@@ -25,6 +72,7 @@ def are_my_neighbors_a_boundary(grid, pos):
     return Boundaries(up, down, left, right)
 
 
+# Depracated
 def neighborhood_at(grid, pos, invariant=0):
     """
     Calculates the Moore's neighborgood of cell at target position 'pos'.
@@ -84,24 +132,3 @@ def neighborhood_at(grid, pos, invariant=0):
     return Neighbors(
         up_left, up, up_right, left, self, right, down_left, down, down_right
     )
-
-
-def moore_n(grid, pos, n=1, invariant=0):
-    row, col = pos
-
-    left_up = row - n, col - n
-    right_up = row - n, col + n
-
-    left_down = row + n, col - n
-    right_down = row + n, col + n
-
-    for corner in [left_up, right_up, left_down, right_down]:
-        i_am_boundary = are_my_neighbors_a_boundary(grid, corner)
-
-        if any(i_am_boundary):
-            # Early return if any boundary
-            return np.array(
-                neighborhood_at(grid, pos, invariant), dtype=grid.dtype
-            ).reshape(3, 3)
-
-    return grid[left_up[0] : left_down[0] + 1, left_up[1] : right_up[1] + 1]
