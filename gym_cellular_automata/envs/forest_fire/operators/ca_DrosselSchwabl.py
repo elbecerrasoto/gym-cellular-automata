@@ -30,7 +30,7 @@ class ForestFire(Operator):
         for row, cells in enumerate(grid):
             for col, cell in enumerate(cells):
 
-                neighbors = neighborhood_at(grid, pos=(row, col), invariant=self.empty)
+                neighbors = neighborhood_at(grid, (row, col), invariant=self.empty)
 
                 if cell == self.tree and self.fire in neighbors:
                     # Burn tree to the ground
