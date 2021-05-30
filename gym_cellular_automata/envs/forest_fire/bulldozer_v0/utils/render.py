@@ -59,8 +59,7 @@ def env_visualization(grid, pos, fire_seed):
     ax_grid.plot(pos[1], pos[0], marker="$B$", markersize=6, color="1.0")
 
     # -------- Local
-
-    bd_hood = moore_n(grid, pos, n=4, invariant=EMPTY)
+    bd_hood = moore_n(4, pos, grid, EMPTY)
 
     n_row, n_col = bd_hood.shape
     mid_row, mid_col = n_row // 2, n_row // 2

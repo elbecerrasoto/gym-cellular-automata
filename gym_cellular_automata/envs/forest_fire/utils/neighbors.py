@@ -1,103 +1,164 @@
 import numpy as np
 
 
-# def moore_n(grid, position, n=1, invariant=0):
+def moore_n(n: int, position: tuple, grid: np.ndarray, invariant: int = 0):
+    """Gets the N Moore neighborhood at given postion."""
 
-#     invariant = np.array(invariant, dtype=grid.dtype)
-#     row, col = position
+    row, col = position
+    nrows, ncols = grid.shape
 
-#     # Target Positions on Grid.
-#     tup, tdown = row + np.array([-n, n + 1])
-#     tleft, tright = col + np.array([-n, n + 1])
+    # Target offsets from position.
+    ofup, ofdo = row + np.array([-n, +n])
+    ofle, ofri = col + np.array([-n, +n])
 
-#     try:
+    try:
 
-#         # Wrong Down and Right targets already raise IndexError.
-#         if tup < 0 or tleft < 0:
-#             raise IndexError
+        if ofup < 0 or ofle < 0 or ofdo + 1 > nrows or ofri + 1 > ncols:
+            raise IndexError
 
-#         # Enough Grid, just return the requested values.
-#         return grid[tup:tdown, tleft:tright]
+        # Current Grid is enough, just return the requested values.
+        return grid[ofup : ofdo + 1, ofle : ofri + 1]
 
-#     except IndexError:
+    except IndexError:
 
-#         # Recursive handling of the error.
-#         # Add Invariant Rows and Cols when Grid would be out of bounds.
-#         return rmoore_n(n, position, grid, invariant)
+        invariant = np.array(invariant, dtype=grid.dtype)
 
+        # 1. Generate extended grid.
 
-def moore_n(grid, position, n=1, invariant=0):
-    return rmoore_n(n, position, grid, invariant)
+        # Grid lenght at step N.
+        l = lambda n: 2 * n + 1
+        ln = l(n)
+        egrid = np.repeat(invariant, ln * ln).reshape(ln, ln)
 
+        # 2. Populate middle cell.
 
-def rmoore_n(n, POSITION, GRID, INVARIANT=0):
+        mid = ln // 2
+        egrid[mid, mid] = grid[row, col]
 
-    # Grid lenght at step N.
-    l = lambda n: 2 * n + 1
+        is_legal = {
+            "up": ofup >= 0,
+            "down": ofdo <= nrows - 1,
+            "left": ofle >= 0,
+            "right": ofri <= ncols - 1,
+        }
 
-    # Grow matrix 1 step.
-    def grow_matrix(M: np.ndarray, c: int = 0) -> np.ndarray:
+        # Distance
+        d = lambda a, b: abs(b - a)
 
-        c = np.array(c, dtype=M.dtype)
-        nrows, ncols = M.shape
+        # 3. Populate Up-Left Corner
+        if is_legal["up"] and is_legal["left"]:
 
-        row = np.repeat(c, ncols).reshape(1, ncols)
-        col = np.repeat(c, nrows + 2).reshape(nrows + 2, 1)
+            egrid[mid - n : mid + 1, mid - n : mid + 1] = grid[
+                row - n : row + 1, col - n : col + 1
+            ]
 
-        M = np.concatenate((row, M, row), axis=0)
-        M = np.concatenate((col, M, col), axis=1)
+        elif not is_legal["up"] and not is_legal["left"]:  # Both ilegal
 
-        return M
+            br = d(row, 0)
+            bc = d(col, 0)
+            egrid[mid - br : mid + 1, mid - bc : mid + 1] = grid[
+                row - br : row + 1, col - bc : col + 1
+            ]
 
-    row, col = POSITION
-    nrows, ncols = GRID.shape
-    INVARIANT = np.array(INVARIANT, dtype=GRID.dtype)
+        elif not is_legal["up"]:
 
-    # Offsets from POSITION
-    oup, odo = row + np.array([-n, n + 1])
-    ole, ori = col + np.array([-n, n + 1])
+            br = d(row, 0)  # Distance to the border
+            egrid[mid - br : mid + 1, mid - n : mid + 1] = grid[
+                row - br : row + 1, col - n : col + 1
+            ]
+        elif not is_legal["left"]:
 
-    # Base Case
-    if n == 0:
-        return GRID[oup:odo, ole:ori]
+            bc = d(col, 0)
+            egrid[mid - n : mid + 1, mid - bc : mid + 1] = grid[
+                row - n : row + 1, col - bc : col + 1
+            ]
 
-    # Defaults when out of borders.
-    defaultC = np.repeat(INVARIANT, l(n - 1)).reshape(l(n - 1), 1)
-    defaultR = np.repeat(INVARIANT, l(n - 1)).reshape(1, l(n - 1))
+        # 4. Populate Up-Right Corner
+        if is_legal["up"] and is_legal["right"]:
 
-    grid = rmoore_n(n - 1, POSITION, GRID, INVARIANT)  # Recursive call.
+            egrid[mid - n : mid + 1, mid : mid + n + 1] = grid[
+                row - n : row + 1, col : col + n + 1
+            ]
 
-    grid = grow_matrix(grid, INVARIANT)
+        elif not is_legal["up"] and not is_legal["right"]:
 
-    # fmt: off
-    # Select Uppermost and Downmost Rows with correct size.
-    up    = defaultR if oup < 0     else GRID[ oup:oup+1, ole+1:ori-1 ]
-    down  = defaultR if odo > nrows else GRID[ odo-1:odo, ole+1:ori-1 ]
+            br = d(row, 0)
+            bc = d(col, ncols)
+            egrid[mid - br : mid + 1, mid : mid + bc] = grid[
+                row - br : row + 1, col : col + bc
+            ]
 
-    # Select Last Leftmost and Rightmost Cols with correct size.
-    left  = defaultC if ole < 0     else GRID[ oup+1:odo-1, ole:ole+1 ]
-    right = defaultC if ori > ncols else GRID[ oup+1:odo-1, ori-1:ori ]
+        elif not is_legal["up"]:
 
-    grid[ 0   , 1:-1 ] = up   [0,:]
-    grid[ -1  , 1:-1 ] = down [0,:]
-    grid[ 1:-1, 0    ] = left [:,0]
-    grid[ 1:-1, -1   ] = right[:,0]
-    # fmt: on
+            br = d(row, 0)
+            egrid[mid - br : mid + 1, mid : mid + n + 1] = grid[
+                row - br : row + 1, col : col + n + 1
+            ]
 
-    # Get the corners right
-    if oup >= 0 and ole >= 0:
-        grid[0, 0] = GRID[oup, ole]
+        elif not is_legal["left"]:
 
-    if oup >= 0 and ori <= ncols:
-        grid[0, l(n) - 1] = GRID[oup, ori - 1]
+            bc = d(col, ncols)
+            egrid[mid - n : mid + 1, mid : mid + bc] = grid[
+                row - n : row + 1, col : col + bc
+            ]
 
-    if odo <= nrows and ole >= 0:
-        grid[l(n) - 1, 0] = GRID[odo - 1, ole]
+        # 5. Populate Down-Left Corner
+        if is_legal["down"] and is_legal["left"]:
 
-    if odo <= nrows and ori <= ncols:
-        grid[l(n) - 1, l(n) - 1] = GRID[odo - 1, ori - 1]
+            egrid[mid : mid + n + 1, mid - n : mid + 1] = grid[
+                row : row + n + 1, col - n : col + 1
+            ]
 
-    return grid
+        elif not is_legal["down"] and not is_legal["left"]:
+
+            br = d(row, nrows)
+            bc = d(col, 0)
+            egrid[mid : mid + br, mid - bc : mid + 1] = grid[
+                row : row + br, col - bc : col + 1
+            ]
+
+        elif not is_legal["down"]:
+
+            br = d(row, nrows)
+            egrid[mid : mid + br, mid - n : mid + 1] = grid[
+                row : row + br, col - n : col + 1
+            ]
+
+        elif not is_legal["left"]:
+
+            bc = d(col, 0)
+            egrid[mid : mid + n + 1, mid - bc : mid + 1] = grid[
+                row : row + n + 1, col - bc : col + 1
+            ]
+
+        # 6. Populate Down-Right Corner
+        if is_legal["down"] and is_legal["right"]:
+
+            egrid[mid : mid + n + 1, mid : mid + n + 1] = grid[
+                row : row + n + 1, col : col + n + 1
+            ]
+
+        elif not is_legal["down"] and not is_legal["right"]:
+
+            br = d(row, nrows)
+            bc = d(col, ncols)
+            egrid[mid : mid + br, mid : mid + bc] = grid[row : row + br, col : col + bc]
+
+        elif not is_legal["down"]:
+
+            br = d(row, nrows)
+            egrid[mid : mid + br, mid : mid + n + 1] = grid[
+                row : row + br, col : col + n + 1
+            ]
+
+        elif not is_legal["right"]:
+
+            bc = d(col, ncols)
+            egrid[mid : mid + n + 1, mid : mid + bc] = grid[
+                row : row + n + 1, col : col + bc
+            ]
+
+        return egrid
 
 
 # Depracated: Still used as interface for CAs.
@@ -129,5 +190,5 @@ def neighborhood_at(grid, pos, invariant=0):
     )
 
     N = 1
-    neighborhood = moore_n(grid, pos, N, invariant).flatten().tolist()
+    neighborhood = moore_n(N, pos, grid, invariant).flatten().tolist()
     return Neighbors(*neighborhood)

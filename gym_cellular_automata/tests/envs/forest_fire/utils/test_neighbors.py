@@ -1,6 +1,3 @@
-from icecream import ic
-from copy import copy
-
 import numpy as np
 import pytest
 from gym import spaces
@@ -11,12 +8,12 @@ from gym_cellular_automata.envs.forest_fire.utils.neighbors import (
 )
 from gym_cellular_automata.grid_space import Grid
 
-ROW = 8
-COL = 8
-
+ROW = 4
+COL = 4
 CELL_STATES = 3
-
 INVARIANT = 0
+MAX_N = 4
+REPEATS = 24
 
 
 @pytest.fixture
@@ -29,31 +26,38 @@ def position_space():
     return spaces.MultiDiscrete([ROW, COL])
 
 
-def test_moore_n(grid_space, position_space):
-    grid1 = grid_space.sample()
-    grid2 = copy(grid1)
-
-    rmid = ROW // 2
-    cmid = COL // 2
-
-    N = 4
-
-    g1 = moore_n(grid1, (rmid, cmid), n=N)
-    g2 = moore_n(grid2, (rmid, cmid), n=N)
-
-    ic(g1)
-    ic(g2)
-    ic(g1.shape)
-    assert g1.shape == (2 * N + 1, 2 * N + 1)
-
-    assert np.all(g1 == g2)
+@pytest.fixture
+def n_space():
+    return spaces.Discrete(MAX_N + 1)
 
 
-# @pytest.mark.skip(reason="Debugging")
+@pytest.mark.repeat(REPEATS)
+def test_moore_n(grid_space, position_space, n_space):
+    n = n_space.sample()
+
+    position = position_space.sample()
+    row, col = position
+
+    grid = grid_space.sample()
+    gridc = grid.copy()
+
+    g = moore_n(n, position, grid)
+    gc = moore_n(n, position, gridc)
+
+    # Copy
+    assert np.all(g == gc)
+
+    l = lambda n: 2 * n + 1
+    # Size
+    assert g.shape == (l(n), l(n))
+
+    # Center
+    mid = l(n) // 2
+    assert g[mid, mid] == grid[row, col]
+
+
 def test_neighborhood_at(grid_space):
-    empty = 0
-    tree = 1
-    fire = 2
+    empty, tree, fire = range(3)
 
     singleton_2d = Grid(values=[fire], shape=(1, 1)).sample()
     neighbors = neighborhood_at(grid=singleton_2d, pos=(0, 0), invariant=empty)

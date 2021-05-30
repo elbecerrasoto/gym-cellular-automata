@@ -29,6 +29,8 @@ class Grid(Space):
 
         super().__init__(shape, dtype)
 
+        assert shape, "Shape must be a non-empty tuple."
+
         if values is not None:
 
             self._from_values = True

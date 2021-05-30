@@ -108,10 +108,10 @@ class ForestFireEnvBulldozerV1(CAEnv):
     def render(self, mode="human"):
         if mode == "human":
 
-            wind, pos, freeze = self.context
+            ca_params, mod_params, coord_params = self.context
 
             # Returning figure for convenience, formally render mode=human returns None
-            return env_visualization(self.grid, pos, self._fire_seed)
+            return env_visualization(self.grid, mod_params, self._fire_seed)
 
         else:
 
@@ -130,7 +130,7 @@ class ForestFireEnvBulldozerV1(CAEnv):
         self.position_space = spaces.MultiDiscrete([self._row, self._col])
 
         self.context_space = spaces.Tuple(
-            (self.ca_params_space, self.time_space, self.position_space)
+            (self.ca_params_space, self.position_space, self.time_space)
         )
 
         # RL spaces
@@ -201,7 +201,7 @@ class ForestFireEnvBulldozerV1(CAEnv):
 
         init_position = np.array([init_row, init_col])
 
-        init_context = self._wind, init_time, init_position
+        init_context = self._wind, init_position, init_time
 
         return init_context
 
@@ -248,11 +248,11 @@ class MDP(Operator):
     def update(self, grid, action, context):
 
         amove, ashoot = action
-        ca_params, time, position = context
+        ca_params, position, time = context
 
         grid, (ca_params, time) = self.repeat_ca(grid, action, (ca_params, time))
 
         grid, position = self.move(grid, amove, position)
         grid, position = self.modify(grid, ashoot, position)
 
-        return grid, (ca_params, time, position)
+        return grid, (ca_params, position, time)
