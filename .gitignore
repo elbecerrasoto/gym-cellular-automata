@@ -11,6 +11,8 @@ monkeytype.sqlite3
 ipython.html
 # isort configurations
 .isort.cfg
+# autosaves
+*~
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
