@@ -7,7 +7,7 @@ from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.render import (
     env_visualization,
 )
 from gym_cellular_automata.envs.forest_fire.bulldozer_v1.config import CONFIG
-from gym_cellular_automata.envs.forest_fire.bulldozer_v1.operators.ca_repeat import (
+from gym_cellular_automata.envs.forest_fire.bulldozer_v1.operators.repeat_ca import (
     RepeatCA,
 )
 from gym_cellular_automata.envs.forest_fire.operators import (
