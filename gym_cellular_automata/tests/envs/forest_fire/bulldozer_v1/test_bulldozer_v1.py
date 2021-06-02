@@ -1,8 +1,10 @@
 import gym
 from gym.spaces import Space
-from matplotlib import pyplot as plt
 
 from gym_cellular_automata.envs.forest_fire.bulldozer_v1 import ForestFireEnvBulldozerV1
+
+# from matplotlib import pyplot as plt
+
 
 THRESHOLD = 12
 

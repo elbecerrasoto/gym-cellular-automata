@@ -4,7 +4,6 @@ from gym_cellular_automata.operator import Operator
 
 REGISTERED_CA_ENVS = (
     "ForestFireHelicopter-v0",
-    "ForestFireBulldozer-v0",
     "ForestFireBulldozer-v1",
 )
 
@@ -18,12 +17,6 @@ register(
 
 register(
     id=REGISTERED_CA_ENVS[1],
-    entry_point=ff_dir + ".bulldozer_v0:ForestFireEnvBulldozerV0",
-)
-
-
-register(
-    id=REGISTERED_CA_ENVS[2],
     entry_point=ff_dir + ".bulldozer_v1:ForestFireEnvBulldozerV1",
 )
 

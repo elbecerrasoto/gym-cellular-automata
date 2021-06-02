@@ -3,12 +3,12 @@ from gym import logger, spaces
 
 from gym_cellular_automata import Operator
 from gym_cellular_automata.ca_env import CAEnv
-from gym_cellular_automata.envs.forest_fire.bulldozer_v0.utils.render import (
-    env_visualization,
-)
-from gym_cellular_automata.envs.forest_fire.bulldozer_v1.config import CONFIG
 from gym_cellular_automata.envs.forest_fire.bulldozer_v1.operators.repeat_ca import (
     RepeatCA,
+)
+from gym_cellular_automata.envs.forest_fire.bulldozer_v1.utils.config import CONFIG
+from gym_cellular_automata.envs.forest_fire.bulldozer_v1.utils.render import (
+    env_visualization,
 )
 from gym_cellular_automata.envs.forest_fire.operators import (
     Modify,

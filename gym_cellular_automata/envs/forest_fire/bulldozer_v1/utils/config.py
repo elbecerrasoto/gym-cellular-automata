@@ -10,7 +10,7 @@ CONFIG_FILE = "bulldozer_v1.yaml"
 
 
 def get_forest_fire_config_dict():
-    config = get_config_dict(get_path(CONFIG_FILE, __file__, behind=0))
+    config = get_config_dict(get_path(CONFIG_FILE, __file__, behind=1))
 
     config["effects"] = translate(config["effects"], config["cell_symbols"])
 
