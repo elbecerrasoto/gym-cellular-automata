@@ -11,13 +11,13 @@ ff_dir = "gym_cellular_automata.forest_fire"
 
 register(
     id=REGISTERED_CA_ENVS[0],
-    entry_point=ff_dir + ".helicopter_v0:ForestFireEnvHelicopterV0",
+    entry_point=ff_dir + ".helicopter:ForestFireEnvHelicopterV0",
 )
 
 
 register(
     id=REGISTERED_CA_ENVS[1],
-    entry_point=ff_dir + ".bulldozer_v1:ForestFireEnvBulldozerV1",
+    entry_point=ff_dir + ".bulldozer:ForestFireEnvBulldozerV1",
 )
 
 __all__ = ["Operator", "REGISTERED_CA_ENVS"]

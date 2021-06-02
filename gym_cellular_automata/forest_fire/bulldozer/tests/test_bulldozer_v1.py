@@ -1,7 +1,7 @@
 import gym
 from gym.spaces import Space
 
-from gym_cellular_automata.forest_fire.bulldozer_v1 import ForestFireEnvBulldozerV1
+from gym_cellular_automata.forest_fire.bulldozer import ForestFireEnvBulldozerV1
 
 # from matplotlib import pyplot as plt
 

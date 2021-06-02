@@ -3,8 +3,8 @@ import numpy as np
 import pytest
 from gym import spaces
 
-from gym_cellular_automata.forest_fire.helicopter_v0 import ForestFireEnvHelicopterV0
-from gym_cellular_automata.forest_fire.helicopter_v0.utils.config import CONFIG
+from gym_cellular_automata.forest_fire.helicopter import ForestFireEnvHelicopterV0
+from gym_cellular_automata.forest_fire.helicopter.utils.config import CONFIG
 from gym_cellular_automata.grid_space import Grid
 
 RANDOM_POLICY_ITERATIONS = 12
