@@ -7,7 +7,7 @@ REGISTERED_CA_ENVS = (
     "ForestFireBulldozer-v1",
 )
 
-ff_dir = "gym_cellular_automata.envs.forest_fire"
+ff_dir = "gym_cellular_automata.forest_fire"
 
 register(
     id=REGISTERED_CA_ENVS[0],

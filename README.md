@@ -77,7 +77,7 @@ print(gymca.REGISTERED_CA_ENVS)
 
 :evergreen_tree: :fire:
 
-For contributions with _Forest Fire CA Envs_ read [this!](./gym_cellular_automata/envs/forest_fire/CONTRIBUTING.md)
+For contributions with _Forest Fire CA Envs_ read [this!](./gym_cellular_automata/forest_fire/CONTRIBUTING.md)
 
 Contributions to _Gym Cellular Automata_ are always welcome. Feel free to open _pull requests_ at will explaining your proposed change.
 
