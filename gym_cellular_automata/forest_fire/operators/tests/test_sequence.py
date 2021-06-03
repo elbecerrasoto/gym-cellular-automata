@@ -33,6 +33,11 @@ def grid_space():
 
 @pytest.fixture
 def operators(grid_space):
+    from collections import namedtuple
+
+    Operators = namedtuple(
+        "Operators", ["identity", "ca1", "ca2", "move", "modify", "coordinate"]
+    )
 
     dummy_space = spaces.Discrete(1)
 
@@ -88,7 +93,7 @@ def operators(grid_space):
         ),
     )
 
-    return identity, ca1, ca2, move, modify, coordinate
+    return Operators(identity, ca1, ca2, move, modify, coordinate)
 
 
 @pytest.mark.repeat(TESTS)
@@ -132,3 +137,38 @@ def test_sequence(operators, grid_space):
     expected_grid = get_expected_grid(operators, grid2, actions, contexts2, flow)
 
     assert np.all(obserseved_grid == expected_grid)
+
+
+@pytest.mark.repeat(TESTS)
+def test_single_pass(operators, grid_space):
+    from gym_cellular_automata.forest_fire.operators.sequence import SinglePass
+
+    # Needs deterministic Operations
+    operators = [operators.identity, operators.modify]
+
+    single_pass = SinglePass(operators)
+
+    grid = grid_space.sample()
+    grid02 = grid.copy()
+
+    l = list()
+    for op in operators:
+        opa = op.action_space.sample()
+        opc = op.context_space.sample()
+        l.append((opa, opc))
+
+    subactions, subcontexts = zip(*l)
+    subcontexts02 = tuple([copy(context) for context in subcontexts])
+
+    def get_expected(grid, operators, subactions, subcontexts):
+
+        for i, f in enumerate(operators):
+            grid, __ = f(grid, subactions[i], subcontexts[i])
+
+        return grid
+
+    obserseved, __ = single_pass(grid, subactions, subcontexts)
+    expected = get_expected(grid02, operators, subactions, subcontexts02)
+
+    # Needs deterministic operations for this to work
+    assert np.all(obserseved == expected)

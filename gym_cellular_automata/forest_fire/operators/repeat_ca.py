@@ -6,29 +6,6 @@ import numpy as np
 from gym_cellular_automata import Operator
 
 
-class SinglePass(Operator):
-
-    grid_dependant = True
-    action_dependant = True
-    context_dependant = True
-
-    def __init__(self, operators, *args, **kwargs):
-
-        super().__init__(*args, **kwargs)
-
-        self.suboperators = tuple(operators)
-
-    def update(self, grid, subactions, subcontexts):
-        subcontexts = list(subcontexts)
-
-        for i, f in enumerate(self.suboperators):
-
-            grid, icontext = f(grid, subactions[i], subcontexts[i])
-            subcontexts[i] = icontext
-
-        return grid, tuple(subcontexts)
-
-
 class RepeatCA(Operator):
 
     grid_dependant = True
@@ -63,6 +40,6 @@ class RepeatCA(Operator):
         accu_time, repeats = math.modf(accu_time)
 
         for repeat in range(int(repeats)):
-            grid, ca_params = grid, icontext = self.ca(grid, action, ca_params)
+            grid, ca_params = self.ca(grid, action, ca_params)
 
         return grid, (ca_params, np.array(accu_time))

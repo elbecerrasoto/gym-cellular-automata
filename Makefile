@@ -29,7 +29,7 @@ test-coverage :
 
 linter :
 	# Finds debugging prints
-	find ./gym_cellular_automata/ -type f -name "*.py" | sed '/test/ d' | xargs grep -n 'print(' | cat
+	find ./gym_cellular_automata/ -type f -name "*.py" | sed '/test/ d' | xargs egrep -n 'print\(|ic\(' | cat
 	mypy --config-file mypy.ini ./
 
 patch :
