@@ -9,6 +9,12 @@ from gym_cellular_automata import Operator
 
 class WindyForestFire(Operator):
 
+    grid_dependant = True
+    action_dependant = False
+    context_dependant = True
+
+    deterministic = False
+
     # Convolution Weights, magic variables
     _identity = 2 ** 11
     _propagation = 2 ** 3

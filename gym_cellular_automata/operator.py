@@ -15,6 +15,8 @@ class Operator(ABC):
     action_dependant: Optional[bool] = None
     context_dependant: Optional[bool] = None
 
+    deterministic: Optional[bool] = None
+
     @abstractmethod
     def __init__(
         self,
@@ -85,6 +87,8 @@ class Identity(Operator):
     grid_dependant = True
     action_dependant = False
     context_dependant = True
+
+    deterministic = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

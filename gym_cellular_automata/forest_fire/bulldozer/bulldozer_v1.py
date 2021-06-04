@@ -229,6 +229,8 @@ class MDP(Operator):
     action_dependant = True
     context_dependant = True
 
+    deterministic = False
+
     def __init__(self, repeat_ca, move, modify, *args, **kwargs):
 
         super().__init__(*args, **kwargs)

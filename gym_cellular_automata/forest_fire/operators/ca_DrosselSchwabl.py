@@ -11,6 +11,8 @@ class ForestFire(Operator):
     action_dependant = False
     context_dependant = True
 
+    deterministic = False
+
     def __init__(self, empty, tree, fire, *args, **kwargs):
 
         super().__init__(*args, **kwargs)

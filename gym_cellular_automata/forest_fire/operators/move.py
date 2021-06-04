@@ -16,6 +16,8 @@ class Move(Operator):
     action_dependant = True
     context_dependant = True
 
+    deterministic = True
+
     def __init__(self, directions_sets, *args, **kwargs):
 
         super().__init__(*args, **kwargs)

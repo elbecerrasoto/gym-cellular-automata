@@ -144,6 +144,8 @@ class MDP(Operator):
     action_dependant = True
     context_dependant = True
 
+    deterministic = False
+
     def __init__(self, cellular_automaton, move, modify, max_freeze, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
@@ -186,6 +188,8 @@ class MoveModify(Operator):
     grid_dependant = True
     action_dependant = True
     context_dependant = True
+
+    deterministic = True
 
     def __init__(self, move, modify, *args, **kwargs):
 

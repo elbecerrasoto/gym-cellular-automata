@@ -8,6 +8,8 @@ class Modify(Operator):
     action_dependant = True
     context_dependant = True
 
+    deterministic = True
+
     def __init__(self, effects: dict, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
