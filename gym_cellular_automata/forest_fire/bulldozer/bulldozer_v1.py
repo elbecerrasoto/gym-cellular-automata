@@ -2,14 +2,15 @@ import numpy as np
 from gym import logger, spaces
 
 from gym_cellular_automata import CAEnv, GridSpace, Operator
-from gym_cellular_automata.forest_fire.bulldozer.utils.config import CONFIG
-from gym_cellular_automata.forest_fire.bulldozer.utils.render import env_visualization
 from gym_cellular_automata.forest_fire.operators import (
     Modify,
     Move,
     RepeatCA,
     WindyForestFire,
 )
+
+from .utils.config import CONFIG
+from .utils.render import env_visualization
 
 
 class ForestFireEnvBulldozerV1(CAEnv):
@@ -43,9 +44,9 @@ class ForestFireEnvBulldozerV1(CAEnv):
     _effects         = CONFIG["effects"]
     # fmt: on
 
-    def __init__(self, rows=None, cols=None):
+    def __init__(self, rows=None, cols=None, *args, **kwargs):
 
-        self.seed()
+        super().__init__(*args, **kwargs)
 
         self._row = self._row if rows is None else rows
         self._col = self._col if cols is None else cols
@@ -104,7 +105,6 @@ class ForestFireEnvBulldozerV1(CAEnv):
 
             ca_params, mod_params, coord_params = self.context
 
-            # Returning figure for convenience, formally render mode=human returns None
             return env_visualization(self.grid, mod_params, self._fire_seed)
 
         else:

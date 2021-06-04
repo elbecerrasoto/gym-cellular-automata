@@ -3,9 +3,7 @@ import numpy as np
 from gym import logger, spaces
 
 from gym_cellular_automata import CAEnv, GridSpace, Operator
-from gym_cellular_automata.forest_fire.operators.ca_DrosselSchwabl import ForestFire
-from gym_cellular_automata.forest_fire.operators.modify import Modify
-from gym_cellular_automata.forest_fire.operators.move import Move
+from gym_cellular_automata.forest_fire.operators import ForestFire, Modify, Move
 
 from .utils.config import CONFIG
 from .utils.render import add_helicopter, plot_grid
@@ -40,7 +38,7 @@ class ForestFireEnvHelicopterV0(CAEnv):
 
     def __init__(self, rows=None, cols=None, *args, **kwargs):
 
-        self.seed()
+        super().__init__(*args, **kwargs)
 
         self._row = self._row if rows is None else rows
         self._col = self._col if cols is None else cols
@@ -56,6 +54,8 @@ class ForestFireEnvHelicopterV0(CAEnv):
         self._MDP = MDP(
             self.cellular_automaton, self.move, self.modify, self._max_freeze
         )
+
+        self.move_modify = self.MDP.move_modify
 
     @property
     def MDP(self):
@@ -107,7 +107,6 @@ class ForestFireEnvHelicopterV0(CAEnv):
             figure = add_helicopter(plot_grid(self.grid), pos)
             plt.show()
 
-            # Returning figure for convenience, formally render mode=human returns None
             return figure
 
         else:
@@ -137,7 +136,9 @@ class ForestFireEnvHelicopterV0(CAEnv):
 class MDP(Operator):
     from collections import namedtuple
 
-    Suboperators = namedtuple("Suboperators", ["cellular_automaton", "move", "modify"])
+    Suboperators = namedtuple(
+        "Suboperators", ["cellular_automaton", "move", "modify", "move_modify"]
+    )
 
     grid_dependant = True
     action_dependant = True
@@ -147,38 +148,57 @@ class MDP(Operator):
 
         super().__init__(*args, **kwargs)
 
-        self.suboperators = self.Suboperators(cellular_automaton, move, modify)
+        self.move_modify = MoveModify(move, modify)
+        self.suboperators = self.Suboperators(
+            cellular_automaton, move, modify, self.move_modify
+        )
 
         self.max_freeze = max_freeze
         self.freeze_space = spaces.Discrete(max_freeze + 1)
 
     def update(self, grid, action, context):
 
+        ca = self.suboperators.cellular_automaton
+        move_modify = self.suboperators.move_modify
+
         ca_params, position, freeze = context
-
-        def move_then_modify(grid, move_action, modify_action, position):
-
-            grid, position = self.suboperators.move(grid, move_action, position)
-            grid, position = self.suboperators.modify(grid, modify_action, position)
-
-            return grid, position
 
         if freeze == 0:
 
-            grid, ca_params = self.suboperators.cellular_automaton(
-                grid, None, ca_params
-            )
-
-            grid, position = move_then_modify(grid, action, True, position)
+            grid, ca_params = ca(grid, None, ca_params)
+            grid, position = move_modify(grid, (action, True), position)
 
             freeze = np.array(self.max_freeze)
 
         else:
 
-            grid, position = move_then_modify(grid, action, True, position)
+            grid, position = move_modify(grid, (action, True), position)
 
             freeze = np.array(freeze - 1)
 
         context = ca_params, position, freeze
 
         return grid, context
+
+
+class MoveModify(Operator):
+
+    grid_dependant = True
+    action_dependant = True
+    context_dependant = True
+
+    def __init__(self, move, modify, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+        self.suboperators = move, modify
+
+        self.move = move
+        self.modify = modify
+
+    def update(self, grid, subactions, position):
+        move_action, modify_action = subactions
+
+        grid, position = self.move(grid, move_action, position)
+        grid, position = self.modify(grid, modify_action, position)
+
+        return grid, position

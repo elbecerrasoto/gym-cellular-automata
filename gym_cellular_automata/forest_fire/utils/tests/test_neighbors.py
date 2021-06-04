@@ -7,7 +7,7 @@ from gym_cellular_automata.forest_fire.utils.neighbors import moore_n, neighborh
 
 ROW = 4
 COL = 3
-CELL_STATES = 3
+VALUES = [55, 66, 77, 88, 99]
 INVARIANT = 0
 MAX_N = 3
 REPEATS = 24
@@ -15,7 +15,7 @@ REPEATS = 24
 
 @pytest.fixture
 def grid_space():
-    return GridSpace(values=[55, 66, 77, 88, 99], shape=(ROW, COL))
+    return GridSpace(values=VALUES, shape=(ROW, COL))
 
 
 @pytest.fixture
