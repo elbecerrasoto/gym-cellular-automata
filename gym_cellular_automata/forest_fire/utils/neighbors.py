@@ -99,7 +99,7 @@ def moore_n(
                 row - br : row + 1, col : col + n + 1
             ]
 
-        elif not is_legal["left"]:
+        elif not is_legal["right"]:
 
             bc = d(col, ncols)
             egrid[mid - n : mid + 1, mid : mid + bc] = grid[

@@ -6,16 +6,16 @@ from gym_cellular_automata import GridSpace
 from gym_cellular_automata.forest_fire.utils.neighbors import moore_n, neighborhood_at
 
 ROW = 4
-COL = 4
+COL = 3
 CELL_STATES = 3
 INVARIANT = 0
-MAX_N = 4
+MAX_N = 3
 REPEATS = 24
 
 
 @pytest.fixture
 def grid_space():
-    return GridSpace(n=CELL_STATES, shape=(ROW, COL))
+    return GridSpace(values=[55, 66, 77, 88, 99], shape=(ROW, COL))
 
 
 @pytest.fixture
@@ -28,14 +28,21 @@ def n_space():
     return spaces.Discrete(MAX_N + 1)
 
 
-# @pytest.fixture
-# def big_grid():
-#     ROW, COL
-#     MAX_N
-
-
 @pytest.mark.repeat(REPEATS)
 def test_moore_n(grid_space, position_space, n_space):
+    def enclose_grid(grid):
+        r, c = grid.shape
+        nrows = 2 * MAX_N + r
+        ncols = 2 * MAX_N + c
+        eg = np.zeros((nrows, ncols), dtype=grid.dtype)
+        eg[MAX_N : MAX_N + r, MAX_N : MAX_N + c] = grid[:]
+        return eg
+
+    def n_moore_certain(n, position, grid):
+        r, c = position
+        r, c = r + MAX_N, c + MAX_N
+        return grid[r - n : r + n + 1, c - n : c + n + 1]
+
     n = n_space.sample()
 
     position = position_space.sample()
@@ -57,6 +64,12 @@ def test_moore_n(grid_space, position_space, n_space):
     # Center
     mid = l(n) // 2
     assert g[mid, mid] == grid[row, col]
+
+    # Compare against a non-out-of-borders big grid
+    enclosed = enclose_grid(grid)
+    expected = n_moore_certain(n, position, enclosed)
+
+    assert np.all(g == expected)
 
 
 def test_neighborhood_at(grid_space):
