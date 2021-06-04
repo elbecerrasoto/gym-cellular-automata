@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 from gym import spaces
 
+from gym_cellular_automata import GridSpace
 from gym_cellular_automata.forest_fire.operators.move import Move
-from gym_cellular_automata.grid_space import Grid
 
 TEST_REPETITIONS = 16
 
@@ -35,7 +35,7 @@ def move(directions_sets):
 
 @pytest.fixture
 def grid_space():
-    return Grid(n=1, shape=(ROW, COL))
+    return GridSpace(n=1, shape=(ROW, COL))
 
 
 @pytest.fixture

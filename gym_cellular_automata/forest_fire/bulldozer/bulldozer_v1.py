@@ -1,13 +1,15 @@
 import numpy as np
 from gym import logger, spaces
 
-from gym_cellular_automata import Operator
-from gym_cellular_automata.ca_env import CAEnv
+from gym_cellular_automata import CAEnv, GridSpace, Operator
 from gym_cellular_automata.forest_fire.bulldozer.utils.config import CONFIG
 from gym_cellular_automata.forest_fire.bulldozer.utils.render import env_visualization
-from gym_cellular_automata.forest_fire.operators import Modify, Move, WindyForestFire
-from gym_cellular_automata.forest_fire.operators.repeat_ca import RepeatCA
-from gym_cellular_automata.grid_space import Grid
+from gym_cellular_automata.forest_fire.operators import (
+    Modify,
+    Move,
+    RepeatCA,
+    WindyForestFire,
+)
 
 
 class ForestFireEnvBulldozerV1(CAEnv):
@@ -112,7 +114,7 @@ class ForestFireEnvBulldozerV1(CAEnv):
             )
 
     def _set_spaces(self):
-        self.grid_space = Grid(
+        self.grid_space = GridSpace(
             values=[self._empty, self._burned, self._tree, self._fire],
             shape=(self._row, self._col),
         )
@@ -167,7 +169,7 @@ class ForestFireEnvBulldozerV1(CAEnv):
 
     def _initial_grid_distribution(self):
         # fmt: off
-        grid_space = Grid(
+        grid_space = GridSpace(
             values = [  self._empty,  self._burned,   self._tree,  self._fire],
             probs  = [self._p_empty,           0.0, self._p_tree,         0.0],
             shape=(self._row, self._col),

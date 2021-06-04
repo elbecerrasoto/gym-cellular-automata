@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 from gym import spaces
 
+from gym_cellular_automata import GridSpace
 from gym_cellular_automata.forest_fire.operators.modify import Modify
-from gym_cellular_automata.grid_space import Grid
 
 TEST_REPETITIONS = 16
 
@@ -29,7 +29,7 @@ def modify(effects):
 
 @pytest.fixture
 def grid_space():
-    return Grid(n=3, shape=(ROW, COL))
+    return GridSpace(n=3, shape=(ROW, COL))
 
 
 @pytest.fixture

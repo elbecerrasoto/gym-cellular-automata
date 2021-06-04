@@ -1,9 +1,9 @@
 import pytest
 from gym import spaces
 
+from gym_cellular_automata import GridSpace
 from gym_cellular_automata.forest_fire.operators.ca_windy import WindyForestFire
 from gym_cellular_automata.forest_fire.utils.neighbors import neighborhood_at
-from gym_cellular_automata.grid_space import Grid
 
 # Number of random grids to test
 TESTS = 16
@@ -38,7 +38,7 @@ def wind(ca):
 
 @pytest.fixture
 def grid_space():
-    return Grid(
+    return GridSpace(
         values=[EMPTY, BURNED, TREE, FIRE],
         shape=(ROW, COL),
     )

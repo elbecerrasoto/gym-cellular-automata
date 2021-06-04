@@ -1,5 +1,7 @@
 from gym.envs.registration import register
 
+from gym_cellular_automata.ca_env import CAEnv
+from gym_cellular_automata.grid_space import GridSpace
 from gym_cellular_automata.operator import Operator
 
 REGISTERED_CA_ENVS = (
@@ -20,4 +22,4 @@ register(
     entry_point=ff_dir + ".bulldozer:ForestFireEnvBulldozerV1",
 )
 
-__all__ = ["Operator", "REGISTERED_CA_ENVS"]
+__all__ = ["CAEnv", "Operator", "GridSpace", "REGISTERED_CA_ENVS"]

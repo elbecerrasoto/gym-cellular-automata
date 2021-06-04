@@ -2,12 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from gym import logger, spaces
 
-from gym_cellular_automata import Operator
-from gym_cellular_automata.ca_env import CAEnv
+from gym_cellular_automata import CAEnv, GridSpace, Operator
 from gym_cellular_automata.forest_fire.operators.ca_DrosselSchwabl import ForestFire
 from gym_cellular_automata.forest_fire.operators.modify import Modify
 from gym_cellular_automata.forest_fire.operators.move import Move
-from gym_cellular_automata.grid_space import Grid
 
 from .utils.config import CONFIG
 from .utils.render import add_helicopter, plot_grid
@@ -127,7 +125,7 @@ class ForestFireEnvHelicopterV0(CAEnv):
             (self.ca_params_space, self.pos_space, self.freeze_space)
         )
 
-        self.grid_space = Grid(
+        self.grid_space = GridSpace(
             values=[self._empty, self._tree, self._fire],
             shape=(self._row, self._col),
         )

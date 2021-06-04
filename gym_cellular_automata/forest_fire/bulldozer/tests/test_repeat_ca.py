@@ -4,9 +4,13 @@ import numpy as np
 import pytest
 from gym import spaces
 
-from gym_cellular_automata.forest_fire.operators import Modify, Move, WindyForestFire
-from gym_cellular_automata.forest_fire.operators.repeat_ca import RepeatCA
-from gym_cellular_automata.grid_space import Grid
+from gym_cellular_automata import GridSpace
+from gym_cellular_automata.forest_fire.operators import (
+    Modify,
+    Move,
+    RepeatCA,
+    WindyForestFire,
+)
 
 TESTS = 8
 SEQUENCE = 8
@@ -21,7 +25,7 @@ ROW, COL = 8, 8
 
 @pytest.fixture
 def grid_space():
-    return Grid(values=[EMPTY, BURNED, TREE, FIRE], shape=(ROW, COL))
+    return GridSpace(values=[EMPTY, BURNED, TREE, FIRE], shape=(ROW, COL))
 
 
 @pytest.fixture

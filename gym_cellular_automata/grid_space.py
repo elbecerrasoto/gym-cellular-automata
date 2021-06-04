@@ -6,15 +6,15 @@ import numpy as np
 from gym.spaces import Space
 
 
-class Grid(Space):
+class GridSpace(Space):
     r"""
     A Space for Cellular Automata Lattices.
     Arbitrary integers can be used as cell states.
 
     Example::
 
-        >>> Grid(n=3, shape=(2, 2))
-        >>> Grid(values=[-1, 0, 1], shape=(2,2))
+        >>> GridSpace(n=3, shape=(2, 2))
+        >>> GridSpace(values=[-1, 0, 1], shape=(2,2))
 
     """
 
@@ -76,15 +76,15 @@ class Grid(Space):
     def __repr__(self):
         if self._from_values:
 
-            return f"Grid(values={self.values}, shape={self.shape})"
+            return f"GridSpace(values={self.values}, shape={self.shape})"
 
         else:
 
-            return f"Grid(n={self.n}, shape={self.shape})"
+            return f"GridSpace(n={self.n}, shape={self.shape})"
 
     def __eq__(self, other):
         return (
-            isinstance(other, Grid)
+            isinstance(other, GridSpace)
             and (self.shape == other.shape)
             and np.all(self.values == other.values)
         )

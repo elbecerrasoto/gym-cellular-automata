@@ -3,9 +3,9 @@ import numpy as np
 import pytest
 from gym import spaces
 
+from gym_cellular_automata import GridSpace
 from gym_cellular_automata.forest_fire.helicopter import ForestFireEnvHelicopterV0
 from gym_cellular_automata.forest_fire.helicopter.utils.config import CONFIG
-from gym_cellular_automata.grid_space import Grid
 
 RANDOM_POLICY_ITERATIONS = 12
 TEST_GRID_ROWS = 3
@@ -43,7 +43,7 @@ def env():
 
 @pytest.fixture
 def all_fire_grid():
-    return Grid(
+    return GridSpace(
         values=[EMPTY, TREE, FIRE],
         shape=(TEST_GRID_ROWS, TEST_GRID_COLS),
         probs=[0.0, 0.0, 1.0],

@@ -3,17 +3,17 @@ from copy import copy
 import numpy as np
 import pytest
 
-from gym_cellular_automata.grid_space import Grid
+from gym_cellular_automata import GridSpace
 
 
 @pytest.mark.parametrize(
     "space",
     [
-        Grid(2, shape=(2, 2, 2)),
-        Grid(5, shape=(5,)),
-        Grid(values=[1, 2, 2], shape=(42,)),
-        Grid(values=np.arange(10), shape=(1, 1, 1)),
-        Grid(n=3, shape=(2, 2)),
+        GridSpace(2, shape=(2, 2, 2)),
+        GridSpace(5, shape=(5,)),
+        GridSpace(values=[1, 2, 2], shape=(42,)),
+        GridSpace(values=np.arange(10), shape=(1, 1, 1)),
+        GridSpace(n=3, shape=(2, 2)),
     ],
 )
 def test_space_contains_its_samples(space):
@@ -23,14 +23,17 @@ def test_space_contains_its_samples(space):
 @pytest.mark.parametrize(
     "space1, space2",
     [
-        (Grid(2, shape=(2, 2, 2)), Grid(2, shape=(2, 2, 2))),
-        (Grid(5, shape=(5,)), Grid(5, shape=(5,))),
-        (Grid(values=[1, 2, 2, 2, 2], shape=(5,)), Grid(values=[1, 2, 1], shape=(5,))),
+        (GridSpace(2, shape=(2, 2, 2)), GridSpace(2, shape=(2, 2, 2))),
+        (GridSpace(5, shape=(5,)), GridSpace(5, shape=(5,))),
         (
-            Grid(values=np.arange(10), shape=(1, 1, 1)),
-            Grid(values=np.arange(9, -1, -1), shape=(1, 1, 1)),
+            GridSpace(values=[1, 2, 2, 2, 2], shape=(5,)),
+            GridSpace(values=[1, 2, 1], shape=(5,)),
         ),
-        (Grid(n=3, shape=(2, 2)), Grid(values=np.arange(3), shape=(2, 2))),
+        (
+            GridSpace(values=np.arange(10), shape=(1, 1, 1)),
+            GridSpace(values=np.arange(9, -1, -1), shape=(1, 1, 1)),
+        ),
+        (GridSpace(n=3, shape=(2, 2)), GridSpace(values=np.arange(3), shape=(2, 2))),
     ],
 )
 def test_grid_equality(space1, space2):
@@ -40,11 +43,11 @@ def test_grid_equality(space1, space2):
 @pytest.mark.parametrize(
     "space",
     [
-        Grid(2, shape=(2, 2, 2)),
-        Grid(5, shape=(5,)),
-        Grid(values=[1, 2, 2], shape=(42,)),
-        Grid(values=np.arange(10), shape=(1, 1, 1)),
-        Grid(n=3, shape=(2, 2)),
+        GridSpace(2, shape=(2, 2, 2)),
+        GridSpace(5, shape=(5,)),
+        GridSpace(values=[1, 2, 2], shape=(42,)),
+        GridSpace(values=np.arange(10), shape=(1, 1, 1)),
+        GridSpace(n=3, shape=(2, 2)),
     ],
 )
 def test_copy(space):

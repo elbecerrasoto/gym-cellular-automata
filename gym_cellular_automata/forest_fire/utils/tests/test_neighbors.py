@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 from gym import spaces
 
+from gym_cellular_automata import GridSpace
 from gym_cellular_automata.forest_fire.utils.neighbors import moore_n, neighborhood_at
-from gym_cellular_automata.grid_space import Grid
 
 ROW = 4
 COL = 4
@@ -15,7 +15,7 @@ REPEATS = 24
 
 @pytest.fixture
 def grid_space():
-    return Grid(n=CELL_STATES, shape=(ROW, COL))
+    return GridSpace(n=CELL_STATES, shape=(ROW, COL))
 
 
 @pytest.fixture
@@ -26,6 +26,12 @@ def position_space():
 @pytest.fixture
 def n_space():
     return spaces.Discrete(MAX_N + 1)
+
+
+# @pytest.fixture
+# def big_grid():
+#     ROW, COL
+#     MAX_N
 
 
 @pytest.mark.repeat(REPEATS)
@@ -56,7 +62,7 @@ def test_moore_n(grid_space, position_space, n_space):
 def test_neighborhood_at(grid_space):
     empty, tree, fire = range(3)
 
-    singleton_2d = Grid(values=[fire], shape=(1, 1)).sample()
+    singleton_2d = GridSpace(values=[fire], shape=(1, 1)).sample()
     neighbors = neighborhood_at(grid=singleton_2d, pos=(0, 0), invariant=empty)
 
     neighbors2 = neighborhood_at2(singleton_2d, (0, 0), empty)
