@@ -9,6 +9,8 @@ from gym_cellular_automata import Operator
 
 class WindyForestFire(Operator):
 
+    action_space = spaces.Discrete(1)  # As a dummy space. Need it for testing.
+
     grid_dependant = True
     action_dependant = False
     context_dependant = True

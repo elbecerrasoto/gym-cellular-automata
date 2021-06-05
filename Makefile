@@ -25,7 +25,7 @@ test :
 	pytest -m "not slow" --maxfail=3 ./gym_cellular_automata
 
 test-coverage :
-	pytest --cov=./gym_cellular_automata ./gym_cellular_automata
+	pytest -m "not slow" --maxfail=1 --cov=./gym_cellular_automata ./gym_cellular_automata
 
 test-slow :
 	time pytest -m "slow" --maxfail=1 ./gym_cellular_automata

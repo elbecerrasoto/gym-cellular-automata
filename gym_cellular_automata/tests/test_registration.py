@@ -10,27 +10,58 @@ matplotlib.interactive(False)
 
 LIBRARY = "gym_cellular_automata"
 
-STEPS = 2
+STEPS = 3
 RESETS = 2
 
+# Plotting on each step is heavy on Bulldozer
+PLOT_EACH = 256
 
-def test_light():
-    assert_gym_api(RESETS, STEPS)
+
+@pytest.fixture
+def envs():
+    return (gym.make(LIBRARY + ":" + ca_env) for ca_env in REGISTERED_CA_ENVS)
+
+
+def are_operator_spaces_defined(operator):
+    spaces = "grid_space", "action_space", "context_space"
+
+    # Base Case. Empty Tuple
+    if not operator.suboperators:
+        for space in spaces:
+            space = getattr(operator, space)
+            if not isinstance(space, Space):
+                return False
+        return True
+
+    for subop in operator.suboperators:
+
+        if not are_operator_spaces_defined(subop):
+            return False
+
+    return True
+
+
+@pytest.mark.skip(reason="Working on other stuff")
+def test_operator_spaces(envs):
+    for env in envs:
+        assert are_operator_spaces_defined(env.MDP)
+
+
+def test_gym_api_light(envs):
+    assert_gym_api(envs, RESETS, STEPS, PLOT_EACH)
 
 
 @pytest.mark.slow
-def test_soak():
-    # Like ~4hrs
-    STEPS_HEAVY = 1024
-    RESETS_HEAVY = 64
-    assert_gym_api(RESETS_HEAVY, STEPS_HEAVY)
+def test_gym_api_heavy(envs):
+    # Like ~10 min
+    STEPS_HEAVY = 4096
+    RESETS_HEAVY = 32
+    assert_gym_api(envs, RESETS_HEAVY, STEPS_HEAVY, PLOT_EACH)
 
 
-def assert_gym_api(resets, steps):
-    for ca_env in REGISTERED_CA_ENVS:
+def assert_gym_api(envs, resets, steps, plot_each):
 
-        calling_string = LIBRARY + ":" + ca_env
-        env = gym.make(calling_string)
+    for env in envs:
 
         assert isinstance(env, gym.Env)
         assert isinstance(env.observation_space, Space)
@@ -46,7 +77,6 @@ def assert_gym_api(resets, steps):
             obs = env.reset()
             assert env.observation_space.contains(obs)
 
-            # Step test
             done = False
             step = 0
 
@@ -59,8 +89,9 @@ def assert_gym_api(resets, steps):
 
                 obs, reward, done, info = env.step(action)
                 # Render test
-                assert isinstance(env.render(), matplotlib.figure.Figure)
-                plt.close("all")  # To garbage collect the figures
+                if step % plot_each == 0 or step <= 1:  # At least a couple of renders
+                    assert isinstance(env.render(), matplotlib.figure.Figure)
+                    plt.close("all")  # To garbage collect the figures
 
                 assert env.observation_space.contains(obs)
                 assert isinstance(reward, float)
