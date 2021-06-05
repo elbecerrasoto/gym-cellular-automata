@@ -22,10 +22,13 @@ style :
 	black ./
 
 test :
-	pytest ./
+	pytest -m "not slow" --maxfail=3 ./gym_cellular_automata
 
 test-coverage :
-	pytest --cov=gym_cellular_automata gym_cellular_automata/tests
+	pytest --cov=./gym_cellular_automata ./gym_cellular_automata
+
+test-slow :
+	time pytest -m "slow" --maxfail=1 ./gym_cellular_automata
 
 linter :
 	# Finds debugging prints
@@ -46,4 +49,4 @@ count :
 	# Counts the lines of Code
 	find ./ -name '*.py' -print | xargs cat | sed '/^$$/ d' | perl -ne 'if(not /^ *?#/){print $$_}' | wc -l
 
-.PHONY : help install conda_env develop hooks style test test-coverage linter patch clean count
+.PHONY : help install conda_env develop hooks style test test-coverage test-slow linter patch clean count
