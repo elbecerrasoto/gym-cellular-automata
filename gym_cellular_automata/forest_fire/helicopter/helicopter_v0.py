@@ -109,10 +109,7 @@ class ForestFireEnvHelicopterV0(CAEnv):
 
             ca_params, pos, freeze = self.context
 
-            figure = add_helicopter(plot_grid(self.grid), pos)
-            plt.show()
-
-            return figure
+            return add_helicopter(plot_grid(self.grid), pos)
 
         else:
 

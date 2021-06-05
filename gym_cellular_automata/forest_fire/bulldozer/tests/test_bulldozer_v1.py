@@ -27,7 +27,6 @@ def test_gym_api():
     assert env.observation_space.contains(obs)
     # env.render(); plt.close()
 
-    total_reward = 0.0
     done = False
     step = 0
     threshold = THRESHOLD
