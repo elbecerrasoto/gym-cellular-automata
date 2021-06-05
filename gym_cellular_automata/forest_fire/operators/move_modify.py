@@ -77,3 +77,58 @@ class Move(Operator):
             return np.array([row, col])
 
         return grid, get_new_position(context)
+
+
+class Modify(Operator):
+    hit = False
+
+    grid_dependant = True
+    action_dependant = True
+    context_dependant = True
+
+    deterministic = True
+
+    def __init__(self, effects: dict, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.effects = effects
+
+    def update(self, grid, action, context):
+        self.hit = False
+
+        row, col = context
+
+        if action:
+
+            if grid[row, col] in self.effects:
+
+                grid[row, col] = self.effects[grid[row, col]]
+                self.hit = True
+
+        return grid, context
+
+
+class MoveModify(Operator):
+
+    grid_dependant = True
+    action_dependant = True
+    context_dependant = True
+
+    deterministic = True
+
+    def __init__(self, move, modify, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+        self.suboperators = move, modify
+
+        self.move = move
+        self.modify = modify
+
+    def update(self, grid, subactions, position):
+        move_action, modify_action = subactions
+
+        grid, position = self.move(grid, move_action, position)
+        grid, position = self.modify(grid, modify_action, position)
+
+        return grid, position

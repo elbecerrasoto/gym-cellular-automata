@@ -5,6 +5,7 @@ from gym_cellular_automata import CAEnv, GridSpace, Operator
 from gym_cellular_automata.forest_fire.operators import (
     Modify,
     Move,
+    MoveModify,
     RepeatCA,
     WindyForestFire,
 )
@@ -235,11 +236,12 @@ class MDP(Operator):
 
         super().__init__(*args, **kwargs)
 
-        self.suboperators = repeat_ca, move, modify
-
         self.repeat_ca = repeat_ca
         self.move = move
         self.modify = modify
+        self.move_modify = MoveModify(move, modify)
+
+        self.suboperators = self.repeat_ca, self.move_modify
 
     def update(self, grid, action, context):
 

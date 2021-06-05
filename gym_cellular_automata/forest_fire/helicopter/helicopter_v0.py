@@ -3,7 +3,12 @@ import numpy as np
 from gym import logger, spaces
 
 from gym_cellular_automata import CAEnv, GridSpace, Operator
-from gym_cellular_automata.forest_fire.operators import ForestFire, Modify, Move
+from gym_cellular_automata.forest_fire.operators import (
+    ForestFire,
+    Modify,
+    Move,
+    MoveModify,
+)
 
 from .utils.config import CONFIG
 from .utils.render import add_helicopter, plot_grid
@@ -181,28 +186,3 @@ class MDP(Operator):
         context = ca_params, position, freeze
 
         return grid, context
-
-
-class MoveModify(Operator):
-
-    grid_dependant = True
-    action_dependant = True
-    context_dependant = True
-
-    deterministic = True
-
-    def __init__(self, move, modify, *args, **kwargs):
-
-        super().__init__(*args, **kwargs)
-        self.suboperators = move, modify
-
-        self.move = move
-        self.modify = modify
-
-    def update(self, grid, subactions, position):
-        move_action, modify_action = subactions
-
-        grid, position = self.move(grid, move_action, position)
-        grid, position = self.modify(grid, modify_action, position)
-
-        return grid, position
