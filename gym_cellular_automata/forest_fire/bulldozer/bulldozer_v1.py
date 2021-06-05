@@ -249,8 +249,6 @@ class MDP(Operator):
         ca_params, position, time = context
 
         grid, (ca_params, time) = self.repeat_ca(grid, action, (ca_params, time))
-
-        grid, position = self.move(grid, amove, position)
-        grid, position = self.modify(grid, ashoot, position)
+        grid, position = self.move_modify(grid, (amove, ashoot), position)
 
         return grid, (ca_params, position, time)

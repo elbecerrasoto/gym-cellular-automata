@@ -1,7 +1,7 @@
 from collections.abc import Hashable
 
 import numpy as np
-from gym import logger
+from gym import logger, spaces
 
 from gym_cellular_automata import Operator
 
@@ -124,6 +124,23 @@ class MoveModify(Operator):
 
         self.move = move
         self.modify = modify
+
+        if self.context_space is None:
+            if (
+                self.move.context_space is not None
+                and self.modify.context_space is not None
+            ):
+                assert self.move.context_space == self.modify.context_space
+                self.context_space = self.move.context_space
+
+        if self.action_space is None:
+            if (
+                self.move.action_space is not None
+                and self.move.action_space is not None
+            ):
+                self.action_space = spaces.Tuple(
+                    (self.move.action_space, self.move.action_space)
+                )
 
     def update(self, grid, subactions, position):
         move_action, modify_action = subactions
