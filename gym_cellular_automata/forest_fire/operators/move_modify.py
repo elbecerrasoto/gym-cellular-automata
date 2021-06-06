@@ -125,14 +125,6 @@ class MoveModify(Operator):
         self.move = move
         self.modify = modify
 
-        if self.context_space is None:
-            if (
-                self.move.context_space is not None
-                and self.modify.context_space is not None
-            ):
-                assert self.move.context_space == self.modify.context_space
-                self.context_space = self.move.context_space
-
         if self.action_space is None:
             if (
                 self.move.action_space is not None
@@ -141,6 +133,14 @@ class MoveModify(Operator):
                 self.action_space = spaces.Tuple(
                     (self.move.action_space, self.move.action_space)
                 )
+
+        if self.context_space is None:
+            if (
+                self.move.context_space is not None
+                and self.modify.context_space is not None
+            ):
+                assert self.move.context_space == self.modify.context_space
+                self.context_space = self.move.context_space
 
     def update(self, grid, subactions, position):
         move_action, modify_action = subactions

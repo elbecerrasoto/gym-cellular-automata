@@ -109,7 +109,7 @@ def test_forest_fire_env_output_spaces(env, reward_space):
     grid, (ca_params, pos, freeze) = obs0
     assert env.grid_space.contains(grid)
     assert env.ca_params_space.contains(ca_params)
-    assert env.pos_space.contains(pos)
+    assert env.position_space.contains(pos)
     assert env.freeze_space.contains(freeze)
 
 
@@ -121,7 +121,7 @@ def assert_observation_and_reward_spaces(env, obs, reward, reward_space):
 
     assert env.grid_space.contains(grid)
     assert env.ca_params_space.contains(ca_params)
-    assert env.pos_space.contains(pos)
+    assert env.position_space.contains(pos)
     assert env.freeze_space.contains(freeze)
 
     # Strong typing of the observations

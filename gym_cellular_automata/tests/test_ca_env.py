@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.skip(reason="Working on other stuff")
+@pytest.mark.skip(reason="WIP")
 def test_gym_if_done_behave_gracefully(env, grid_space, context_space):
     env.reset()
     env.done = True
@@ -14,7 +14,7 @@ def test_gym_if_done_behave_gracefully(env, grid_space, context_space):
     assert reward == 0.0
 
 
-@pytest.mark.skip(reason="Working on other stuff")
+@pytest.mark.skip(reason="WIP")
 def test_counts(env):
     obs = env.reset()
     grid, context = obs

@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 from gym import logger, spaces
 
@@ -50,14 +49,20 @@ class ForestFireEnvHelicopterV0(CAEnv):
 
         self._set_spaces()
 
-        self.cellular_automaton = ForestFire(self._empty, self._tree, self._fire)
+        self.cellular_automaton = ForestFire(
+            self._empty, self._tree, self._fire, **self.ca_space
+        )
 
-        self.move = Move(self._action_sets)
+        self.move = Move(self._action_sets, **self.move_space)
 
-        self.modify = Modify(self._effects)
+        self.modify = Modify(self._effects, **self.modify_space)
 
         self._MDP = MDP(
-            self.cellular_automaton, self.move, self.modify, self._max_freeze
+            self.cellular_automaton,
+            self.move,
+            self.modify,
+            self._max_freeze,
+            **self.MDP_space,
         )
 
         self.move_modify = self.MDP.move_modify
@@ -119,11 +124,11 @@ class ForestFireEnvHelicopterV0(CAEnv):
 
     def _set_spaces(self):
         self.ca_params_space = spaces.Box(0.0, 1.0, shape=(2,))
-        self.pos_space = spaces.MultiDiscrete([self._row, self._col])
+        self.position_space = spaces.MultiDiscrete([self._row, self._col])
         self.freeze_space = spaces.Discrete(self._max_freeze + 1)
 
         self.context_space = spaces.Tuple(
-            (self.ca_params_space, self.pos_space, self.freeze_space)
+            (self.ca_params_space, self.position_space, self.freeze_space)
         )
 
         self.grid_space = GridSpace(
@@ -131,8 +136,35 @@ class ForestFireEnvHelicopterV0(CAEnv):
             shape=(self._row, self._col),
         )
 
+        # RL spaces
+
         self.action_space = spaces.Discrete(self._n_actions)
         self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
+
+        # Suboperators Spaces
+
+        self.ca_space = {
+            "grid_space": self.grid_space,
+            "context_space": self.ca_params_space,
+        }
+
+        self.move_space = {
+            "grid_space": self.grid_space,
+            "action_space": self.action_space,
+            "context_space": self.position_space,
+        }
+
+        self.modify_space = {
+            "grid_space": self.grid_space,
+            "action_space": spaces.Discrete(2),
+            "context_space": self.position_space,
+        }
+
+        self.MDP_space = {
+            "grid_space": self.grid_space,
+            "action_space": self.action_space,
+            "context_space": self.context_space,
+        }
 
 
 class MDP(Operator):
@@ -152,7 +184,9 @@ class MDP(Operator):
 
         super().__init__(*args, **kwargs)
 
-        self.move_modify = MoveModify(move, modify)
+        self.move_modify = MoveModify(move, modify, grid_space=self.grid_space)
+        self.ca = cellular_automaton
+
         self.suboperators = self.Suboperators(
             cellular_automaton, move, modify, self.move_modify
         )
@@ -162,21 +196,18 @@ class MDP(Operator):
 
     def update(self, grid, action, context):
 
-        ca = self.suboperators.cellular_automaton
-        move_modify = self.suboperators.move_modify
-
         ca_params, position, freeze = context
 
         if freeze == 0:
 
-            grid, ca_params = ca(grid, None, ca_params)
-            grid, position = move_modify(grid, (action, True), position)
+            grid, ca_params = self.ca(grid, None, ca_params)
+            grid, position = self.move_modify(grid, (action, True), position)
 
             freeze = np.array(self.max_freeze)
 
         else:
 
-            grid, position = move_modify(grid, (action, True), position)
+            grid, position = self.move_modify(grid, (action, True), position)
 
             freeze = np.array(freeze - 1)
 

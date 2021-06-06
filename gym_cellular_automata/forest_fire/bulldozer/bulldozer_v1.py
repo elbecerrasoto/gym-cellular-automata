@@ -67,6 +67,8 @@ class ForestFireEnvBulldozerV1(CAEnv):
         )
         self._MDP = MDP(self.repeater, self.move, self.modify, **self.MDP_space)
 
+        self.move_modify = self.MDP.move_modify
+
     @property
     def MDP(self):
         return self._MDP
@@ -121,8 +123,8 @@ class ForestFireEnvBulldozerV1(CAEnv):
         )
 
         self.ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3))
-        self.time_space = spaces.Box(0.0, float("inf"), shape=tuple())
         self.position_space = spaces.MultiDiscrete([self._row, self._col])
+        self.time_space = spaces.Box(0.0, float("inf"), shape=tuple())
 
         self.context_space = spaces.Tuple(
             (self.ca_params_space, self.position_space, self.time_space)

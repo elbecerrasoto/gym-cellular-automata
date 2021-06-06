@@ -10,7 +10,7 @@ from gym_cellular_automata.forest_fire.bulldozer import ForestFireEnvBulldozerV1
 THRESHOLD = 12
 
 
-@pytest.mark.skip(reason="Working on other stuff")
+@pytest.mark.skip(reason="WIP")
 def test_termination_behavior(env, all_trees):
     env.reset()
 
@@ -24,7 +24,7 @@ def test_termination_behavior(env, all_trees):
     assert done
 
 
-@pytest.mark.skip(reason="Working on other stuff")
+@pytest.mark.skip(reason="WIP")
 def test_single_fire_seed(env):
     obs = env.reset()
 
@@ -35,44 +35,3 @@ def test_single_fire_seed(env):
 
     # Single fire seed
     assert len(grid[grid == FIRE]) == 1
-
-
-@pytest.mark.skip(reason="Depracated")
-def test_gym_api():
-
-    env = ForestFireEnvBulldozerV1()
-
-    assert isinstance(env, gym.Env)
-    assert isinstance(env.observation_space, Space)
-    assert isinstance(env.action_space, Space)
-    assert hasattr(env, "reset")
-    assert hasattr(env, "step")
-    assert hasattr(env, "render")
-    assert hasattr(env, "close")
-    assert hasattr(env, "seed")
-
-    # Reset Step
-    obs = env.reset()
-    assert env.observation_space.contains(obs)
-    # env.render(); plt.close()
-
-    done = False
-    step = 0
-    threshold = THRESHOLD
-
-    # Random Policy for at most "threshold" steps
-    while not done and step < threshold:
-        step += 1
-        # Step test
-        action = env.action_space.sample()
-        assert env.action_space.contains(action)
-
-        obs, reward, done, info = env.step(action)
-        # env.render(); plt.close()
-
-        assert env.observation_space.contains(obs)
-        assert isinstance(reward, float)
-        assert isinstance(done, bool)
-        assert isinstance(info, dict)
-
-    env.close()

@@ -22,28 +22,9 @@ def envs():
     return (gym.make(LIBRARY + ":" + ca_env) for ca_env in REGISTERED_CA_ENVS)
 
 
-def are_operator_spaces_defined(operator):
-    spaces = "grid_space", "action_space", "context_space"
-
-    # Base Case. Empty Tuple
-    if not operator.suboperators:
-        for space in spaces:
-            space = getattr(operator, space)
-            if not isinstance(space, Space):
-                return False
-        return True
-
-    for subop in operator.suboperators:
-
-        if not are_operator_spaces_defined(subop):
-            return False
-
-    return True
-
-
-@pytest.mark.skip(reason="Working on other stuff")
+@pytest.mark.skip(reason="debugging")
 def test_operator_spaces(envs):
-    for env in envs:
+    for idx, env in enumerate(envs):
         assert are_operator_spaces_defined(env.MDP)
 
 
@@ -99,3 +80,56 @@ def assert_gym_api(envs, resets, steps, plot_each):
                 assert isinstance(info, dict)
 
         env.close()
+
+
+def are_operator_spaces_defined(operator):
+    spaces = "grid_space", "action_space", "context_space"
+
+    # Base Case. Empty Tuple
+    if not operator.suboperators:
+        for space in spaces:
+            space = getattr(operator, space)
+            if not isinstance(space, Space):
+                return False
+        return True
+
+    for subop in operator.suboperators:
+
+        if not are_operator_spaces_defined(subop):
+
+            return False
+
+    return True
+
+
+def test_are_operator_spaces_defined():
+    def generate_deep_suboperators(spaces_defined=True):
+        from gym import spaces
+
+        from gym_cellular_automata import GridSpace
+        from gym_cellular_automata.operator import Identity
+
+        gS = GridSpace(values=[55, 66, 77], shape=(2, 2))
+        aS = spaces.Discrete(2)
+        cS = spaces.Discrete(3)
+
+        I = lambda: Identity(gS, aS, cS)
+        main = I()
+
+        deep_call = I if spaces_defined else Identity
+
+        Li = list()
+        lj = list()
+        for i in range(2):
+            for j in range(3):
+                lj.append(deep_call())
+            tmp = I()
+            tmp.suboperators = tuple(lj)
+            Li.append(tmp)
+        main.suboperators = tuple(Li)
+        return main
+
+    epass = generate_deep_suboperators(spaces_defined=True)
+    efail = generate_deep_suboperators(spaces_defined=False)
+    assert are_operator_spaces_defined(epass)
+    assert not are_operator_spaces_defined(efail)
