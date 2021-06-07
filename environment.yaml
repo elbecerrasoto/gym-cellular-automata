@@ -18,8 +18,11 @@ dependencies:
   - pytest-repeat
   - pytest-cov
   - pre-commit
+  - ipdb
   - pip:
     # Dependencies
     - svgpath2mpl
     # Development
     - pytest-randomly
+    # pip install git+git://github.com/mverteuil/pytest-ipdb.git
+    - pytest-ipdb

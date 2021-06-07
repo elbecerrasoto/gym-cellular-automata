@@ -61,8 +61,15 @@ def assert_gym_api(envs, resets, steps, plot_each):
             done = False
             step = 0
 
+            max_steps = env.spec.max_episode_steps
+
             # Random Policy for at most "threshold" steps
             while not done and step < steps:
+
+                if max_steps is not None:
+                    if step > max_steps:
+                        break
+
                 step += 1
                 # Step test
                 action = env.action_space.sample()
