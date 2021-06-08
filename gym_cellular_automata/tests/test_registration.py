@@ -22,9 +22,9 @@ def envs():
     return (gym.make(LIBRARY + ":" + ca_env) for ca_env in REGISTERED_CA_ENVS)
 
 
-@pytest.mark.skip(reason="debugging")
+# @pytest.mark.skip(reason="debugging")
 def test_operator_spaces(envs):
-    for idx, env in enumerate(envs):
+    for env in envs:
         assert are_operator_spaces_defined(env.MDP)
 
 
@@ -91,22 +91,34 @@ def assert_gym_api(envs, resets, steps, plot_each):
 
 def are_operator_spaces_defined(operator):
     spaces = "grid_space", "action_space", "context_space"
+    from objprint import objprint as obp
+
+    def check_op(operator):
+
+        for space in spaces:
+            space = getattr(operator, space)
+
+            if not isinstance(space, Space):
+                obp(operator)  # Debug print
+                return False
+
+        return True
 
     # Base Case. Empty Tuple
     if not operator.suboperators:
-        for space in spaces:
-            space = getattr(operator, space)
-            if not isinstance(space, Space):
+        return check_op(operator)
+
+    else:
+
+        for subop in operator.suboperators:
+
+            current_level = check_op(subop)
+            lower_level = are_operator_spaces_defined(subop)
+
+            if not (current_level and lower_level):
                 return False
+
         return True
-
-    for subop in operator.suboperators:
-
-        if not are_operator_spaces_defined(subop):
-
-            return False
-
-    return True
 
 
 def test_are_operator_spaces_defined():

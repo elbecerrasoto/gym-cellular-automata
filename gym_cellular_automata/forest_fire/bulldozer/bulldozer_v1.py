@@ -58,16 +58,17 @@ class ForestFireEnvBulldozerV1(CAEnv):
         self.ca = WindyForestFire(
             self._empty, self._burned, self._tree, self._fire, **self.ca_space
         )
+
         self.move = Move(self._action_sets, **self.move_space)
         self.modify = Modify(self._effects, **self.modify_space)
+
+        self.move_modify = MoveModify(self.move, self.modify, **self.move_modify_space)
 
         # Composite Operators
         self.repeater = RepeatCA(
             self.ca, self.time_per_action, self.time_per_state, **self.repeater_space
         )
-        self._MDP = MDP(self.repeater, self.move, self.modify, **self.MDP_space)
-
-        self.move_modify = self.MDP.move_modify
+        self._MDP = MDP(self.repeater, self.move_modify, **self.MDP_space)
 
     @property
     def MDP(self):
@@ -140,6 +141,7 @@ class ForestFireEnvBulldozerV1(CAEnv):
 
         self.ca_space = {
             "grid_space": self.grid_space,
+            "action_space": self.action_space,
             "context_space": self.ca_params_space,
         }
 
@@ -155,8 +157,15 @@ class ForestFireEnvBulldozerV1(CAEnv):
             "context_space": self.position_space,
         }
 
+        self.move_modify_space = {
+            "grid_space": self.grid_space,
+            "action_space": self.action_space,
+            "context_space": self.position_space,
+        }
+
         self.repeater_space = {
             "grid_space": self.grid_space,
+            "action_space": self.action_space,
             "context_space": spaces.Tuple((self.ca_params_space, self.time_space)),
         }
 
@@ -234,14 +243,12 @@ class MDP(Operator):
 
     deterministic = False
 
-    def __init__(self, repeat_ca, move, modify, *args, **kwargs):
+    def __init__(self, repeat_ca, move_modify, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
 
         self.repeat_ca = repeat_ca
-        self.move = move
-        self.modify = modify
-        self.move_modify = MoveModify(move, modify)
+        self.move_modify = move_modify
 
         self.suboperators = self.repeat_ca, self.move_modify
 
@@ -251,6 +258,6 @@ class MDP(Operator):
         ca_params, position, time = context
 
         grid, (ca_params, time) = self.repeat_ca(grid, action, (ca_params, time))
-        grid, position = self.move_modify(grid, (amove, ashoot), position)
+        grid, position = self.move_modify(grid, action, position)
 
         return grid, (ca_params, position, time)

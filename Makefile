@@ -22,7 +22,7 @@ style :
 	black ./
 
 test :
-	pytest -m "not slow" --ipdb --maxfail=3 ./gym_cellular_automata
+	pytest -m "not slow" --maxfail=3 ./gym_cellular_automata
 
 test-debug :
 		pytest -m "not slow" --ipdb ./gym_cellular_automata

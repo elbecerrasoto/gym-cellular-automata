@@ -54,18 +54,17 @@ class ForestFireEnvHelicopterV0(CAEnv):
         )
 
         self.move = Move(self._action_sets, **self.move_space)
-
         self.modify = Modify(self._effects, **self.modify_space)
 
+        self.move_modify = MoveModify(self.move, self.modify, **self.move_modify_space)
+
+        # Composite Operators
         self._MDP = MDP(
             self.cellular_automaton,
-            self.move,
-            self.modify,
+            self.move_modify,
             self._max_freeze,
             **self.MDP_space,
         )
-
-        self.move_modify = self.MDP.move_modify
 
     @property
     def MDP(self):
@@ -145,6 +144,7 @@ class ForestFireEnvHelicopterV0(CAEnv):
 
         self.ca_space = {
             "grid_space": self.grid_space,
+            "action_space": self.action_space,
             "context_space": self.ca_params_space,
         }
 
@@ -160,6 +160,12 @@ class ForestFireEnvHelicopterV0(CAEnv):
             "context_space": self.position_space,
         }
 
+        self.move_modify_space = {
+            "grid_space": self.grid_space,
+            "action_space": spaces.Tuple((self.action_space, spaces.Discrete(2))),
+            "context_space": self.position_space,
+        }
+
         self.MDP_space = {
             "grid_space": self.grid_space,
             "action_space": self.action_space,
@@ -170,9 +176,7 @@ class ForestFireEnvHelicopterV0(CAEnv):
 class MDP(Operator):
     from collections import namedtuple
 
-    Suboperators = namedtuple(
-        "Suboperators", ["cellular_automaton", "move", "modify", "move_modify"]
-    )
+    Suboperators = namedtuple("Suboperators", ["cellular_automaton", "move_modify"])
 
     grid_dependant = True
     action_dependant = True
@@ -180,16 +184,14 @@ class MDP(Operator):
 
     deterministic = False
 
-    def __init__(self, cellular_automaton, move, modify, max_freeze, *args, **kwargs):
+    def __init__(self, cellular_automaton, move_modify, max_freeze, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
 
-        self.move_modify = MoveModify(move, modify, grid_space=self.grid_space)
+        self.move_modify = move_modify
         self.ca = cellular_automaton
 
-        self.suboperators = self.Suboperators(
-            cellular_automaton, move, modify, self.move_modify
-        )
+        self.suboperators = self.Suboperators(cellular_automaton, move_modify)
 
         self.max_freeze = max_freeze
         self.freeze_space = spaces.Discrete(max_freeze + 1)
