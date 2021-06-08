@@ -1,37 +1,42 @@
-import gym
 import pytest
-from gym.spaces import Space
 
+from gym_cellular_automata import GridSpace
 from gym_cellular_automata.forest_fire.bulldozer import ForestFireEnvBulldozerV1
-
-# from matplotlib import pyplot as plt
-
 
 THRESHOLD = 12
 
 
-@pytest.mark.skip(reason="WIP")
-def test_termination_behavior(env, all_trees):
+@pytest.fixture
+def env():
+    return ForestFireEnvBulldozerV1()
+
+
+def test_termination_behavior(env):
     env.reset()
 
-    env.grid = all_trees
+    cells = env._empty, env._burned, env._tree
+    ncols, nrows = env._col, env._row
+    non_fire = GridSpace(values=[cells], shape=(ncols, nrows)).sample()
+
+    env.grid = non_fire
     action = env.action_space.sample()
 
-    # Acting on an all_tree grid causes termination
+    # Acting on an non-fire grid causes termination
     obs, reward, done, info = env.step(action)
     grid, context = obs
 
+    # Assert termination
     assert done
 
 
-@pytest.mark.skip(reason="WIP")
-def test_single_fire_seed(env):
+def test_starting_conditions_seed(env):
     obs = env.reset()
 
     grid, context = obs
-    ca_params, mod_params, freeze = context
+    ca_params, mod_params, time_params = context
 
-    assert freeze == MAX_FREEZE
+    # Internal clock at 0.0
+    assert time_params == 0.0
 
     # Single fire seed
-    assert len(grid[grid == FIRE]) == 1
+    assert len(grid[grid == env._fire]) == 1
