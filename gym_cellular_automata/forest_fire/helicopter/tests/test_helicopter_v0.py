@@ -143,16 +143,6 @@ def test_forest_fire_env_with_random_policy(env, reward_space):
 
 
 def test_forest_fire_env_hit_info(env, all_fire_grid):
-    def set_up_env():
-        env.reset()
-
-        ca_params = np.array(P_FIRE, P_TREE)
-        pos = np.array([0, 0], dtype=ACTION_TYPE)
-        freeze = 3
-        context = ca_params, pos, freeze
-
-        env = set_env_with_custom_state(env, all_fire_grid.copy(), context)
-
     def assert_hit_right_notmove_down():
         obs, reward, done, info = env.action(ACTION_RIGHT)
 
@@ -165,11 +155,6 @@ def test_forest_fire_env_hit_info(env, all_fire_grid):
         obs, reward, done, info = env.action(ACTION_DOWN)
 
         assert info["hit"] is True
-
-    def hit_flag_robustness_to_env_resets(repeat=2):
-        for i in range(repeat):
-            set_up_env()
-            assert_hit_right_notmove_down()
 
 
 def manual_assesment(verbose=False):

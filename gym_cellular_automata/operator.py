@@ -4,8 +4,10 @@ from typing import Any, Optional
 
 import numpy as np
 from gym.spaces import Space
+from objprint import add_objprint
 
 
+@add_objprint
 class Operator(ABC):
 
     # Set these in ALL subclasses

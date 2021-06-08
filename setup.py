@@ -19,6 +19,7 @@ setup(
         "seaborn",
         "pyyaml",
         "svgpath2mpl",
+        "objprint",
     ],
     tests_require=["pytest", "pytest-cov", "pytest-repeat", "pytest-randomly"],
     python_requires=">=3.9",
