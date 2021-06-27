@@ -1,5 +1,5 @@
 import numpy as np
-from gym import logger, spaces
+from gym import spaces
 
 from gym_cellular_automata import CAEnv, GridSpace, Operator
 from gym_cellular_automata.forest_fire.bulldozer.utils.config import CONFIG
@@ -115,7 +115,10 @@ class ForestFireEnvBulldozerV1(CAEnv):
         2. Is it equivalent with Sparse Reward?
         """
         counts = self.count_cells(self.grid)
-        return -(counts[self._fire] / (counts[self._fire] + counts[self._tree]))
+        t = counts[self._tree]
+        f = counts[self._fire]
+        b = counts[self._burned]
+        return -(f / (t + f + b))
 
     def _is_done(self):
         self.done = not bool(np.any(self.grid == self._fire))
@@ -124,7 +127,9 @@ class ForestFireEnvBulldozerV1(CAEnv):
         return {"hit": self.modify.hit}
 
     def render(self, mode="human"):
-        pass
+        from gym_cellular_automata.forest_fire.bulldozer.utils.render import render
+
+        return render(self)
 
     def _set_spaces(self):
         self.grid_space = GridSpace(

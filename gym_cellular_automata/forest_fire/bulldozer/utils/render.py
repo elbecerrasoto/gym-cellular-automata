@@ -230,36 +230,4 @@ def render(env):
     plot_local_grid(ax_lgrid, env)
     plot_global_grid(ax_ggrid, env)
     plot_counts(ax_counts, env)
-
-
-# Things to do with this
-# 1. Convert it into a function DONE
-# 2. Interface with Bulldozer as svg_paths
-# 3. Improve it.
-
-
-def main():
-    import gym
-
-    env = init_env()
-    obs = env.reset()
-    total_reward = 0.0
-    done = False
-    step = 0
-    threshold = 240
-
-    render(env)
-
-    # Random Policy for at most "threshold" steps
-    while not done and step < threshold:
-        action = env.action_space.sample()  # Your agent goes here!
-        obs, reward, done, info = env.step(action)
-        render(env)
-        total_reward += reward
-        step += 1
-
-    print(f"Total Steps: {step}")
-    print(f"Total Reward: {total_reward}")
-
-
-main()
+    return plt.gcf()
