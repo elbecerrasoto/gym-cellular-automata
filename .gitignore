@@ -13,6 +13,7 @@ ipython.html
 .isort.cfg
 # autosaves
 *~
+*#*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
