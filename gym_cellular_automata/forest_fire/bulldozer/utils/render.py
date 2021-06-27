@@ -2,7 +2,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
-import gym_cellular_automata.forest_fire.bulldozer.utils.render.svg_paths as svg_paths
+import gym_cellular_automata.forest_fire.bulldozer.utils.svg_paths as svg_paths
 from gym_cellular_automata.forest_fire.utils.render import parse_svg_into_mpl
 
 
@@ -75,7 +75,7 @@ def plot_gauge(ax, env):
     new_gauge = np.array([0.1])
     y = np.array([0])
 
-    # Old Gauge
+    # Old Gauge as svg_paths
     ax.barh(y, old_gauge, height=0.04, color=COLOR_OLDGAUGE, edgecolor="None")
     # New Gauge
     ax.barh(
@@ -159,7 +159,7 @@ def plot_global_grid(ax, env):
     offset = 10
 
     if fire_seed[0] - offset >= 0:
-        # Position the Fire svg for better visualization
+        # Position the Fire svg for better visuali as svg_pathszation
         ax.plot(
             fire_seed[1],
             fire_seed[0] - offset,
@@ -234,19 +234,19 @@ def render(env):
 
 # Things to do with this
 # 1. Convert it into a function DONE
-# 2. Interface with Bulldozer
+# 2. Interface with Bulldozer as svg_paths
 # 3. Improve it.
 
 
 def main():
     import gym
 
-    env = gym.make("gym_cellular_automata:ForestFireBulldozer-v0")
+    env = init_env()
     obs = env.reset()
     total_reward = 0.0
     done = False
     step = 0
-    threshold = 12
+    threshold = 240
 
     render(env)
 
