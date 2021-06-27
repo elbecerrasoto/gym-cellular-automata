@@ -69,38 +69,43 @@ def clear_ax(ax, xticks=True, yticks=True):
     ax.spines.bottom.set_visible(False)
 
 
-def plot_gauge(ax, env):
+class PlotGauge:
+    def __init__(self, env):
+        __, __, time = env.context
+        self.old_time = time
 
-    old_gauge = np.array([0.4])
-    new_gauge = np.array([0.1])
-    y = np.array([0])
+    def __call__(self, ax, env):
+        __, __, time = env.context
+        diff_time = np.array(max(time - self.old_time, 0))
+        y = np.array(0)
 
-    # Old Gauge as svg_paths
-    ax.barh(y, old_gauge, height=0.04, color=COLOR_OLDGAUGE, edgecolor="None")
-    # New Gauge
-    ax.barh(
-        y,
-        new_gauge,
-        height=0.04,
-        color=COLOR_NEWGAUGE,
-        left=old_gauge,
-        edgecolor="None",
-    )
+        HEIGHT = 0.6
+        # Old Gauge as svg_paths
+        ax.barh(y, self.old_time, height=HEIGHT, color=COLOR_OLDGAUGE, edgecolor="None")
+        # New Gauge
+        ax.barh(
+            y,
+            diff_time,
+            height=HEIGHT,
+            color=COLOR_NEWGAUGE,
+            left=self.old_time,
+            edgecolor="None",
+        )
 
-    ax.set_yticks([0])
-    ax.set_xlim(0 - 0.1, 1 + 0.1)
-    ax.set_ylim(-0.4, 0.4)
+        ax.set_yticks([0])
+        ax.set_xlim(0 - 0.1, 1 + 0.1)
+        ax.set_ylim(-0.4, 0.4)
 
-    ucycle = "\U0001f504"
-    ax.set_yticklabels(ucycle, font=EMOJIFONT, size=34)
+        ucycle = "\U0001f504"
+        ax.set_yticklabels(ucycle, font=EMOJIFONT, size=34)
 
-    ax.get_yticklabels()[0].set_color("0.74")
+        ax.get_yticklabels()[0].set_color("0.74")
 
-    ax.set_xticks([0.0, 1.0])
+        ax.set_xticks([0.0, 1.0])
 
-    clear_ax(ax, yticks=False)
+        clear_ax(ax, yticks=False)
 
-    ax.grid(axis="x", color="0.86")
+        ax.grid(axis="x", color="0.86")
 
 
 def plot_counts(ax, env):
@@ -226,6 +231,7 @@ def render(env):
     ax_lgrid = plt.subplot2grid(fig_shape, (2, 0), colspan=8, rowspan=10)
     ax_ggrid = plt.subplot2grid(fig_shape, (0, 8), colspan=6, rowspan=6)
     ax_counts = plt.subplot2grid(fig_shape, (6, 8), colspan=6, rowspan=6)
+    plot_gauge = PlotGauge(env)
     plot_gauge(ax_gauge, env)
     plot_local_grid(ax_lgrid, env)
     plot_global_grid(ax_ggrid, env)

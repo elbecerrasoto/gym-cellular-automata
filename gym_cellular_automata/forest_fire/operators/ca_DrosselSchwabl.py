@@ -54,7 +54,4 @@ class ForestFire(Operator):
                     # Consume fire
                     new_grid[row][col] = self.empty
 
-                else:
-                    continue
-
         return new_grid, context
