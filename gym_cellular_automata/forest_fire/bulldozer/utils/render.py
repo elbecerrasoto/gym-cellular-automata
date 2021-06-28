@@ -37,10 +37,8 @@ COLOR_FIRE = "#E68181"  # Salmon-Red
 COLOR_OLDGAUGE = "#D1B2EA"  # Light-Purple
 COLOR_NEWGAUGE = "#B991D9"  # Purple
 
-EMOJIFONT = get_font("/home/ebecerra/.fonts/OpenMoji-Black.ttf")
-TITLEFONT = get_font(
-    "/home/ebecerra/.fonts/frederika_the_great/FrederickatheGreat-Regular.ttf"
-)
+EMOJIFONT = get_font("./fonts/OpenMoji-Black.ttf")
+TITLEFONT = get_font("./fonts/FrederickatheGreat-Regular.ttf")
 
 
 ENV = init_env()

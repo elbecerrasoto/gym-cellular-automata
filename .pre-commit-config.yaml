@@ -19,6 +19,7 @@ repos:
     -   id: trailing-whitespace
     -   id: mixed-line-ending
     -   id: check-added-large-files
+        args: ['--maxkb=10240']
 -   repo: https://github.com/psf/black
     rev: 20.8b1
     hooks:

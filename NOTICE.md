@@ -39,7 +39,28 @@ permission notices, disclaimers, and copyright statements.
 + Source: [svgpath2mpl](https://github.com/nvictus/svgpath2mpl)
 + License: [BSD (3-Clause)](https://github.com/nvictus/svgpath2mpl/blob/master/LICENSE)
 
+## Fonts
+
+### Fredericka the Great
+
++ Author: Tart Workshop
++ Source: [Fredericka the Great]
++ License: [Open Font License](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL#9ccf5052)
+
+### OpenMoji
+
++ Author: OpenMoji
++ Source: [Open Moji](https://github.com/hfg-gmuend/openmoji)
++ License: [Creative Commons Attribution Share Alike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/)
++ Attribution: `All emojis designed by OpenMoji – the open-source emoji and icon project. License: CC BY-SA 4.0`
+
 ## Images
+
+### Bulldozer Icon
+
+### Location Pin
+
+### Fire Icon
 
 ### Helicopter Icon
 
