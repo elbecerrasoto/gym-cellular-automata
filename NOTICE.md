@@ -44,7 +44,7 @@ permission notices, disclaimers, and copyright statements.
 ### Fredericka the Great
 
 + Author: Tart Workshop
-+ Source: [Fredericka the Great]
++ Source: [Fredericka the Great](https://fonts.google.com/specimen/Fredericka+the+Great)
 + License: [Open Font License](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL#9ccf5052)
 
 ### OpenMoji
@@ -52,15 +52,30 @@ permission notices, disclaimers, and copyright statements.
 + Author: OpenMoji
 + Source: [Open Moji](https://github.com/hfg-gmuend/openmoji)
 + License: [Creative Commons Attribution Share Alike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/)
-+ Attribution: `All emojis designed by OpenMoji – the open-source emoji and icon project. License: CC BY-SA 4.0`
++ Suggested Attribution: `All emojis designed by OpenMoji – the open-source emoji and icon project. License: CC BY-SA 4.0`
 
 ## Images
 
 ### Bulldozer Icon
 
++ Author: Serhii Smirnov
++ Source: [The Noun Project](https://thenounproject.com/search/?q=3104675&i=3104675)
++ License: [CC 3.0 United States](https://creativecommons.org/licenses/by/3.0/us/legalcode)
++ Changes: Removed some lines. Embedded into an image.
+
 ### Location Pin
 
++ Author: Google
++ Source: [Google Material Design Icons](https://fonts.google.com/icons?selected=Material%20Icons%20Outlined%3Alocation_on)
++ Repository: https://github.com/google/material-design-icons
++ License: [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0.html)
+
 ### Fire Icon
+
++ Author: Iga
++ Source: [The Noun Project](https://thenounproject.com/search/?q=2986916&i=2986916)
++ License: [CC 3.0 United States](https://creativecommons.org/licenses/by/3.0/us/legalcode)
++ Changes: Colored to red. Embedded into an image.
 
 ### Helicopter Icon
 
