@@ -1,7 +1,8 @@
 import numpy as np
-from gym import logger, spaces
+from gym import spaces
 
 from gym_cellular_automata import CAEnv, GridSpace, Operator
+from gym_cellular_automata.forest_fire.bulldozer.utils.config import CONFIG
 from gym_cellular_automata.forest_fire.operators import (
     Modify,
     Move,
@@ -9,9 +10,6 @@ from gym_cellular_automata.forest_fire.operators import (
     RepeatCA,
     WindyForestFire,
 )
-
-from .utils.config import CONFIG
-from .utils.render import env_visualization
 
 
 class ForestFireEnvBulldozerV1(CAEnv):
@@ -89,14 +87,38 @@ class ForestFireEnvBulldozerV1(CAEnv):
         return self._initial_state
 
     def _award(self):
+        """Reward Function
 
-        # Negative Ratio of Fire and Trees
-        # Reasons for using this Reward function:
-        # 1. Easy to interpret
-        # 2. Communicates the desire to terminate as fast as possible
-        # 3. Internalizes the cost of Bulldozer actions
+        Negative Ratio of Burning Area per Total Flammable Area
+
+        -[f / (t + f + b)]
+        Where:
+            t: tree cell counts
+            f: fire cell counts
+            b: burned cell counts
+
+        Objective:
+        Keep as much forest as possible.
+
+        Advantages:
+        1. Easy to interpret.
+            + Percent of the forest lost at each step.
+        2. Terminate ASAP.
+            + As the reward is negative.
+        3. Built-in cost of action.
+            + The agent removes trees, this decreases the reward.
+        4. Shaped reward.
+            + Reward is given at each step.
+
+        Disadvantages:
+        1. Lack of experimental results.
+        2. Is it equivalent with Sparse Reward?
+        """
         counts = self.count_cells(self.grid)
-        return -(counts[self._fire] / (counts[self._fire] + counts[self._tree]))
+        t = counts[self._tree]
+        f = counts[self._fire]
+        b = counts[self._burned]
+        return -(f / (t + f + b))
 
     def _is_done(self):
         self.done = not bool(np.any(self.grid == self._fire))
@@ -105,17 +127,9 @@ class ForestFireEnvBulldozerV1(CAEnv):
         return {"hit": self.modify.hit}
 
     def render(self, mode="human"):
-        if mode == "human":
+        from gym_cellular_automata.forest_fire.bulldozer.utils.render import render
 
-            ca_params, mod_params, coord_params = self.context
-
-            return env_visualization(self.grid, mod_params, self._fire_seed)
-
-        else:
-
-            logger.warn(
-                f"Undefined mode.\nAvailable modes {self.metadata['render.modes']}"
-            )
+        return render(self)
 
     def _set_spaces(self):
         self.grid_space = GridSpace(

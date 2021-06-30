@@ -17,6 +17,12 @@ hooks :
 	pre-commit install
 	gitmoji -i
 
+hooks-dry :
+	pre-commit run --all-files
+
+hooks-update :
+	pre-commit autoupdate
+
 style :
 	isort ./
 	black ./
@@ -52,4 +58,4 @@ count :
 	# Counts the lines of Code
 	find ./ -name '*.py' -print | xargs cat | sed '/^$$/ d' | perl -ne 'if(not /^ *?#/){print $$_}' | wc -l
 
-.PHONY : help install conda_env develop hooks style test test-debug test-coverage test-slow linter patch clean count
+.PHONY : help install conda_env develop hooks hooks-dry hooks-update style test test-debug test-coverage test-slow linter patch clean count

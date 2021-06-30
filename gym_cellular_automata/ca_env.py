@@ -84,11 +84,11 @@ class CAEnv(ABC, gym.Env):
     def _report(self):
         raise NotImplementedError
 
-    @staticmethod
-    def count_cells(grid):
+    def count_cells(self, grid=None):
         """Returns dict of cell counts"""
         from collections import Counter
 
+        grid = self.grid if grid is None else grid
         return Counter(grid.flatten().tolist())
 
 

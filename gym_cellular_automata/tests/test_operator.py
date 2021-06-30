@@ -9,7 +9,7 @@ from gym_cellular_automata import Operator
 @pytest.fixture(scope="session")
 def has_operator_specs():
     def has_operator_specs(operator) -> bool:
-        """ Test Atts, signatures and outputs """
+        """Test Atts, signatures and outputs"""
         ...
         return True
 

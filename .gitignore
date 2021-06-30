@@ -13,6 +13,10 @@ ipython.html
 .isort.cfg
 # autosaves
 *~
+*#*
+# Kanban Board
+taskell.md
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
