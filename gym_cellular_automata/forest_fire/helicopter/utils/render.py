@@ -6,6 +6,8 @@ import seaborn as sns
 from matplotlib import colors
 from svgpath2mpl import parse_path
 
+from gym_cellular_automata.forest_fire.utils.render import parse_svg_into_mpl
+
 from .config import CONFIG
 from .helicopter_shape import SVG_PATH
 
@@ -114,18 +116,3 @@ def grid_ticks_settings(ax, n_row, n_col):
     ax.tick_params(axis="both", which="both", length=0)
 
     return ax
-
-
-def parse_svg_into_mpl(svg_path):
-
-    mpl_path = parse_path(svg_path)
-
-    def center(mpl_path):
-        mpl_path.vertices -= mpl_path.vertices.mean(axis=0)
-        return mpl_path
-
-    def upsidedown(mpl_path):
-        mpl_path.vertices[:, 1] *= -1
-        return mpl_path
-
-    return upsidedown(center(mpl_path))

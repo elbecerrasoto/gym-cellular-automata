@@ -34,12 +34,18 @@ COLOR_EMPTY = "#DDD1D3"  # Gray
 COLOR_BURNED = "#DFA4A0"  # Light-Red
 COLOR_TREE = "#A9C499"  # Green
 COLOR_FIRE = "#E68181"  # Salmon-Red
-COLOR_OLDGAUGE = "#D1B2EA"  # Light-Purple
+COLOR_OLDGAUGE = "#D4CCDB"  # "Gray-Purple"
 COLOR_NEWGAUGE = "#B991D9"  # Purple
 
-EMOJIFONT = get_font("./fonts/OpenMoji-Black.ttf")
-TITLEFONT = get_font("./fonts/FrederickatheGreat-Regular.ttf")
+from gym_cellular_automata.forest_fire.utils.config import get_path
 
+# __file__ =
+# ./gym-cellular-automata/gym_cellular_automata/forest_fire/bulldozer/utils/render.py
+emoji_path = get_path("./fonts/OpenMoji-Black.ttf", __file__, behind=4)
+title_path = get_path("./fonts/FrederickatheGreat-Regular.ttf", __file__, behind=4)
+
+EMOJIFONT = get_font(emoji_path)
+TITLEFONT = get_font(title_path)
 
 ENV = init_env()
 
@@ -77,7 +83,7 @@ class PlotGauge:
         diff_time = np.array(max(time - self.old_time, 0))
         y = np.array(0)
 
-        HEIGHT = 0.6
+        HEIGHT = 0.1
         # Old Gauge as svg_paths
         ax.barh(y, self.old_time, height=HEIGHT, color=COLOR_OLDGAUGE, edgecolor="None")
         # New Gauge
@@ -91,11 +97,11 @@ class PlotGauge:
         )
 
         ax.set_yticks([0])
-        ax.set_xlim(0 - 0.1, 1 + 0.1)
+        ax.set_xlim(0 - 0.03, 1 + 0.1)
         ax.set_ylim(-0.4, 0.4)
 
         ucycle = "\U0001f504"
-        ax.set_yticklabels(ucycle, font=EMOJIFONT, size=34)
+        ax.set_yticklabels(ucycle, font=EMOJIFONT, size=32)
 
         ax.get_yticklabels()[0].set_color("0.74")
 
@@ -162,7 +168,7 @@ def plot_global_grid(ax, env):
     offset = 10
 
     if fire_seed[0] - offset >= 0:
-        # Position the Fire svg for better visuali as svg_pathszation
+        # Position the Fire svg for better visualization
         ax.plot(
             fire_seed[1],
             fire_seed[0] - offset,
@@ -218,13 +224,16 @@ def plot_local_grid(ax, env):
     ax.tick_params(axis="both", which="both", length=0)
 
     svg_bulldozer = parse_svg_into_mpl(svg_paths.BULLDOZER)
-    ax.plot(mid_col, mid_row, marker=svg_bulldozer, markersize=17, color="1.0")
+    ax.plot(mid_col, mid_row, marker=svg_bulldozer, markersize=52, color="1.0")
     clear_ax(ax)
 
 
 def render(env):
     fig_shape = (12, 14)
-    fig = plt.figure(figsize=(8, 5))
+    fig = plt.figure(figsize=(15, 12))
+    fig.suptitle(
+        "Save the Forest!", font=TITLEFONT, fontsize=64, color="0.6", ha="right"
+    )
     ax_gauge = plt.subplot2grid(fig_shape, (0, 0), colspan=8, rowspan=2)
     ax_lgrid = plt.subplot2grid(fig_shape, (2, 0), colspan=8, rowspan=10)
     ax_ggrid = plt.subplot2grid(fig_shape, (0, 8), colspan=6, rowspan=6)
