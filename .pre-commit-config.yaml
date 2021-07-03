@@ -24,8 +24,6 @@ repos:
     -   id: debug-statements
     -   id: fix-encoding-pragma
         args: ['--remove']
-    -   id: name-tests-test
-        args: ['--django']
     -   id: check-docstring-first
     # Git
     -   id: no-commit-to-branch
