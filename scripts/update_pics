@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+import gym
+
+from gym_cellular_automata import PROJECT_PATH
+
+
+def envs():
+    from gym_cellular_automata import REGISTERED_CA_ENVS
+
+    LIBRARY = "gym_cellular_automata"
+
+    for ca_env in REGISTERED_CA_ENVS:
+        yield gym.make(LIBRARY + ":" + ca_env)
+
+
+def play_random_policy(env, steps):
+    obs = env.reset()
+
+    done = False
+    step = 0
+    threshold = steps
+
+    # Random Policy for at most "threshold" steps
+    while not done and step < threshold:
+        action = env.action_space.sample()  # Your agent goes here!
+        obs, reward, done, info = env.step(action)
+        step += 1
+
+    return env
+
+
+if __name__ == "__main__":
+    helicopter = PROJECT_PATH / "pics/render_helicopter.svg"
+    bulldozer = PROJECT_PATH / "pics/render_bulldozer.svg"
+    STEPS = (0, 1024)
+    PICS = (helicopter, bulldozer)
+
+    for env, steps, pic in zip(envs(), STEPS, PICS):
+        env = play_random_policy(env, steps)
+        fig = env.render()
+        fig.savefig(pic)

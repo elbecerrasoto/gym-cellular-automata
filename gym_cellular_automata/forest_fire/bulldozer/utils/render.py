@@ -1,15 +1,12 @@
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
 import gym_cellular_automata.forest_fire.bulldozer.utils.svg_paths as svg_paths
-from gym_cellular_automata.forest_fire.utils.render import parse_svg_into_mpl
-
-
-def get_font(ttfpath):
-    from pathlib import Path
-
-    return Path(mpl.get_data_path(), ttfpath)
+from gym_cellular_automata.forest_fire.utils.render import (
+    EMOJIFONT,
+    TITLEFONT,
+    parse_svg_into_mpl,
+)
 
 
 def init_env():
@@ -37,15 +34,6 @@ COLOR_FIRE = "#E68181"  # Salmon-Red
 COLOR_OLDGAUGE = "#D4CCDB"  # "Gray-Purple"
 COLOR_NEWGAUGE = "#B991D9"  # Purple
 
-from gym_cellular_automata.forest_fire.utils.config import get_path
-
-# __file__ =
-# ./gym-cellular-automata/gym_cellular_automata/forest_fire/bulldozer/utils/render.py
-emoji_path = get_path("./fonts/OpenMoji-Black.ttf", __file__, behind=4)
-title_path = get_path("./fonts/FrederickatheGreat-Regular.ttf", __file__, behind=4)
-
-EMOJIFONT = get_font(emoji_path)
-TITLEFONT = get_font(title_path)
 
 ENV = init_env()
 

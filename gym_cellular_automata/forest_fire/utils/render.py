@@ -1,5 +1,20 @@
 from svgpath2mpl import parse_path
 
+from gym_cellular_automata import PROJECT_PATH
+from gym_cellular_automata.forest_fire.utils.config import get_path
+
+
+def get_font(ttfpath):
+    from pathlib import Path
+
+    import matplotlib as mpl
+
+    return Path(mpl.get_data_path(), ttfpath)
+
+
+EMOJIFONT = get_font(PROJECT_PATH / "fonts/OpenMoji-Black.ttf")
+TITLEFONT = get_font(PROJECT_PATH / "fonts/FrederickatheGreat-Regular.ttf")
+
 
 def parse_svg_into_mpl(svg_path):
 
