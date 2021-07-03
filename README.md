@@ -2,7 +2,7 @@
 ---
 
 <p align="center">
-    <a href="pics/gym_automata_diagram.svg"><img src="pics/gym_automata_diagram.svg"></a>
+    <a href="pics/gym_cellular_automata.svg"><img src="pics/gym_cellular_automata.svg"></a>
     <br />
     <br />
     <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-v0.4.7-blue" alt="Semantic Versioning"></a>
@@ -65,9 +65,9 @@ print(gymca.REGISTERED_CA_ENVS)
 
 ## Gallery
 
-![Forest Fire](pics/forest_fire.svg)
+![Forest Fire Helicopter](pics/render_helicopter.svg)
 
-![FF Bulldozer](pics/ff_bulldozer_prototype.svg)
+![Forest Fire Bulldozer](pics/render_bulldozer.svg)
 
 ## Documentation
 

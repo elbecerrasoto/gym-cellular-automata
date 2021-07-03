@@ -47,8 +47,8 @@ linter :
 patch :
 	./scripts/versionate -v --do "patch_up"
 
-pics :
-	./scripts/update_pics
+gallery :
+	./scripts/update_gallery
 
 clean :
 	find ./ -type d -name "__pycache__" | xargs -I{} trash {}
@@ -62,4 +62,4 @@ count :
 	# Counts the lines of Code
 	find ./ -name '*.py' -print | xargs cat | sed '/^$$/ d' | perl -ne 'if(not /^ *?#/){print $$_}' | wc -l
 
-.PHONY : help install conda_env develop hooks hooks-dry hooks-update style test test-debug test-coverage test-slow linter patch clean count
+.PHONY : help install conda_env develop hooks hooks-dry hooks-update style test test-debug test-coverage test-slow linter patch gallery clean count

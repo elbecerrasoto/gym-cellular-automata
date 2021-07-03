@@ -34,17 +34,4 @@ except GymError:  # Avoid annoying Re-register error when working interactively.
     pass
 
 
-def get_path(file, pwd, behind=1):
-    """
-    Absolute Path of file,
-    expected to be found 1 directory behind of Current Working Directory
-
-        >>> get_path("my_file.yaml", __file__)
-    """
-    from pathlib import Path
-
-    dir = Path(pwd).parents[behind]
-    return dir / file
-
-
 __all__ = ["CAEnv", "Operator", "GridSpace", "REGISTERED_CA_ENVS"]

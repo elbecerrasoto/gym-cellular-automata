@@ -10,19 +10,6 @@ def get_config_dict(file):
     return yaml_content
 
 
-def get_path(file, pwd, behind=1):
-    """
-    Absolute Path of file,
-    expected to be found 1 directory behind of Current Working Directory
-
-        >>> get_path("my_file.yaml", __file__)
-    """
-    from pathlib import Path
-
-    dir = Path(pwd).parents[behind]
-    return dir / file
-
-
 ###############################################################################
 # Utilities
 # Common parsing operations on Forest Fire CA Environments

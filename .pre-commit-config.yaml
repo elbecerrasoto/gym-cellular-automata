@@ -13,7 +13,7 @@ repos:
     -   id: fix-byte-order-marker
     -   id: check-case-conflict
     -   id: check-executables-have-shebangs
-        args: ['./scripts/versionate']
+        args: ['./scripts/versionate', './scripts/update_gallery']
     -   id: check-yaml
     -   id: detect-private-key
     -   id: end-of-file-fixer

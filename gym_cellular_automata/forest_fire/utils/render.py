@@ -1,7 +1,6 @@
 from svgpath2mpl import parse_path
 
 from gym_cellular_automata import PROJECT_PATH
-from gym_cellular_automata.forest_fire.utils.config import get_path
 
 
 def get_font(ttfpath):
