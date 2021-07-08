@@ -1,3 +1,10 @@
+
+# Deprecated
+
+:warning: :warning: :warning:
+
+> This document is deprecated. Keeping it for reference.
+
 # Adding _Forest Fire CA Envs_
 
 :woman_firefighter: :evergreen_tree: :fire: :man_firefighter:

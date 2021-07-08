@@ -5,7 +5,7 @@
     <a href="pics/gym_cellular_automata.svg"><img src="pics/gym_cellular_automata.svg"></a>
     <br />
     <br />
-    <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-v0.4.8-blue" alt="Semantic Versioning"></a>
+    <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-v0.5.0-blue" alt="Semantic Versioning"></a>
     <a href="http://choosealicense.com/licenses/mit/"><img src="https://img.shields.io/badge/license-MIT-red.svg?style=flat" alt="MIT License"></a>
     <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a>
     <a href="https://gitmoji.dev"><img src="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg" alt="Gitmoji"></a>
@@ -65,13 +65,23 @@ print(gymca.REGISTERED_CA_ENVS)
 
 ## Gallery
 
-![Forest Fire Helicopter](pics/render_helicopter.svg)
+### Helicopter ###
 
-![Forest Fire Bulldozer](pics/render_bulldozer.svg)
+![Forest Fire Helicopter](./pics/render_helicopter.svg)
+
+[Forest Fire Helicopter](./gym_cellular_automata/forest_fire/helicopter/README.md)
+
+### Bulldozer ###
+
+![Forest Fire Bulldozer](./pics/render_bulldozer.svg)
+
+[Forest Fire Bulldozer](./gym_cellular_automata/forest_fire/bulldozer/README.md)
 
 ## Documentation
 
 :construction_worker: Documentation is in progress.
+
+[Forest Fire Environment Bulldozer V1](./gym_cellular_automata/forest_fire/bulldozer/README.md)
 
 ## Contributing
 
