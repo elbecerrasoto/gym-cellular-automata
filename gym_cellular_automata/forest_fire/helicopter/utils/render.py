@@ -6,7 +6,7 @@ import seaborn as sns
 from matplotlib import colors
 from svgpath2mpl import parse_path
 
-from gym_cellular_automata.forest_fire.utils.render import parse_svg_into_mpl
+from gym_cellular_automata.forest_fire.utils.render import TITLEFONT, parse_svg_into_mpl
 
 from .config import CONFIG
 from .helicopter_shape import SVG_PATH
@@ -17,18 +17,18 @@ FIRE = CONFIG["cell_symbols"]["fire"]
 
 
 DEFAULT_KWARGS = {
-    "color_empty": CONFIG["plot"]["cell_colors"]["empty"],
-    "color_tree": CONFIG["plot"]["cell_colors"]["tree"],
-    "color_fire": CONFIG["plot"]["cell_colors"]["fire"],
-    "title_size": CONFIG["plot"]["title_size"],
-    "title_color": CONFIG["plot"]["title_color"],
-    "helicopter_size": CONFIG["plot"]["helicopter_size"],
-    "helicopter_color": CONFIG["plot"]["helicopter_color"],
-    "fontname": CONFIG["plot"]["font"],
+    "color_empty": "#DDD1D3",  # Gray
+    "color_tree": "#A9C499",  # Green
+    "color_fire": "#DFA4A0",  # Redo
+    "title": "Save the Forest!",
+    "title_size": 21,
+    "title_color": "#B3B3B3",  # Gray 70%
+    "helicopter_size": 39,
+    "helicopter_color": "#FFFFFF",  # White
 }
 
 
-def plot_grid(grid, title=CONFIG["plot"]["title"], **kwargs):
+def plot_grid(grid, title=DEFAULT_KWARGS["title"], **kwargs):
 
     kwargs = {**DEFAULT_KWARGS, **kwargs}
 
@@ -49,7 +49,8 @@ def plot_grid(grid, title=CONFIG["plot"]["title"], **kwargs):
         title,
         size=kwargs["title_size"],
         color=kwargs["title_color"],
-        fontname=kwargs["fontname"],
+        font=TITLEFONT,
+        ha="right",
     )
 
     # Modify Ticks by Axes methods
