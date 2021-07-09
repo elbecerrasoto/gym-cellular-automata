@@ -127,9 +127,12 @@ class ForestFireEnvBulldozerV1(CAEnv):
         return {"hit": self.modify.hit}
 
     def render(self, mode="human"):
-        from gym_cellular_automata.forest_fire.bulldozer.utils.render import render
+        from warnings import catch_warnings
 
-        return render(self)
+        with catch_warnings():
+            from gym_cellular_automata.forest_fire.bulldozer.utils.render import render
+
+            return render(self)
 
     def _set_spaces(self):
         self.grid_space = GridSpace(

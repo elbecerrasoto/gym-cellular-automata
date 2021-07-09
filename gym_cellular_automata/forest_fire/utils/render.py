@@ -4,11 +4,13 @@ from gym_cellular_automata import PROJECT_PATH
 
 
 def get_font(ttfpath):
+    import warnings
     from pathlib import Path
 
     import matplotlib as mpl
 
-    return Path(mpl.get_data_path(), ttfpath)
+    with warnings.catch_warnings():
+        return Path(mpl.get_data_path(), ttfpath)
 
 
 EMOJIFONT = get_font(PROJECT_PATH / "fonts/OpenMoji-Black.ttf")

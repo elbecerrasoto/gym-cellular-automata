@@ -1,19 +1,14 @@
 #!/usr/bin/env python3
+import argparse
+import re
+from pathlib import Path
+
 import gym
 
-from gym_cellular_automata import PROJECT_PATH
+from gym_cellular_automata import PROJECT_PATH, REGISTERED_CA_ENVS
 
 
-def envs():
-    from gym_cellular_automata import REGISTERED_CA_ENVS
-
-    LIBRARY = "gym_cellular_automata"
-
-    for ca_env in REGISTERED_CA_ENVS:
-        yield gym.make(LIBRARY + ":" + ca_env)
-
-
-def play_random_policy(env, steps):
+def play_random_policy(env, steps, verbose=False):
     obs = env.reset()
 
     done = False
@@ -22,20 +17,169 @@ def play_random_policy(env, steps):
 
     # Random Policy for at most "threshold" steps
     while not done and step < threshold:
+        if verbose:
+            if step % 64 == 0:
+                print(".", end="")
         action = env.action_space.sample()  # Your agent goes here!
         obs, reward, done, info = env.step(action)
         step += 1
 
+    if verbose:
+        print()
+
     return env
 
 
-if __name__ == "__main__":
-    helicopter = PROJECT_PATH / "pics/render_helicopter.svg"
-    bulldozer = PROJECT_PATH / "pics/render_bulldozer.svg"
-    STEPS = (0, 1024)
-    PICS = (helicopter, bulldozer)
+LIBRARY = "gym_cellular_automata"
 
-    for env, steps, pic in zip(envs(), STEPS, PICS):
-        env = play_random_policy(env, steps)
-        fig = env.render()
-        fig.savefig(pic)
+# Helicopter
+
+OHELICOPTER = PROJECT_PATH / "./pics/TMPhelicopter.svg"
+CALL_HELICOPTER = LIBRARY + ":" + REGISTERED_CA_ENVS[0]
+RE_HELICOPTER = re.compile(r"helicopter|heli|hel|ffh|hff", re.IGNORECASE)
+STEPS_HELICOPTER = 0
+
+# Bulldozer
+OBULLDOZER = PROJECT_PATH / "./pics/TMPbulldozer.svg"
+CALL_BULLDOZER = LIBRARY + ":" + REGISTERED_CA_ENVS[1]
+RE_BULLDOZER = re.compile(r"bulldozer|bull|blldz|ffb|bff", re.IGNORECASE)
+STEPS_BULLDOZER = 256
+
+# Globals onto Dictionaries
+KENVS = ["helicopter", "bulldozer"]
+REGEXS = {"helicopter": RE_HELICOPTER, "bulldozer": RE_BULLDOZER}
+CALLS = {"helicopter": CALL_HELICOPTER, "bulldozer": CALL_BULLDOZER}
+DFILES = {"helicopter": OHELICOPTER, "bulldozer": OBULLDOZER}
+DSTEPS = {"helicopter": STEPS_HELICOPTER, "bulldozer": STEPS_BULLDOZER}
+
+# CLI args
+parser = argparse.ArgumentParser()
+parser.description = "Generate a sample gallery for the gym_cellular_automata library. Also works as a test for envs renders."
+
+
+parser.add_argument(
+    "envs",
+    nargs="*",
+    help="From which enviroments generate the gallery. If empty, defaults to all environments. The selections are {'helicopter', 'bulldozer'} (case insensitive).",
+)
+
+parser.add_argument("--out", "-o", nargs="*", help=f"Output files. Default {DFILES}.")
+
+parser.add_argument(
+    "--steps",
+    "-s",
+    nargs="*",
+    type=int,
+    help=f"Steps to play on the environment. {DSTEPS}",
+)
+
+
+parser.add_argument(
+    "--interactive",
+    "-i",
+    action="store_true",
+    help="Do not generate output files, instead open plots interactively.",
+)
+
+parser.add_argument(
+    "--dry",
+    "-d",
+    action="store_true",
+    help="Dry run.",
+)
+
+parser.add_argument(
+    "--verbose",
+    "-v",
+    action="store_true",
+    help="Verbose flag.",
+)
+
+
+parser.add_argument(
+    "--debug",
+    action="store_true",
+    help="Debugging Info.",
+)
+
+args = parser.parse_args()
+
+AENVS = args.envs
+AFILES = args.out
+ASTEPS = args.steps
+INTERACTIVE = args.interactive
+VERBOSE = args.verbose
+DRY = args.dry
+DEBUG = args.debug
+
+if DEBUG:
+    from icecream import ic
+
+    ic(args.envs)
+    ic(args.out)
+    ic(args.steps)
+    ic(args.interactive)
+    ic(args.verbose)
+    ic(args.dry)
+    ic(args.debug)
+
+
+def argument_policy():
+
+    # Defaults
+    ACTIONS = {}
+    for kenv in KENVS:
+        ACTIONS[kenv] = {"do": False, "out": DFILES[kenv], "steps": DSTEPS[kenv]}
+
+    # If not args, do all of them
+    # Uses defualts for ofiles and steps
+    if not AENVS:
+        for idx, kenv in enumerate(KENVS):
+            ACTIONS[kenv]["do"] = True
+    else:
+        for idx, aenv in enumerate(AENVS):
+
+            for kenv in KENVS:
+
+                if re.search(REGEXS[kenv], aenv):
+
+                    ACTIONS[kenv]["do"] = True
+                    if AFILES:
+                        ACTIONS[kenv]["out"] = Path(AFILES[idx])
+                    if ASTEPS:
+                        ACTIONS[kenv]["steps"] = ASTEPS[idx]
+                    break
+
+    return ACTIONS
+
+
+if __name__ == "__main__":
+
+    ACTIONS = argument_policy()
+
+    if DEBUG:
+        ic(ACTIONS)
+
+    for kenv in KENVS:
+
+        if ACTIONS[kenv]["do"]:
+
+            env = gym.make(CALLS[kenv])
+            ofile = ACTIONS[kenv]["out"]
+            steps = ACTIONS[kenv]["steps"]
+
+            env = play_random_policy(env, steps, VERBOSE)
+            fig = env.render()
+
+            if INTERACTIVE:
+                if not DRY:
+                    from matplotlib import pyplot as plt
+
+                    plt.show(block=True)
+                if VERBOSE:
+                    print(f"Opening {kenv} figure after {steps} steps")
+            else:
+                if not DRY:
+                    fig.savefig(ofile)
+                if VERBOSE:
+                    print(f"Saving {kenv} figure to {ofile} after {steps} steps")

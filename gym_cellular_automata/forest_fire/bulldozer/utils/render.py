@@ -84,6 +84,14 @@ class PlotGauge:
             edgecolor="None",
         )
 
+        ax.barh(
+            0.0,
+            1.0,
+            height=0.15,
+            color="None",
+            edgecolor="0.86",
+        )
+
         ax.set_yticks([0])
         ax.set_xlim(0 - 0.03, 1 + 0.1)
         ax.set_ylim(-0.4, 0.4)
@@ -97,7 +105,7 @@ class PlotGauge:
 
         clear_ax(ax, yticks=False)
 
-        ax.grid(axis="x", color="0.86")
+        # ax.grid(axis="x", color="0.86")
 
 
 def plot_counts(ax, env):
@@ -219,11 +227,9 @@ def plot_local_grid(ax, env):
 def render(env):
     fig_shape = (12, 14)
     fig = plt.figure(figsize=(15, 12))
-    fig.suptitle(
-        "Save the Forest!", font=TITLEFONT, fontsize=64, color="0.6", ha="right"
-    )
-    ax_gauge = plt.subplot2grid(fig_shape, (0, 0), colspan=8, rowspan=2)
-    ax_lgrid = plt.subplot2grid(fig_shape, (2, 0), colspan=8, rowspan=10)
+    fig.suptitle("Forest Fire", font=TITLEFONT, fontsize=64, color="0.6", ha="right")
+    ax_gauge = plt.subplot2grid(fig_shape, (10, 0), colspan=8, rowspan=2)
+    ax_lgrid = plt.subplot2grid(fig_shape, (0, 0), colspan=8, rowspan=10)
     ax_ggrid = plt.subplot2grid(fig_shape, (0, 8), colspan=6, rowspan=6)
     ax_counts = plt.subplot2grid(fig_shape, (6, 8), colspan=6, rowspan=6)
     plot_gauge = PlotGauge(env)

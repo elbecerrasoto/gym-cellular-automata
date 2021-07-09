@@ -39,6 +39,9 @@ test-coverage :
 test-slow :
 	time pytest -m "slow" -x ./gym_cellular_automata
 
+test-visual :
+	./scripts/update_gallery "helicopter" "bulldozer" --interactive -v --steps "128" "512"
+
 linter :
 	# Finds debugging prints
 	find ./gym_cellular_automata/ -type f -name "*.py" | sed '/test/ d' | xargs egrep -n 'print\(|ic\(' | cat
@@ -48,13 +51,14 @@ patch :
 	./scripts/versionate -v --do "patch_up"
 
 gallery :
-	./scripts/update_gallery
+	./scripts/update_gallery "helicopter" "bulldozer" -v --out "./pics/tmp_helicopter.svg" "./pics/tmp_bulldozer.svg" --steps "64" "1066"
 
 clean :
 	find ./ -type d -name "__pycache__" | xargs -I{} trash {}
 	find ./ -type d -name '*.egg-info' | xargs -I{} trash {}
 	find ./ -type f -name '*~' | xargs -I{} trash {}
 	find ./ -type f -name "monkeytype.sqlite3" | xargs -I{} trash {}
+	trash ./pics/tmp_bulldozer.svg  ./pics/tmp_helicopter.svg
 	git clean -d -n # To remove them change -n to -f
 	echo "\n\nTo remove git untracked files run:\ngit clean -d -f"
 
@@ -62,4 +66,4 @@ count :
 	# Counts the lines of Code
 	find ./ -name '*.py' -print | xargs cat | sed '/^$$/ d' | perl -ne 'if(not /^ *?#/){print $$_}' | wc -l
 
-.PHONY : help install conda_env develop hooks hooks-dry hooks-update style test test-debug test-coverage test-slow linter patch gallery clean count
+.PHONY : help install conda_env develop hooks hooks-dry hooks-update style test test-debug test-coverage test-slow test-visual linter patch gallery clean count

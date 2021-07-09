@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from matplotlib import colors
-from svgpath2mpl import parse_path
 
 from gym_cellular_automata.forest_fire.utils.render import TITLEFONT, parse_svg_into_mpl
 
@@ -21,14 +20,14 @@ DEFAULT_KWARGS = {
     "color_tree": "#A9C499",  # Green
     "color_fire": "#DFA4A0",  # Redo
     "title": "Save the Forest!",
-    "title_size": 21,
+    "title_size": 64,
     "title_color": "#B3B3B3",  # Gray 70%
-    "helicopter_size": 39,
+    "helicopter_size": 96,
     "helicopter_color": "#FFFFFF",  # White
 }
 
 
-def plot_grid(grid, title=DEFAULT_KWARGS["title"], **kwargs):
+def plot_grid(grid, **kwargs):
 
     kwargs = {**DEFAULT_KWARGS, **kwargs}
 
@@ -39,29 +38,33 @@ def plot_grid(grid, title=DEFAULT_KWARGS["title"], **kwargs):
     # Plot style
     sns.set_style("whitegrid")
 
+    fig, ax = plt.subplots(figsize=(15, 12))
+
     # Main Plot
-    plt.imshow(
+    ax.imshow(
         grid, aspect="equal", cmap=color_mapping["cmap"], norm=color_mapping["norm"]
     )
 
     # Title
-    plt.title(
-        title,
-        size=kwargs["title_size"],
+    fig.suptitle(
+        "Forest Fire",
         color=kwargs["title_color"],
         font=TITLEFONT,
-        ha="right",
+        fontsize=64,
+        ha="center",
     )
 
     # Modify Ticks by Axes methods
     grid_ticks_settings(plt.gca(), n_row=grid.shape[0], n_col=grid.shape[1])
 
-    fig = plt.gcf()
     return fig
 
 
 def add_helicopter(fig, pos, **kwargs):
+    import matplotlib.patheffects as path_effects
+
     helicopter = parse_svg_into_mpl(SVG_PATH)
+    pe = [path_effects.Stroke(linewidth=3, foreground="white"), path_effects.Normal()]
     kwargs = {**DEFAULT_KWARGS, **kwargs}
 
     ax = fig.get_axes()[0]
@@ -74,6 +77,7 @@ def add_helicopter(fig, pos, **kwargs):
         markersize=kwargs["helicopter_size"],
         color=kwargs["helicopter_color"],
         fillstyle="none",
+        path_effects=pe,
     )
 
     return fig
