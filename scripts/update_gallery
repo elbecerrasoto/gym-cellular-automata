@@ -171,15 +171,22 @@ if __name__ == "__main__":
             env = play_random_policy(env, steps, VERBOSE)
             fig = env.render()
 
+            def mute_warnings(callable_, *args, **kwargs):
+                from warnings import catch_warnings, simplefilter
+
+                with catch_warnings():
+                    simplefilter("ignore")
+                    callable_(*args, **kwargs)
+
             if INTERACTIVE:
                 if not DRY:
-                    from matplotlib import pyplot as plt
+                    import matplotlib.pyplot as plt
 
-                    plt.show(block=True)
+                    mute_warnings(plt.show, block=True)
                 if VERBOSE:
                     print(f"Opening {kenv} figure after {steps} steps")
             else:
                 if not DRY:
-                    fig.savefig(ofile)
+                    mute_warnings(fig.savefig, ofile)
                 if VERBOSE:
                     print(f"Saving {kenv} figure to {ofile} after {steps} steps")

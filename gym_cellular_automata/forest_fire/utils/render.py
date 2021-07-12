@@ -1,23 +1,11 @@
-from svgpath2mpl import parse_path
-
 from gym_cellular_automata import PROJECT_PATH
 
-
-def get_font(ttfpath):
-    import warnings
-    from pathlib import Path
-
-    import matplotlib as mpl
-
-    with warnings.catch_warnings():
-        return Path(mpl.get_data_path(), ttfpath)
-
-
-EMOJIFONT = get_font(PROJECT_PATH / "fonts/OpenMoji-Black.ttf")
-TITLEFONT = get_font(PROJECT_PATH / "fonts/FrederickatheGreat-Regular.ttf")
+EMOJIFONT = PROJECT_PATH / "fonts/OpenMoji-Black.ttf"
+TITLEFONT = PROJECT_PATH / "fonts/FrederickatheGreat-Regular.ttf"
 
 
 def parse_svg_into_mpl(svg_path):
+    from svgpath2mpl import parse_path
 
     mpl_path = parse_path(svg_path)
 
