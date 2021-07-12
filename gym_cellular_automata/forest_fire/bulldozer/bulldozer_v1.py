@@ -2,7 +2,6 @@ import numpy as np
 from gym import spaces
 
 from gym_cellular_automata import CAEnv, GridSpace, Operator
-from gym_cellular_automata.forest_fire.bulldozer.utils.config import CONFIG
 from gym_cellular_automata.forest_fire.operators import (
     Modify,
     Move,
@@ -10,6 +9,8 @@ from gym_cellular_automata.forest_fire.operators import (
     RepeatCA,
     WindyForestFire,
 )
+
+from .utils.config import CONFIG
 
 
 class ForestFireEnvBulldozerV1(CAEnv):
@@ -28,8 +29,8 @@ class ForestFireEnvBulldozerV1(CAEnv):
     _t_act_shoot     = CONFIG["time"]["ta_shoot"]
     _t_env_any       = CONFIG["time"]["te_any"]
 
-    _row             = CONFIG["grid_shape"]["n_row"]
-    _col             = CONFIG["grid_shape"]["n_col"]
+    _row             = CONFIG["grid_shape"]["nrows"]
+    _col             = CONFIG["grid_shape"]["ncols"]
 
     _empty           = CONFIG["cell_symbols"]["empty"]
     _burned          = CONFIG["cell_symbols"]["burned"]
@@ -57,9 +58,8 @@ class ForestFireEnvBulldozerV1(CAEnv):
         self.move = Move(self._action_sets, **self.move_space)
         self.modify = Modify(self._effects, **self.modify_space)
 
-        self.move_modify = MoveModify(self.move, self.modify, **self.move_modify_space)
-
         # Composite Operators
+        self.move_modify = MoveModify(self.move, self.modify, **self.move_modify_space)
         self.repeater = RepeatCA(
             self.ca, self.time_per_action, self.time_per_state, **self.repeater_space
         )
@@ -124,12 +124,9 @@ class ForestFireEnvBulldozerV1(CAEnv):
         return {"hit": self.modify.hit}
 
     def render(self, mode="human"):
-        from warnings import catch_warnings
+        from .utils.render import render
 
-        with catch_warnings():
-            from gym_cellular_automata.forest_fire.bulldozer.utils.render import render
-
-            return render(self)
+        return render(self)
 
     def _set_spaces(self):
         self.grid_space = GridSpace(

@@ -53,13 +53,13 @@ class Move(Operator):
         def get_new_position(position: tuple) -> np.array:
             row, col = position
 
-            n_row, n_col = grid.shape
+            nrows, ncols = grid.shape
 
             # fmt: off
             valid_up    = row > 0
-            valid_down  = row < (n_row - 1)
+            valid_down  = row < (nrows - 1)
             valid_left  = col > 0
-            valid_right = col < (n_col - 1)
+            valid_right = col < (ncols - 1)
 
             if (action in self.up_set)    and valid_up:
                 row -= 1

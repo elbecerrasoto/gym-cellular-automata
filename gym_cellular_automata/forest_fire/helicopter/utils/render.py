@@ -55,7 +55,7 @@ def plot_grid(grid, **kwargs):
     )
 
     # Modify Ticks by Axes methods
-    grid_ticks_settings(plt.gca(), n_row=grid.shape[0], n_col=grid.shape[1])
+    grid_ticks_settings(plt.gca(), nrows=grid.shape[0], ncols=grid.shape[1])
 
     return fig
 
@@ -101,19 +101,19 @@ def cell_colors_to_cmap_and_norm(colors_forest):
     }
 
 
-def grid_ticks_settings(ax, n_row, n_col):
+def grid_ticks_settings(ax, nrows, ncols):
 
     # NO Labels for ticks
     ax.set_xticklabels([])
     ax.set_yticklabels([])
 
     # Major ticks
-    ax.set_xticks(np.arange(0, n_col, 1))
-    ax.set_yticks(np.arange(0, n_row, 1))
+    ax.set_xticks(np.arange(0, ncols, 1))
+    ax.set_yticks(np.arange(0, nrows, 1))
 
     # Minor ticks
-    ax.set_xticks(np.arange(-0.5, n_col, 1), minor=True)
-    ax.set_yticks(np.arange(-0.5, n_row, 1), minor=True)
+    ax.set_xticks(np.arange(-0.5, ncols, 1), minor=True)
+    ax.set_yticks(np.arange(-0.5, nrows, 1), minor=True)
 
     # Gridlines based on minor ticks
     ax.grid(which="minor", color="whitesmoke", linestyle="-", linewidth=2)

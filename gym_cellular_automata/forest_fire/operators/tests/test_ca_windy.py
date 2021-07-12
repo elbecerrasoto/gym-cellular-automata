@@ -62,12 +62,12 @@ def test_windy_forest_fire_update(ca, grid_space, wind, position_space):
 
             row, col = position_space.sample()
 
-            assert_forest_fire_update_at_position_row_col(grid, new_grid, row, col)
+            assert_forest_fire_update_at_positionrows_col(grid, new_grid, row, col)
 
         grid = new_grid
 
 
-def assert_forest_fire_update_at_position_row_col(grid, new_grid, row, col):
+def assert_forest_fire_update_at_positionrows_col(grid, new_grid, row, col):
     log_error = (
         f"\n row: {row}"
         + f"\n col: {col}"

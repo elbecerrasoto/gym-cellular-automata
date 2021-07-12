@@ -6,8 +6,8 @@ cell_symbols:
   fire:  2
 
 grid_shape:
-  n_row: 5
-  n_col: 5
+  nrows: 5
+  ncols: 5
 
 ca_params:
   p_fire: 0.033

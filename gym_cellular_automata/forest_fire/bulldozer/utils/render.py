@@ -1,16 +1,17 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-import gym_cellular_automata.forest_fire.bulldozer.utils.svg_paths as svg_paths
 from gym_cellular_automata.forest_fire.utils.render import (
     EMOJIFONT,
     TITLEFONT,
     parse_svg_into_mpl,
 )
 
+from . import svg_paths
+
 
 def init_env():
-    from gym_cellular_automata.forest_fire.bulldozer import ForestFireEnvBulldozerV1
+    from ..bulldozer_v1 import ForestFireEnvBulldozerV1
 
     env = ForestFireEnvBulldozerV1()
     env.reset()
@@ -201,18 +202,18 @@ def plot_local_grid(ax, env):
     from gym_cellular_automata.forest_fire.utils.neighbors import moore_n
 
     bd_hood = moore_n(3, pos, grid, EMPTY)
-    n_row, n_col = bd_hood.shape
-    mid_row, mid_col = n_row // 2, n_row // 2
+    nrows, ncols = bd_hood.shape
+    mid_row, mid_col = nrows // 2, nrows // 2
 
     ax.imshow(bd_hood, interpolation="none", cmap=cmap, norm=norm)
 
     # Major ticks
-    ax.set_xticks(np.arange(0, n_col, 1))
-    ax.set_yticks(np.arange(0, n_row, 1))
+    ax.set_xticks(np.arange(0, ncols, 1))
+    ax.set_yticks(np.arange(0, nrows, 1))
 
     # Minor ticks
-    ax.set_xticks(np.arange(-0.5, n_col, 1), minor=True)
-    ax.set_yticks(np.arange(-0.5, n_row, 1), minor=True)
+    ax.set_xticks(np.arange(-0.5, ncols, 1), minor=True)
+    ax.set_yticks(np.arange(-0.5, nrows, 1), minor=True)
 
     # Gridlines based on minor ticks
     ax.grid(which="minor", color="whitesmoke", linestyle="-", linewidth=2)

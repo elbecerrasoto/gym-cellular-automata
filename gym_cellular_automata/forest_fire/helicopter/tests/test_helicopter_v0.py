@@ -11,8 +11,8 @@ RANDOM_POLICY_ITERATIONS = 12
 TEST_GRID_ROWS = 3
 TEST_GRID_COLS = 3
 
-ROW = CONFIG["grid_shape"]["n_row"]
-COL = CONFIG["grid_shape"]["n_row"]
+ROW = CONFIG["grid_shape"]["nrows"]
+COL = CONFIG["grid_shape"]["nrows"]
 
 ACTION_NOT_MOVE = CONFIG["actions"]["not_move"]
 

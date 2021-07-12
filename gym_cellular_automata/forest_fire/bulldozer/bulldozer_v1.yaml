@@ -6,8 +6,8 @@ cell_symbols:
 
 
 grid_shape:
-  n_row: 256
-  n_col: 256
+  nrows: 256
+  ncols: 256
 
 
 # Fire seed initialized to a single cell

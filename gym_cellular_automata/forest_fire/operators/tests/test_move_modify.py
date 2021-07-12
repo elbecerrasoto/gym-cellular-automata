@@ -59,7 +59,7 @@ def test_move(move, grid_space, action_space, position_space, directions_sets):
     right_set = directions_sets["right"]
 
     grid = grid_space.sample()
-    n_row, n_col = grid.shape
+    nrows, ncols = grid.shape
 
     action = action_space.sample()
 
@@ -70,13 +70,13 @@ def test_move(move, grid_space, action_space, position_space, directions_sets):
     if (action in up_set)    and (row > 0):
         row -= 1
 
-    if (action in down_set)  and (row < (n_row-1)):
+    if (action in down_set)  and (row < (nrows-1)):
         row += 1
 
     if (action in left_set)  and (col > 0):
         col -= 1
 
-    if (action in right_set) and (col < (n_col-1)):
+    if (action in right_set) and (col < (ncols-1)):
         col += 1
     # fmt: on
 

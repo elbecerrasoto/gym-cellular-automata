@@ -22,8 +22,8 @@ class ForestFireEnvHelicopterV0(CAEnv):
     _fire            = CONFIG["cell_symbols"]["fire"]
 
 
-    _row              = CONFIG["grid_shape"]["n_row"]
-    _col              = CONFIG["grid_shape"]["n_col"]
+    _row              = CONFIG["grid_shape"]["nrows"]
+    _col              = CONFIG["grid_shape"]["ncols"]
 
     _p_fire           = CONFIG["ca_params"]["p_fire"]
     _p_tree           = CONFIG["ca_params"]["p_tree"]
