@@ -1,3 +1,4 @@
+import warnings
 from pathlib import Path
 
 from gym.envs.registration import register
@@ -7,9 +8,13 @@ from gym_cellular_automata.ca_env import CAEnv
 from gym_cellular_automata.grid_space import GridSpace
 from gym_cellular_automata.operator import Operator
 
+# Ignore warnings trigger by Bulldozer Render
+# EmojiFont raises RuntimeWarning
+warnings.filterwarnings("ignore", message="Glyph 108 missing from current font.")
+warnings.filterwarnings("ignore", message="Glyph 112 missing from current font.")
+
 # Global path on current machine
 PROJECT_PATH = Path(__file__).parents[1]
-
 
 REGISTERED_CA_ENVS = (
     "ForestFireHelicopter-v0",
@@ -21,14 +26,11 @@ try:
     register(
         id=REGISTERED_CA_ENVS[0],
         entry_point=ffdir + ".helicopter:ForestFireEnvHelicopterV0",
-        max_episode_steps=999,
     )
 
     register(
         id=REGISTERED_CA_ENVS[1],
         entry_point=ffdir + ".bulldozer:ForestFireEnvBulldozerV1",
-        max_episode_steps=4096,
-        reward_threshold=0.0,
     )
 except GymError:  # Avoid annoying Re-register error when working interactively.
     pass

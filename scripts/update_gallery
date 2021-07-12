@@ -32,25 +32,28 @@ def play_random_policy(env, steps, verbose=False):
 
 LIBRARY = "gym_cellular_automata"
 
+# fmt: off
 # Helicopter
 
-OHELICOPTER = PROJECT_PATH / "./pics/TMPhelicopter.svg"
-CALL_HELICOPTER = LIBRARY + ":" + REGISTERED_CA_ENVS[0]
-RE_HELICOPTER = re.compile(r"helicopter|heli|hel|ffh|hff", re.IGNORECASE)
+OHELICOPTER      = PROJECT_PATH / "./pics/TMPhelicopter.svg"
+CALL_HELICOPTER  = LIBRARY + ":" + REGISTERED_CA_ENVS[0]
+RE_HELICOPTER    = re.compile(r"helicopter|heli|hel|ffh|hff", re.IGNORECASE)
 STEPS_HELICOPTER = 0
 
 # Bulldozer
-OBULLDOZER = PROJECT_PATH / "./pics/TMPbulldozer.svg"
-CALL_BULLDOZER = LIBRARY + ":" + REGISTERED_CA_ENVS[1]
-RE_BULLDOZER = re.compile(r"bulldozer|bull|blldz|ffb|bff", re.IGNORECASE)
+OBULLDOZER      = PROJECT_PATH / "./pics/TMPbulldozer.svg"
+CALL_BULLDOZER  = LIBRARY + ":" + REGISTERED_CA_ENVS[1]
+RE_BULLDOZER    = re.compile(r"bulldozer|bull|blldz|ffb|bff", re.IGNORECASE)
 STEPS_BULLDOZER = 256
 
 # Globals onto Dictionaries
-KENVS = ["helicopter", "bulldozer"]
-REGEXS = {"helicopter": RE_HELICOPTER, "bulldozer": RE_BULLDOZER}
-CALLS = {"helicopter": CALL_HELICOPTER, "bulldozer": CALL_BULLDOZER}
-DFILES = {"helicopter": OHELICOPTER, "bulldozer": OBULLDOZER}
+
+KENVS  = ["helicopter",                   "bulldozer"]
+REGEXS = {"helicopter": RE_HELICOPTER,    "bulldozer": RE_BULLDOZER}
+CALLS  = {"helicopter": CALL_HELICOPTER,  "bulldozer": CALL_BULLDOZER}
+DFILES = {"helicopter": OHELICOPTER,      "bulldozer": OBULLDOZER}
 DSTEPS = {"helicopter": STEPS_HELICOPTER, "bulldozer": STEPS_BULLDOZER}
+# fmt: on
 
 # CLI args
 parser = argparse.ArgumentParser()
@@ -171,22 +174,15 @@ if __name__ == "__main__":
             env = play_random_policy(env, steps, VERBOSE)
             fig = env.render()
 
-            def mute_warnings(callable_, *args, **kwargs):
-                from warnings import catch_warnings, simplefilter
-
-                with catch_warnings():
-                    simplefilter("ignore")
-                    callable_(*args, **kwargs)
-
             if INTERACTIVE:
                 if not DRY:
                     import matplotlib.pyplot as plt
 
-                    mute_warnings(plt.show, block=True)
+                    plt.show(block=True)
                 if VERBOSE:
                     print(f"Opening {kenv} figure after {steps} steps")
             else:
                 if not DRY:
-                    mute_warnings(fig.savefig, ofile)
+                    fig.savefig(ofile)
                 if VERBOSE:
                     print(f"Saving {kenv} figure to {ofile} after {steps} steps")
