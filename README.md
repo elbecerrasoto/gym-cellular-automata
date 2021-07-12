@@ -69,20 +69,24 @@ print(gymca.REGISTERED_CA_ENVS)
 
 ![Forest Fire Helicopter](./pics/render_helicopter.svg)
 
-[Forest Fire Helicopter](./gym_cellular_automata/forest_fire/helicopter/README.md)
++ [Forest Fire Helicopter](./gym_cellular_automata/forest_fire/helicopter/README.md)
 
 ### Bulldozer ###
 
 ![Forest Fire Bulldozer](./pics/render_bulldozer.svg)
 
-[Forest Fire Bulldozer](./gym_cellular_automata/forest_fire/bulldozer/README.md)
++ [Forest Fire Bulldozer](./gym_cellular_automata/forest_fire/bulldozer/README.md)
 
 ## Documentation
 
 :construction_worker: Documentation is in progress.
 
-[Forest Fire Environment Helicopter V0](./gym_cellular_automata/forest_fire/helicopter/README.md)
-[Forest Fire Environment Bulldozer V1](./gym_cellular_automata/forest_fire/bulldozer/README.md)
++ [Forest Fire Environment Helicopter V0](./gym_cellular_automata/forest_fire/helicopter/README.md)
++ [Forest Fire Environment Bulldozer V1](./gym_cellular_automata/forest_fire/bulldozer/README.md)
+
+## Issues
+
++ [Known Issues](./issues.md)
 
 ## Contributing
 
@@ -98,6 +102,6 @@ We aim to have a _zoo_ of Cellular Automata Environments. Thus of particular imp
 
 This project adheres to the following practices:
 
-+ Worflow: [GitHub flow](https://guides.github.com/introduction/flow/)
++ Workflow: [GitHub flow](https://guides.github.com/introduction/flow/)
 + Style: [Black](https://github.com/psf/black)
 + Test Suite: [Pytest](https://docs.pytest.org/en/stable/index.html)
