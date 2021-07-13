@@ -4,6 +4,8 @@ import numpy as np
 from gym_cellular_automata.forest_fire.utils.render import (
     EMOJIFONT,
     TITLEFONT,
+    clear_ax,
+    get_norm_cmap,
     parse_svg_into_mpl,
 )
 
@@ -18,22 +20,13 @@ def init_env():
     return env
 
 
-def get_norm_cmap(values, colors):
-    from matplotlib.colors import BoundaryNorm, ListedColormap
-
-    norm = BoundaryNorm(values, len(values), extend="max")
-    cmap = ListedColormap(colors)
-    return norm, cmap
-
-
 plt.style.use("seaborn-whitegrid")
 
 COLOR_EMPTY = "#DDD1D3"  # Gray
 COLOR_BURNED = "#DFA4A0"  # Light-Red
 COLOR_TREE = "#A9C499"  # Green
 COLOR_FIRE = "#E68181"  # Salmon-Red
-COLOR_OLDGAUGE = "#D4CCDB"  # "Gray-Purple"
-COLOR_NEWGAUGE = "#B991D9"  # Purple
+COLOR_GAUGE = "#D4CCDB"  # "Gray-Purple"
 
 
 ENV = init_env()
@@ -48,65 +41,35 @@ CELLS = [EMPTY, BURNED, TREE, FIRE]
 norm, cmap = get_norm_cmap(CELLS, COLORS)
 
 
-def clear_ax(ax, xticks=True, yticks=True):
-    ax.grid([])
+def plot_gauge(ax, env):
+    __, __, time = env.context
+    y = np.array(0)
 
-    if xticks:
-        ax.set_xticklabels([])
-    if yticks:
-        ax.set_yticklabels([])
+    HEIGHT = 0.1
+    # Old Gauge as svg_paths
+    ax.barh(y, time, height=HEIGHT, color=COLOR_GAUGE, edgecolor="None")
 
-    ax.spines.right.set_visible(False)
-    ax.spines.top.set_visible(False)
-    ax.spines.left.set_visible(False)
-    ax.spines.bottom.set_visible(False)
+    # Frame 0-1
+    ax.barh(
+        0.0,
+        1.0,
+        height=0.15,
+        color="None",
+        edgecolor="0.86",
+    )
 
+    ax.set_yticks([0])
+    ax.set_xlim(0 - 0.03, 1 + 0.1)
+    ax.set_ylim(-0.4, 0.4)
 
-class PlotGauge:
-    def __init__(self, env):
-        __, __, time = env.context
-        self.old_time = time
+    ucycle = "\U0001f504"
+    ax.set_yticklabels(ucycle, font=EMOJIFONT, size=32)
 
-    def __call__(self, ax, env):
-        __, __, time = env.context
-        diff_time = np.array(max(time - self.old_time, 0))
-        y = np.array(0)
+    ax.get_yticklabels()[0].set_color("0.74")
 
-        HEIGHT = 0.1
-        # Old Gauge as svg_paths
-        ax.barh(y, self.old_time, height=HEIGHT, color=COLOR_OLDGAUGE, edgecolor="None")
-        # New Gauge
-        ax.barh(
-            y,
-            diff_time,
-            height=HEIGHT,
-            color=COLOR_NEWGAUGE,
-            left=self.old_time,
-            edgecolor="None",
-        )
+    ax.set_xticks([0.0, 1.0])
 
-        ax.barh(
-            0.0,
-            1.0,
-            height=0.15,
-            color="None",
-            edgecolor="0.86",
-        )
-
-        ax.set_yticks([0])
-        ax.set_xlim(0 - 0.03, 1 + 0.1)
-        ax.set_ylim(-0.4, 0.4)
-
-        ucycle = "\U0001f504"
-        ax.set_yticklabels(ucycle, font=EMOJIFONT, size=32)
-
-        ax.get_yticklabels()[0].set_color("0.74")
-
-        ax.set_xticks([0.0, 1.0])
-
-        clear_ax(ax, yticks=False)
-
-        # ax.grid(axis="x", color="0.86")
+    clear_ax(ax, yticks=False)
 
 
 def plot_counts(ax, env):
@@ -233,7 +196,6 @@ def render(env):
     ax_lgrid = plt.subplot2grid(fig_shape, (0, 0), colspan=8, rowspan=10)
     ax_ggrid = plt.subplot2grid(fig_shape, (0, 8), colspan=6, rowspan=6)
     ax_counts = plt.subplot2grid(fig_shape, (6, 8), colspan=6, rowspan=6)
-    plot_gauge = PlotGauge(env)
     plot_gauge(ax_gauge, env)
     plot_local_grid(ax_lgrid, env)
     plot_global_grid(ax_ggrid, env)
