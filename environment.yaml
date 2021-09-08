@@ -26,4 +26,3 @@ dependencies:
     - pytest-randomly
     # pip install git+git://github.com/mverteuil/pytest-ipdb.git
     - pytest-ipdb
-    - objprint
