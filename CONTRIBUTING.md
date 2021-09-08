@@ -46,7 +46,7 @@ make hooks
 
 + :octocat: Checkout a new development branch
 ```
-  checkout -b my-awesome-env
+  checkout -b awesome-feat
 ```
 
 ### Code
@@ -55,8 +55,9 @@ make hooks
 
 + Across coding sessions, pull and merge to get the latest hotness from _main_
 ```bash
+  git switch main
   git pull
-  git checkout my-awesome-env
+  git checkout awesome-feat
   git merge main
 ```
 
