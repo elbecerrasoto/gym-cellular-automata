@@ -7,12 +7,6 @@ install :
 conda_env :
 	conda env create --file "environment.yaml"
 
-develop :
-	pre-commit install
-	sudo npm i -g gitmoji-cli
-	gitmoji -i
-	pip install -e .
-
 hooks :
 	pre-commit install
 	gitmoji -i
@@ -53,7 +47,7 @@ patch :
 gallery :
 	./scripts/update_gallery "helicopter" "bulldozer" -v --out "./pics/tmp_helicopter.svg" "./pics/tmp_bulldozer.svg" --steps "64" "1066"
 
-clean :
+clean : # Depends on trash-cli  https://github.com/andreafrancia/trash-cli
 	find ./ -type d -name "__pycache__" | xargs -I{} trash {}
 	find ./ -type d -name '*.egg-info' | xargs -I{} trash {}
 	find ./ -type f -name '*~' | xargs -I{} trash {}
@@ -63,7 +57,7 @@ clean :
 	echo "\n\nTo remove git untracked files run:\ngit clean -d -f"
 
 count :
-	# Counts the lines of Code
+	# Counts lines of code
 	find ./ -name '*.py' -print | xargs cat | sed '/^$$/ d' | perl -ne 'if(not /^ *?#/){print $$_}' | wc -l
 
-.PHONY : help install conda_env develop hooks hooks-dry hooks-update style test test-debug test-coverage test-slow test-visual linter patch gallery clean count
+.PHONY : help install conda_env hooks hooks-dry hooks-update style test test-debug test-coverage test-slow test-visual linter patch gallery clean count
