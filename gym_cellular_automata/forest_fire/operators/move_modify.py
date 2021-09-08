@@ -12,7 +12,9 @@ def hashable(x):
 
 class Move(Operator):
 
-    grid_dependant = True  # A minor effect because of boundaries
+    grid_dependant = (
+        False  # If a constant size grid is used (that is usually the case).
+    )
     action_dependant = True
     context_dependant = True
 
