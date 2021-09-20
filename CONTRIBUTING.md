@@ -46,20 +46,12 @@ make hooks
 
 + :octocat: Checkout a new development branch
 ```
-  checkout -b awesome-feat
+git checkout -b awesome-feat
 ```
 
-### Code
+## Code
 
 + :space_invader: Code
-
-+ Across coding sessions, pull and merge to get the latest hotness from _main_
-```bash
-  git switch main
-  git pull
-  git checkout awesome-feat
-  git merge main
-```
 
 + Now and then format and test your code
 ``` bash
@@ -67,7 +59,7 @@ make hooks
     make test
 ```
 
-### Integrate
+## Integrate
 
 + Open a _pull request_
 + Wait for your changes to be accepted
@@ -80,4 +72,3 @@ make hooks
   + `make style`
 + Do not break the build, check it by running the test suite
   + `make test`
-+ Test your code
