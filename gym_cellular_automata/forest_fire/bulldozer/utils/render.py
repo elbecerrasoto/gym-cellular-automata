@@ -7,6 +7,7 @@ from gym_cellular_automata.forest_fire.utils.render import (
     clear_ax,
     get_norm_cmap,
     parse_svg_into_mpl,
+    plot_grid,
 )
 
 from . import svg_paths
@@ -41,7 +42,44 @@ CELLS = [EMPTY, BURNED, TREE, FIRE]
 norm, cmap = get_norm_cmap(CELLS, COLORS)
 
 
-def plot_gauge(ax, env):
+def render(env):
+
+    fig_shape = (12, 14)
+    fig = plt.figure(figsize=(15, 12))
+    fig.suptitle("Forest Fire", font=TITLEFONT, fontsize=64, color="0.6", ha="right")
+
+    ax_gauge = plt.subplot2grid(fig_shape, (10, 0), colspan=8, rowspan=2)
+    ax_lgrid = plt.subplot2grid(fig_shape, (0, 0), colspan=8, rowspan=10)
+    ax_ggrid = plt.subplot2grid(fig_shape, (0, 8), colspan=6, rowspan=6)
+    ax_counts = plt.subplot2grid(fig_shape, (6, 8), colspan=6, rowspan=6)
+
+    bulldozer_gauge(ax_gauge, env)
+    bulldozer_local(ax_lgrid, env)
+    bulldozer_global(ax_ggrid, env)
+    bulldozer_counts(ax_counts, env)
+
+    return plt.gcf()
+
+
+def bulldozer_local(ax, env):
+    from gym_cellular_automata.forest_fire.utils.neighbors import moore_n
+
+    grid = env.grid
+    __, pos, __ = env.context
+
+    bd_hood = moore_n(3, pos, grid, EMPTY)
+    nrows, ncols = bd_hood.shape
+    mid_row, mid_col = nrows // 2, nrows // 2
+
+    svg_bulldozer = parse_svg_into_mpl(svg_paths.BULLDOZER)
+    ax.plot(mid_col, mid_row, marker=svg_bulldozer, markersize=52, color="1.0")
+
+    plot_grid(ax, bd_hood, interpolation="none", cmap=cmap, norm=norm)
+
+    clear_ax(ax)
+
+
+def bulldozer_gauge(ax, env):
     __, __, time = env.context
     y = np.array(0)
 
@@ -72,7 +110,7 @@ def plot_gauge(ax, env):
     clear_ax(ax, yticks=False)
 
 
-def plot_counts(ax, env):
+def bulldozer_counts(ax, env):
     utree = "\U0001f332"
     uburned = "\ue08a"
 
@@ -113,7 +151,7 @@ def plot_counts(ax, env):
     ax.grid(axis="y", color="0.94")
 
 
-def plot_global_grid(ax, env):
+def bulldozer_global(ax, env):
     size = 17
     from gym_cellular_automata.forest_fire.bulldozer.utils import svg_paths
 
@@ -156,48 +194,3 @@ def plot_global_grid(ax, env):
         ax.plot(pos[1], pos[0], marker=".", markersize=size, color="1.0")
 
     clear_ax(ax)
-
-
-def plot_local_grid(ax, env):
-    grid = env.grid
-    __, pos, __ = env.context
-
-    from gym_cellular_automata.forest_fire.utils.neighbors import moore_n
-
-    bd_hood = moore_n(3, pos, grid, EMPTY)
-    nrows, ncols = bd_hood.shape
-    mid_row, mid_col = nrows // 2, nrows // 2
-
-    ax.imshow(bd_hood, interpolation="none", cmap=cmap, norm=norm)
-
-    # Major ticks
-    ax.set_xticks(np.arange(0, ncols, 1))
-    ax.set_yticks(np.arange(0, nrows, 1))
-
-    # Minor ticks
-    ax.set_xticks(np.arange(-0.5, ncols, 1), minor=True)
-    ax.set_yticks(np.arange(-0.5, nrows, 1), minor=True)
-
-    # Gridlines based on minor ticks
-    ax.grid(which="minor", color="whitesmoke", linestyle="-", linewidth=2)
-    ax.grid(which="major", color="w", linestyle="-", linewidth=0)
-    ax.tick_params(axis="both", which="both", length=0)
-
-    svg_bulldozer = parse_svg_into_mpl(svg_paths.BULLDOZER)
-    ax.plot(mid_col, mid_row, marker=svg_bulldozer, markersize=52, color="1.0")
-    clear_ax(ax)
-
-
-def render(env):
-    fig_shape = (12, 14)
-    fig = plt.figure(figsize=(15, 12))
-    fig.suptitle("Forest Fire", font=TITLEFONT, fontsize=64, color="0.6", ha="right")
-    ax_gauge = plt.subplot2grid(fig_shape, (10, 0), colspan=8, rowspan=2)
-    ax_lgrid = plt.subplot2grid(fig_shape, (0, 0), colspan=8, rowspan=10)
-    ax_ggrid = plt.subplot2grid(fig_shape, (0, 8), colspan=6, rowspan=6)
-    ax_counts = plt.subplot2grid(fig_shape, (6, 8), colspan=6, rowspan=6)
-    plot_gauge(ax_gauge, env)
-    plot_local_grid(ax_lgrid, env)
-    plot_global_grid(ax_ggrid, env)
-    plot_counts(ax_counts, env)
-    return plt.gcf()

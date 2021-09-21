@@ -1,3 +1,5 @@
+import numpy as np
+
 from gym_cellular_automata import PROJECT_PATH
 
 EMOJIFONT = PROJECT_PATH / "fonts/OpenMoji-Black.ttf"
@@ -35,7 +37,7 @@ def clear_ax(ax, xticks=True, yticks=True):
 
 
 def get_norm_cmap(values, colors):
-    """Assumes ordering of values and Colors"""
+    """Assumes ordering of values (ascending) and Colors"""
     from matplotlib.colors import BoundaryNorm, ListedColormap
 
     norm = BoundaryNorm(values, len(values), extend="max")
@@ -43,11 +45,11 @@ def get_norm_cmap(values, colors):
     return norm, cmap
 
 
-def plot_local_grid(ax, grid, cmap, norm):
+def plot_grid(ax, grid, **kwargs):
     """
     Just the grid
     """
-
+    nrows, ncols = grid.shape
     # Major ticks
     ax.set_xticks(np.arange(0, ncols, 1))
     ax.set_yticks(np.arange(0, nrows, 1))
@@ -62,4 +64,4 @@ def plot_local_grid(ax, grid, cmap, norm):
     ax.tick_params(axis="both", which="both", length=0)
 
     clear_ax(ax)
-    return ax.imshow(grid, interpolation="none", cmap=cmap, norm=norm)
+    return ax.imshow(grid, **kwargs)
