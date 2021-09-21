@@ -10,7 +10,7 @@ from gym_cellular_automata.forest_fire.operators import (
 )
 
 from .utils.config import CONFIG
-from .utils.render import add_helicopter, plot_grid
+from .utils.render import render
 
 
 class ForestFireEnvHelicopterV0(CAEnv):
@@ -108,9 +108,7 @@ class ForestFireEnvHelicopterV0(CAEnv):
 
         if mode == "human":
 
-            ca_params, pos, freeze = self.context
-
-            return add_helicopter(plot_grid(self.grid), pos)
+            return render(self)
 
         else:
 
