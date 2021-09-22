@@ -138,22 +138,28 @@ def plot_counts(ax, counts_empty, counts_burned, counts_tree, counts_fire):
 
     counts_total = sum((counts_empty, counts_burned, counts_tree, counts_fire))
 
-    # Empty & Burned Bars
-    ax.bar(
-        [0, 1],
-        [counts_empty, counts_burned],
-        width=0.1,
-        color=[COLOR_EMPTY, COLOR_BURNED],
-    )
+    commons = {"x": [0, 1], "width": 0.1}
+    pc = "1.0"  # placeholder color
 
-    # Tree & Fire Bars
-    ax.bar(
-        [0, 1],
-        [counts_tree, counts_fire],
-        width=0.1,
-        color=[COLOR_TREE, COLOR_FIRE],
-        bottom=[counts_empty, counts_burned],
-    )
+    lv1y = [counts_tree, counts_empty]
+    lv1c = [COLOR_TREE, COLOR_EMPTY]
+
+    lv2y = [0, counts_burned]  # level 2 y axis
+    lv2c = [pc, COLOR_BURNED]  # level 2 colors
+    lv2b = lv1y  # level 2 bottom
+
+    lv3y = [0, counts_fire]
+    lv3c = [pc, COLOR_FIRE]
+    lv3b = [lv1y[i] + lv2y[i] for i in range(len(lv1y))]
+
+    # First Level Bars
+    ax.bar(height=lv1y, color=lv1c, **commons)
+
+    # Second Level Bars
+    ax.bar(height=lv2y, color=lv2c, bottom=lv2b, **commons)
+
+    # Third Level Bars
+    ax.bar(height=lv3y, color=lv3c, bottom=lv3b, **commons)
 
     # Bar Symbols Settings
     ax.set_xticks(np.arange(2))
