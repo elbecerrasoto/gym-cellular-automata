@@ -1,4 +1,10 @@
+# GYMCA ignores
+
+# Gallery temporal files
+pics/TMP*.svg
+
 # Custom ignores
+
 # VScode editor
 .vscode/
 # npm
@@ -9,15 +15,11 @@ package.json
 monkeytype.sqlite3
 # spyder's ipython console log
 ipython.html
-# isort configurations
-.isort.cfg
-# autosaves
+# EMACS autosaves
 *~
 *#*
-# Kanban Board
-taskell.md
 
-
+# Ignores from template
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
