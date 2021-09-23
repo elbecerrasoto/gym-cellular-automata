@@ -50,6 +50,9 @@ NORM, CMAP = get_norm_cmap(CELLS, COLORS)
 MARKBULL_SIZE = 52
 
 # Global Grid
+MARKFSEED_SIZE = 62
+MARKLOCATION_SIZE = 62
+
 
 # Gauge
 HEIGHT_GAUGE = 0.1
@@ -67,9 +70,9 @@ def render(env):
     ca_params, pos, time = env.context
 
     local_grid = moore_n(3, pos, grid, EMPTY)
+    pos_fseed = env._fire_seed
 
     plt.style.use("seaborn-whitegrid")
-
     fig_shape = (12, 14)
     fig = plt.figure(figsize=(15, 12))
     fig.suptitle(
@@ -81,14 +84,14 @@ def render(env):
         ha=TITLE_ALIGN
     )
 
-    ax_gauge = plt.subplot2grid(fig_shape, (10, 0), colspan=8, rowspan=2)
     ax_lgrid = plt.subplot2grid(fig_shape, (0, 0), colspan=8, rowspan=10)
     ax_ggrid = plt.subplot2grid(fig_shape, (0, 8), colspan=6, rowspan=6)
+    ax_gauge = plt.subplot2grid(fig_shape, (10, 0), colspan=8, rowspan=2)
     ax_counts = plt.subplot2grid(fig_shape, (6, 8), colspan=6, rowspan=6)
 
     plot_local(ax_lgrid, local_grid)
 
-    plot_global(ax_ggrid, env)
+    plot_global(ax_ggrid, grid, pos, pos_fseed)
 
     plot_gauge(ax_gauge, time)
 
@@ -191,26 +194,17 @@ def plot_counts(ax, counts_empty, counts_burned, counts_tree, counts_fire):
     ax.grid(axis="y", color="0.94")
 
 
-def plot_global(ax, env):
-    MARKFIRE_SIZE = 62
-    MARKLOCATION_SIZE = 62
-    from gym_cellular_automata.forest_fire.bulldozer.utils import svg_paths
-
-    grid = env.grid
-    __, pos, __ = env.context
-
+def plot_global(ax, grid, pos, pos_fseed):
     ax.imshow(grid, interpolation="none", cmap=CMAP, norm=NORM)
 
     # Fire Seed
     markfire = align_marker(parse_svg_into_mpl(svg_paths.FIRE), valign="bottom")
 
-    fire_seed = env._fire_seed
-
     ax.plot(
-        fire_seed[1],
-        fire_seed[0],
+        pos_fseed[1],
+        pos_fseed[0],
         marker=markfire,
-        markersize=MARKFIRE_SIZE,
+        markersize=MARKFSEED_SIZE,
         color=COLOR_FIRE,
     )
 
