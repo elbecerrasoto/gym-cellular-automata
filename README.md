@@ -5,7 +5,7 @@
     <a href="pics/gym_cellular_automata.svg"><img src="pics/gym_cellular_automata.svg"></a>
     <br />
     <br />
-    <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-v0.5.1-blue" alt="Semantic Versioning"></a>
+    <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-v0.5.2-blue" alt="Semantic Versioning"></a>
     <a href="http://choosealicense.com/licenses/mit/"><img src="https://img.shields.io/badge/license-MIT-red.svg?style=flat" alt="MIT License"></a>
     <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a>
     <a href="https://gitmoji.dev"><img src="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg" alt="Gitmoji"></a>
@@ -84,9 +84,10 @@ print(gymca.REGISTERED_CA_ENVS)
 + [Forest Fire Environment Helicopter V0](./gym_cellular_automata/forest_fire/helicopter/README.md)
 + [Forest Fire Environment Bulldozer V1](./gym_cellular_automata/forest_fire/bulldozer/README.md)
 
-## Issues
+## Releases
 
-+ [Known Issues](./issues.md)
+:drum:
++ [`releases.md`](./releases.md)
 
 ## Contributing
 
@@ -105,3 +106,7 @@ This project adheres to the following practices:
 + Workflow: [GitHub flow](https://guides.github.com/introduction/flow/)
 + Style: [Black](https://github.com/psf/black)
 + Test Suite: [Pytest](https://docs.pytest.org/en/stable/index.html)
+
+## Issues
+
++ [Known Issues](./issues.md)

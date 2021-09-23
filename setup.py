@@ -16,7 +16,6 @@ setup(
         "numpy",
         "matplotlib",
         "scipy",
-        "seaborn",
         "pyyaml",
         "svgpath2mpl",
     ],
