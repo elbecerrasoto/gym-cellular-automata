@@ -112,6 +112,29 @@ def plot_local(ax, grid):
     ax.plot(mid_col, mid_row, marker=markbull, markersize=MARKBULL_SIZE, color="1.0")
 
 
+def plot_global(ax, grid, pos, pos_fseed):
+    ax.imshow(grid, interpolation="none", cmap=CMAP, norm=NORM)
+
+    # Fire Seed
+    markfire = align_marker(parse_svg_into_mpl(svg_paths.FIRE), valign="bottom")
+
+    ax.plot(
+        pos_fseed[1],
+        pos_fseed[0],
+        marker=markfire,
+        markersize=MARKFSEED_SIZE,
+        color=COLOR_FIRE,
+    )
+
+    # Bulldozer Location
+    marklocation = align_marker(parse_svg_into_mpl(svg_paths.LOCATION), valign="bottom")
+
+    ax.plot(
+        pos[1], pos[0], marker=marklocation, markersize=MARKLOCATION_SIZE, color="1.0"
+    )
+    clear_ax(ax)
+
+
 def plot_gauge(ax, time):
     ax.barh(0.0, time, height=HEIGHT_GAUGE, color=COLOR_GAUGE, edgecolor="None")
 
@@ -123,16 +146,19 @@ def plot_gauge(ax, time):
         edgecolor="0.86",
     )
 
-    # Comment here please!
-    ax.set_yticks([0])
-    ax.set_xlim(0 - 0.03, 1 + 0.1)
-    ax.set_ylim(-0.4, 0.4)
+    # Mess with x,y limits for aethetics reasons
+    INCREASE_LIMS = True
 
+    if INCREASE_LIMS:
+        ax.set_xlim(0 - 0.03, 1 + 0.1)  # Breathing room
+        ax.set_ylim(-0.4, 0.4)  # Center the bar
+
+    ax.set_xticks([0.0, 1.0])  # Start Time and End Time x ticks
+
+    # Set the CA update symbol
+    ax.set_yticks([0])  # Set symbol position
     ax.set_yticklabels(CYCLE_SYMBOL, font=EMOJIFONT, size=CYCLE_SIZE)
-
-    ax.get_yticklabels()[0].set_color("0.74")
-
-    ax.set_xticks([0.0, 1.0])
+    ax.get_yticklabels()[0].set_color("0.74")  # Light gray
 
     clear_ax(ax, yticks=False)
 
@@ -191,27 +217,4 @@ def plot_counts(ax, counts_empty, counts_burned, counts_tree, counts_fire):
     # Remove clutter
     clear_ax(ax, xticks=False)
     # Add back y marks each quarter
-    ax.grid(axis="y", color="0.94")
-
-
-def plot_global(ax, grid, pos, pos_fseed):
-    ax.imshow(grid, interpolation="none", cmap=CMAP, norm=NORM)
-
-    # Fire Seed
-    markfire = align_marker(parse_svg_into_mpl(svg_paths.FIRE), valign="bottom")
-
-    ax.plot(
-        pos_fseed[1],
-        pos_fseed[0],
-        marker=markfire,
-        markersize=MARKFSEED_SIZE,
-        color=COLOR_FIRE,
-    )
-
-    # Bulldozer Location
-    marklocation = align_marker(parse_svg_into_mpl(svg_paths.LOCATION), valign="bottom")
-
-    ax.plot(
-        pos[1], pos[0], marker=marklocation, markersize=MARKLOCATION_SIZE, color="1.0"
-    )
-    clear_ax(ax)
+    ax.grid(axis="y", color="0.94")  # Dim gray
