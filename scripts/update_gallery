@@ -43,7 +43,7 @@ STEPS_HELICOPTER = 0
 # Bulldozer
 OBULLDOZER      = PROJECT_PATH / "./pics/TMPbulldozer.svg"
 CALL_BULLDOZER  = LIBRARY + ":" + REGISTERED_CA_ENVS[1]
-RE_BULLDOZER    = re.compile(r"bulldozer|bull|blldz|ffb|bff", re.IGNORECASE)
+RE_BULLDOZER    = re.compile(r"bulldozer|bul|blldz|ffb|bff", re.IGNORECASE)
 STEPS_BULLDOZER = 256
 
 # Globals onto Dictionaries
@@ -105,6 +105,16 @@ parser.add_argument(
     help="Debugging Info.",
 )
 
+
+parser.add_argument(
+    "--overwrite",
+    "--force",
+    "-f",
+    action="store_true",
+    help="Overwrite files.",
+)
+
+
 args = parser.parse_args()
 
 AENVS = args.envs
@@ -114,6 +124,7 @@ INTERACTIVE = args.interactive
 VERBOSE = args.verbose
 DRY = args.dry
 DEBUG = args.debug
+OVERWRITE = args.overwrite
 
 if DEBUG:
     from icecream import ic
@@ -125,6 +136,7 @@ if DEBUG:
     ic(args.verbose)
     ic(args.dry)
     ic(args.debug)
+    ic(args.overwrite)
 
 
 def argument_policy():
@@ -132,6 +144,7 @@ def argument_policy():
     # Defaults
     ACTIONS = {}
     for kenv in KENVS:
+        # Init defaults
         ACTIONS[kenv] = {"do": False, "out": DFILES[kenv], "steps": DSTEPS[kenv]}
 
     # If not args, do all of them
@@ -144,7 +157,7 @@ def argument_policy():
 
             for kenv in KENVS:
 
-                if re.search(REGEXS[kenv], aenv):
+                if re.match(REGEXS[kenv], aenv):
 
                     ACTIONS[kenv]["do"] = True
                     if AFILES:
@@ -183,6 +196,19 @@ if __name__ == "__main__":
                     print(f"Opening {kenv} figure after {steps} steps")
             else:
                 if not DRY:
-                    fig.savefig(ofile)
+
+                    def path2write(file):
+                        if OVERWRITE:
+                            return file
+                        else:
+                            i = 1
+                            original = file
+                            while file.exists():
+                                file = original.with_stem(original.stem + f"_{i}")
+                                i += 1
+                            return file
+
+                    fig.savefig(path2write(ofile))
+
                 if VERBOSE:
                     print(f"Saving {kenv} figure to {ofile} after {steps} steps")
