@@ -169,9 +169,18 @@ def plot_counts(ax, counts_empty, counts_burned, counts_tree, counts_fire):
         label.set_color(color)
 
     # Mess with x,y limits for aethetics reasons
-    goff = 2048
-    ax.set_ylim(0 - goff, counts_total + goff)  # It gives breathing room for bars
-    ax.set_xlim(-1, 2)  # It centers the bars
+    INCREASE_LIMS = True
+    INCREASE_FACTORS = [0.1, 0.3]  # Y axis down, up
+
+    if INCREASE_LIMS:
+        # Makes the bars look long & tall, also centers them
+        offdown, offup = (
+            counts_total * INCREASE_FACTORS[i] for i in range(len(INCREASE_FACTORS))
+        )
+        ax.set_ylim(
+            0 - offdown, counts_total + offup
+        )  # It gives breathing room for bars
+        ax.set_xlim(-1, 2)  # It centers the bars
 
     # Grid Settings and Tick settings
     # Show marks each quarter
