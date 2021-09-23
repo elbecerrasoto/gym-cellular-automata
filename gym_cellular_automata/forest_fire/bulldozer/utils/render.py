@@ -27,6 +27,9 @@ from . import svg_paths
 from .config import CONFIG
 
 # Figure Globals
+FIGSIZE = (15, 12)
+FIGSTYLE = "seaborn-whitegrid"
+
 TITLE = "Forest Fire\nBulldozer-v1"
 TITLE_SIZE = 42
 TITLE_POS = {"x": 0.121, "y": 0.96}
@@ -42,20 +45,20 @@ BURNED = CONFIG["cell_symbols"]["burned"]
 TREE = CONFIG["cell_symbols"]["tree"]
 FIRE = CONFIG["cell_symbols"]["fire"]
 
+# Assumes that cells values are in ascending order and paired with its colors
 COLORS = [COLOR_EMPTY, COLOR_BURNED, COLOR_TREE, COLOR_FIRE]
 CELLS = [EMPTY, BURNED, TREE, FIRE]
 NORM, CMAP = get_norm_cmap(CELLS, COLORS)
 
 # Local Grid
+N_LOCAL = 3  # n x n local grid size
 MARKBULL_SIZE = 52
 
 # Global Grid
 MARKFSEED_SIZE = 62
 MARKLOCATION_SIZE = 62
 
-
 # Gauge
-HEIGHT_GAUGE = 0.1
 COLOR_GAUGE = "#D4CCDB"  # "Gray-Purple"
 CYCLE_SYMBOL = "\U0001f504"
 CYCLE_SIZE = 32
@@ -69,12 +72,12 @@ def render(env):
     grid = env.grid
     ca_params, pos, time = env.context
 
-    local_grid = moore_n(3, pos, grid, EMPTY)
+    local_grid = moore_n(N_LOCAL, pos, grid, EMPTY)
     pos_fseed = env._fire_seed
 
-    plt.style.use("seaborn-whitegrid")
+    plt.style.use(FIGSTYLE)
     fig_shape = (12, 14)
-    fig = plt.figure(figsize=(15, 12))
+    fig = plt.figure(figsize=FIGSIZE)
     fig.suptitle(
         TITLE,
         font=TITLEFONT,
@@ -136,6 +139,7 @@ def plot_global(ax, grid, pos, pos_fseed):
 
 
 def plot_gauge(ax, time):
+    HEIGHT_GAUGE = 0.1
     ax.barh(0.0, time, height=HEIGHT_GAUGE, color=COLOR_GAUGE, edgecolor="None")
 
     ax.barh(
