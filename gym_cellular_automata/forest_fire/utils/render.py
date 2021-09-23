@@ -109,7 +109,7 @@ def align_marker(
     from matplotlib import markers
     from matplotlib.path import Path
 
-    if isinstance(halign, (str, unicode)):
+    if isinstance(halign, str):
         halign = {
             "right": -1.0,
             "middle": 0.0,
@@ -117,7 +117,7 @@ def align_marker(
             "left": 1.0,
         }[halign]
 
-    if isinstance(valign, (str, unicode)):
+    if isinstance(valign, str):
         valign = {
             "top": -1.0,
             "middle": 0.0,

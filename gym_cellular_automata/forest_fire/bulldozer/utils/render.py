@@ -183,7 +183,8 @@ def plot_counts(ax, counts_empty, counts_burned, counts_tree, counts_fire):
 
 
 def plot_global(ax, env):
-    size = 17
+    MARKFIRE_SIZE = 62
+    MARKLOCATION_SIZE = 62
     from gym_cellular_automata.forest_fire.bulldozer.utils import svg_paths
 
     grid = env.grid
@@ -192,36 +193,22 @@ def plot_global(ax, env):
     ax.imshow(grid, interpolation="none", cmap=CMAP, norm=NORM)
 
     # Fire Seed
-    svg_fire = parse_svg_into_mpl(svg_paths.FIRE)
-    fire_seed = env._fire_seed
-    offset = 10
+    markfire = align_marker(parse_svg_into_mpl(svg_paths.FIRE), valign="bottom")
 
-    if fire_seed[0] - offset >= 0:
-        # Position the Fire svg for better visualization
-        ax.plot(
-            fire_seed[1],
-            fire_seed[0] - offset,
-            marker=svg_fire,
-            markersize=size,
-            color=COLOR_FIRE,
-        )
-    else:
-        # If offset just put a point
-        ax.plot(
-            fire_seed[1], fire_seed[0], marker=".", markersize=size, color=COLOR_FIRE
-        )
+    fire_seed = env._fire_seed
+
+    ax.plot(
+        fire_seed[1],
+        fire_seed[0],
+        marker=markfire,
+        markersize=MARKFIRE_SIZE,
+        color=COLOR_FIRE,
+    )
 
     # Bulldozer Location
-    svg_location = parse_svg_into_mpl(svg_paths.LOCATION)
+    marklocation = align_marker(parse_svg_into_mpl(svg_paths.LOCATION), valign="bottom")
 
-    # Off set
-    offset = 15
-
-    if pos[0] - offset >= 0:
-        ax.plot(
-            pos[1], pos[0] - offset, marker=svg_location, markersize=size, color="1.0"
-        )
-    else:
-        ax.plot(pos[1], pos[0], marker=".", markersize=size, color="1.0")
-
+    ax.plot(
+        pos[1], pos[0], marker=marklocation, markersize=MARKLOCATION_SIZE, color="1.0"
+    )
     clear_ax(ax)
