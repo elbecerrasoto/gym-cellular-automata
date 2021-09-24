@@ -19,7 +19,10 @@ class CAEnv(ABC, gym.Env):
     def initial_state(self):
         self._resample_initial = False
 
-    def __init__(self):
+    def __init__(self, nrows, ncols):
+        # Get default parameters dictionary
+        self._defaults = self._get_defaults(nrows, ncols)
+
         # Gym spec method
         self.seed()
 
@@ -83,6 +86,10 @@ class CAEnv(ABC, gym.Env):
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
+
+    @abstractmethod
+    def _set_parameters(self, nrows, ncols):
+        raise NotImplementedError
 
     @abstractmethod
     def _award(self):
