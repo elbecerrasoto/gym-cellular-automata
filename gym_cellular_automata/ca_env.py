@@ -41,6 +41,10 @@ class CAEnv(ABC, gym.Env):
             done = self.done
             info = self._report()
 
+            # Status method
+            self.steps_elapsed += 1
+            self.reward_accumulated += reward
+
             return obs, reward, done, info
 
         else:
@@ -62,11 +66,19 @@ class CAEnv(ABC, gym.Env):
     def reset(self):
 
         self.done = False
+        self.steps_elapsed = 0
+        self.reward_accumulated = 0.0
         self.steps_beyond_done = 0
         self._resample_initial = True
         obs = self.state = self.grid, self.context = self.initial_state
 
         return obs
+
+    def status(self):
+        return {
+            "steps_elapsed": self.steps_elapsed,
+            "reward_accumulated": self.reward_accumulated,
+        }
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
