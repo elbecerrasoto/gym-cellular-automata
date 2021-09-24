@@ -44,9 +44,21 @@ class ForestFireEnvBulldozerV1(CAEnv):
     _effects         = CONFIG["effects"]
     # fmt: on
 
-    def __init__(self, *args, **kwargs):
+    def _get_defaults_free(self, *args, **kwargs):
+        """
+        place holder
+        """
+        return {}
 
-        super().__init__(*args, **kwargs)
+    def _get_defaults_scale(self, nrows, ncols):
+        """
+        place holder
+        """
+        return {}
+
+    def __init__(self, nrows=_row, ncols=_col, *args, **kwargs):
+
+        super().__init__(nrows, ncols, *args, **kwargs)
 
         self._set_spaces()
         self._init_time_mappings()

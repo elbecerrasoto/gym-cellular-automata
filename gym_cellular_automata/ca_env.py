@@ -19,9 +19,17 @@ class CAEnv(ABC, gym.Env):
     def initial_state(self):
         self._resample_initial = False
 
-    def __init__(self, nrows, ncols):
-        # Get default parameters dictionary
-        self._defaults = self._get_defaults(nrows, ncols)
+    def __init__(self, nrows, ncols, *args, **kwargs):
+        # Get default parameters
+
+        # Scale free parameters default dictionary
+        self._defaults_free = self._get_defaults_free(*args, **kwargs)
+
+        # Scale dependant parameters default dictionary
+        self._defaults_scale = self._get_defaults_scale(nrows, ncols)
+
+        # Parameters Default Dictionary
+        self._defaults = {**self._defaults_free, **self._defaults_scale}
 
         # Gym spec method
         self.seed()
@@ -88,7 +96,11 @@ class CAEnv(ABC, gym.Env):
         return [seed]
 
     @abstractmethod
-    def _set_parameters(self, nrows, ncols):
+    def _get_defaults_free(self, *args, **kwargs) -> dict:
+        raise NotImplementedError
+
+    @abstractmethod
+    def _get_defaults_scale(self, nrows, ncols) -> dict:
         raise NotImplementedError
 
     @abstractmethod
@@ -116,9 +128,21 @@ class MockCAEnv(CAEnv):
     _ncols = 8
     _states = 8
 
-    def __init__(self, *args, **kwargs):
+    def _get_defaults_free(self, *args, **kwargs):
+        """
+        place holder
+        """
+        return {}
 
-        super().__init__(*args, **kwargs)
+    def _get_defaults_scale(self, nrows, ncols):
+        """
+        place holder
+        """
+        return {}
+
+    def __init__(self, nrows=_nrows, ncols=_ncols, *args, **kwargs):
+
+        super().__init__(nrows, ncols, *args, **kwargs)
 
         self._set_spaces()
 
