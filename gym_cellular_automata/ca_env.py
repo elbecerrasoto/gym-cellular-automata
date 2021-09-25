@@ -19,17 +19,9 @@ class CAEnv(ABC, gym.Env):
     def initial_state(self):
         self._resample_initial = False
 
-    def __init__(self, nrows, ncols, *args, **kwargs):
-        # Get default parameters
-
-        # Scale free parameters default dictionary
-        self._defaults_free = self._get_defaults_free(*args, **kwargs)
-
-        # Scale dependant parameters default dictionary
-        self._defaults_scale = self._get_defaults_scale(nrows, ncols)
-
-        # Parameters Default Dictionary
-        self._defaults = {**self._defaults_free, **self._defaults_scale}
+    def __init__(self, nrows, ncols, **kwargs):
+        # Set default dict and create atts per key
+        self._set_defaults(nrows, ncols, **kwargs)
 
         # Gym spec method
         self.seed()
@@ -96,12 +88,26 @@ class CAEnv(ABC, gym.Env):
         return [seed]
 
     @abstractmethod
-    def _get_defaults_free(self, *args, **kwargs) -> dict:
+    def _get_defaults_free(self, **kwargs) -> dict:
         raise NotImplementedError
 
     @abstractmethod
     def _get_defaults_scale(self, nrows, ncols) -> dict:
         raise NotImplementedError
+
+    def _set_defaults(self, nrows, ncols, **kwargs):
+
+        # Scale free parameters default dictionary
+        self._defaults_free = self._get_defaults_free(**kwargs)
+
+        # Scale dependant parameters default dictionary
+        self._defaults_scale = self._get_defaults_scale(nrows, ncols)
+
+        # Parameters Default Dictionary
+        self._defaults = {**self._defaults_free, **self._defaults_scale}
+
+        for key in self._defaults:
+            self.__dict__[key] = self._defaults[key]
 
     @abstractmethod
     def _award(self):
@@ -128,7 +134,7 @@ class MockCAEnv(CAEnv):
     _ncols = 8
     _states = 8
 
-    def _get_defaults_free(self, *args, **kwargs):
+    def _get_defaults_free(self, **kwargs):
         """
         place holder
         """
@@ -140,9 +146,9 @@ class MockCAEnv(CAEnv):
         """
         return {}
 
-    def __init__(self, nrows=_nrows, ncols=_ncols, *args, **kwargs):
+    def __init__(self, nrows=_nrows, ncols=_ncols, **kwargs):
 
-        super().__init__(nrows, ncols, *args, **kwargs)
+        super().__init__(nrows, ncols, **kwargs)
 
         self._set_spaces()
 

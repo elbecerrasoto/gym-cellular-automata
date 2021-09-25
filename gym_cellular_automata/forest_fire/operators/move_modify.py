@@ -42,6 +42,10 @@ class Move(Operator):
 
     def update(self, grid, action, context):
 
+        # ToDo: remove hashable test, seems unnecessary, it is testing for numpy array
+        # Why not test it directly?
+        # Simplify to just cast everything to int?
+        # "Be loose on what you accept and strict on what you return"
         if not hashable(action):
             casting = int
             logger.warn(f"Unhashable Movement Action {action}.\nCasting to {casting}.")

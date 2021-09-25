@@ -16,45 +16,13 @@ from .utils.render import render
 class ForestFireEnvHelicopterV0(CAEnv):
     metadata = {"render.modes": ["human"]}
 
-    # fmt: off
-    _empty           = CONFIG["cell_symbols"]["empty"]
-    _tree            = CONFIG["cell_symbols"]["tree"]
-    _fire            = CONFIG["cell_symbols"]["fire"]
+    _row = CONFIG["grid_shape"]["nrows"]
+    _col = CONFIG["grid_shape"]["ncols"]
 
+    def __init__(self, nrows=_row, ncols=_col, **kwargs):
 
-    _row              = CONFIG["grid_shape"]["nrows"]
-    _col              = CONFIG["grid_shape"]["ncols"]
-
-    _p_fire           = CONFIG["ca_params"]["p_fire"]
-    _p_tree           = CONFIG["ca_params"]["p_tree"]
-
-    _effects          = CONFIG["effects"]
-
-    _max_freeze       = CONFIG["max_freeze"]
-
-    _n_actions        = len(CONFIG["actions"])
-    _action_sets      = CONFIG["actions_sets"]
-
-    _reward_per_empty = CONFIG["rewards"]["per_empty"]
-    _reward_per_tree  = CONFIG["rewards"]["per_tree"]
-    _reward_per_fire  = CONFIG["rewards"]["per_fire"]
-    # fmt: on
-
-    def _get_defaults_free(self, *args, **kwargs):
-        """
-        place holder
-        """
-        return {}
-
-    def _get_defaults_scale(self, nrows, ncols):
-        """
-        place holder
-        """
-        return {}
-
-    def __init__(self, nrows=_row, ncols=_col, *args, **kwargs):
-
-        super().__init__(nrows, ncols, *args, **kwargs)
+        # Sets defaults and runs seed method
+        super().__init__(nrows, ncols, **kwargs)
 
         self._set_spaces()
 
@@ -74,6 +42,32 @@ class ForestFireEnvHelicopterV0(CAEnv):
             self._max_freeze,
             **self.MDP_space,
         )
+
+    def _get_defaults_free(self, **kwargs):
+        """
+        place holder
+        """
+        return {
+            "_empty": CONFIG["cell_symbols"]["empty"],
+            "_tree": CONFIG["cell_symbols"]["tree"],
+            "_fire": CONFIG["cell_symbols"]["fire"],
+            "_effects": CONFIG["effects"],
+            "_n_actions": len(CONFIG["actions"]),
+            "_action_sets": CONFIG["actions_sets"],
+        }
+
+    def _get_defaults_scale(self, nrows, ncols):
+        """
+        place holder
+        """
+        return {
+            "_p_fire": CONFIG["ca_params"]["p_fire"],
+            "_p_tree": CONFIG["ca_params"]["p_tree"],
+            "_max_freeze": CONFIG["max_freeze"],
+            "_reward_per_empty": CONFIG["rewards"]["per_empty"],
+            "_reward_per_tree": CONFIG["rewards"]["per_tree"],
+            "_reward_per_fire": CONFIG["rewards"]["per_fire"],
+        }
 
     @property
     def MDP(self):
