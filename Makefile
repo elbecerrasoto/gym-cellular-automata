@@ -8,8 +8,9 @@ install-develop : # sudo make install-develop
 	npm i -g gitmoji-cli
 	npm install git-br -g
 
-develop :
+git-aliases :
 	git config --global alias.br !git-br
+	git config --global alias.root 'rev-parse --show-toplevel'
 
 conda_env :
 	conda env create --file "environment.yaml"
@@ -67,4 +68,4 @@ count :
 	# Counts lines of code
 	find ./ -name '*.py' -print | xargs cat | sed '/^$$/ d' | perl -ne 'if(not /^ *?#/){print $$_}' | wc -l
 
-.PHONY : help install install-develop develop conda_env hooks hooks-dry hooks-update style test test-debug test-coverage test-slow test-visual linter patch gallery clean count
+.PHONY : help install install-develop git-aliases conda_env hooks hooks-dry hooks-update style test test-debug test-coverage test-slow test-visual linter patch gallery clean count
