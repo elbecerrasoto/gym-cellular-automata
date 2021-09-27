@@ -101,17 +101,21 @@ class ForestFireEnvHelicopterV0(CAEnv):
         return self._initial_state
 
     def _award(self):
+        ncells = self.nrows * self.ncols
+
         dict_counts = self.count_cells(self.grid)
 
         cell_counts = np.array(
             [dict_counts[self._empty], dict_counts[self._tree], dict_counts[self._fire]]
         )
 
+        cell_counts_relative = cell_counts / ncells
+
         reward_weights = np.array(
             [self._reward_per_empty, self._reward_per_tree, self._reward_per_fire]
         )
 
-        return np.dot(reward_weights, cell_counts)
+        return np.dot(reward_weights, cell_counts_relative)
 
     def _is_done(self):
         return False

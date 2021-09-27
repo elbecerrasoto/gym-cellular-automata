@@ -20,6 +20,8 @@ class CAEnv(ABC, gym.Env):
         self._resample_initial = False
 
     def __init__(self, nrows, ncols, **kwargs):
+        self.nrows, self.ncols = nrows, ncols
+
         # Set default dict and create atts per key
         self._set_defaults(nrows, ncols, **kwargs)
 
