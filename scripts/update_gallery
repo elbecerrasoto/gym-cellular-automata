@@ -208,7 +208,8 @@ if __name__ == "__main__":
                                 i += 1
                             return file
 
-                    fig.savefig(path2write(ofile))
+                    written_file = path2write(ofile)
+                    fig.savefig(written_file)
 
                 if VERBOSE:
-                    print(f"Saving {kenv} figure to {ofile} after {steps} steps")
+                    print(f"Saving {kenv} figure to {written_file} after {steps} steps")
