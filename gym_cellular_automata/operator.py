@@ -26,9 +26,9 @@ class Operator(ABC):
     ) -> None:
 
         # fmt: off
-        self.grid_space    = grid_space    if grid_space    is not None else None
-        self.action_space  = action_space  if action_space  is not None else None
-        self.context_space = context_space if context_space is not None else None
+        self.grid_space    = grid_space
+        self.action_space  = action_space
+        self.context_space = context_space
         # fmt: on
 
     @abstractmethod
