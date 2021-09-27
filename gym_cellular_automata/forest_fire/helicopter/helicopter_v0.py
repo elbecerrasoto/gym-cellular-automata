@@ -48,25 +48,33 @@ class ForestFireEnvHelicopterV0(CAEnv):
         place holder
         """
         return {
+            "_p_fire": CONFIG["ca_params"]["p_fire"],
+            "_p_tree": CONFIG["ca_params"]["p_tree"],
             "_empty": CONFIG["cell_symbols"]["empty"],
             "_tree": CONFIG["cell_symbols"]["tree"],
             "_fire": CONFIG["cell_symbols"]["fire"],
             "_effects": CONFIG["effects"],
             "_n_actions": len(CONFIG["actions"]),
             "_action_sets": CONFIG["actions_sets"],
+            "_reward_per_empty": CONFIG["rewards"]["per_empty"],
+            "_reward_per_tree": CONFIG["rewards"]["per_tree"],
+            "_reward_per_fire": CONFIG["rewards"]["per_fire"],
         }
 
     def _get_defaults_scale(self, nrows, ncols):
         """
         place holder
         """
+        ROW_SPEED = 1 / 2
+        COL_SPEED = 1 / 2
+
+        row_speed_abs = int(nrows * ROW_SPEED)
+        col_speed_abs = int(ncols * COL_SPEED)
+
+        max_freeze = (row_speed_abs + col_speed_abs) // 2
+
         return {
-            "_p_fire": CONFIG["ca_params"]["p_fire"],
-            "_p_tree": CONFIG["ca_params"]["p_tree"],
-            "_max_freeze": CONFIG["max_freeze"],
-            "_reward_per_empty": CONFIG["rewards"]["per_empty"],
-            "_reward_per_tree": CONFIG["rewards"]["per_tree"],
-            "_reward_per_fire": CONFIG["rewards"]["per_fire"],
+            "_max_freeze": max_freeze,
         }
 
     @property
