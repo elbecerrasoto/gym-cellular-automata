@@ -65,17 +65,18 @@ class ForestFireEnvHelicopterV0(CAEnv):
         """
         place holder
         """
-        ROW_SPEED = 1 / 2
-        COL_SPEED = 1 / 2
+        if CONFIG["max_freeze"] > -1:
 
-        row_speed_abs = int(nrows * ROW_SPEED)
-        col_speed_abs = int(ncols * COL_SPEED)
+            max_freeze = CONFIG["max_freeze"]
 
-        max_freeze = (row_speed_abs + col_speed_abs) // 2
+        else:
 
-        return {
-            "_max_freeze": max_freeze,
-        }
+            ROW_SPEED = CONFIG["row_speed"]
+            COL_SPEED = CONFIG["col_speed"]
+
+            max_freeze = (int(ROW_SPEED * nrows) + int(COL_SPEED * ncols)) // 2
+
+        return {"_max_freeze": max_freeze}
 
     @property
     def MDP(self):
