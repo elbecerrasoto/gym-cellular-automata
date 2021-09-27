@@ -17,7 +17,7 @@ warnings.filterwarnings("ignore", message="Glyph 112 missing from current font."
 PROJECT_PATH = Path(__file__).parents[1]
 
 REGISTERED_CA_ENVS = (
-    "ForestFireHelicopter-v0",
+    "ForestFireHelicopter5x5-v1",
     "ForestFireBulldozer-v1",
 )
 
@@ -26,6 +26,7 @@ try:
     register(
         id=REGISTERED_CA_ENVS[0],
         entry_point=ffdir + ".helicopter:ForestFireEnvHelicopterV0",
+        kwargs={"nrows": 5, "ncols": 5},
     )
 
     register(
