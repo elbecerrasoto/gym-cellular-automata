@@ -18,7 +18,7 @@ PROJECT_PATH = Path(__file__).parents[1]
 
 REGISTERED_CA_ENVS = (
     "ForestFireHelicopter5x5-v1",
-    "ForestFireBulldozer-v1",
+    "ForestFireBulldozer256x256-v2",
 )
 
 try:
@@ -32,6 +32,7 @@ try:
     register(
         id=REGISTERED_CA_ENVS[1],
         entry_point=ffdir + ".bulldozer:ForestFireEnvBulldozerV1",
+        kwargs={"nrows": 256, "ncols": 256},
     )
 except GymError:  # Avoid annoying Re-register error when working interactively.
     pass

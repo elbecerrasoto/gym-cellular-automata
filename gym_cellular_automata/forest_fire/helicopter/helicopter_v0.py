@@ -74,7 +74,10 @@ class ForestFireEnvHelicopterV0(CAEnv):
             ROW_SPEED = CONFIG["row_speed"]
             COL_SPEED = CONFIG["col_speed"]
 
-            max_freeze = (int(ROW_SPEED * nrows) + int(COL_SPEED * ncols)) // 2
+            MOORE_CORRECTION = 2  # Cause moving diagonally
+            max_freeze = (
+                int(ROW_SPEED * nrows) + int(COL_SPEED * ncols)
+            ) // MOORE_CORRECTION
 
         return {"_max_freeze": max_freeze}
 

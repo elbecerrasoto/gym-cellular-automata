@@ -16,49 +16,67 @@ from .utils.config import CONFIG
 class ForestFireEnvBulldozerV1(CAEnv):
     metadata = {"render.modes": ["human"]}
 
-    # fmt: off
-
-    # Actions
-    _moves           = CONFIG["actions"]["movement"]
-    _shoots          = CONFIG["actions"]["shooting"]
-    _action_sets     = CONFIG["actions"]["sets"]
-
-    # Time parameters on CA updates units.
-    _t_act_none      = CONFIG["time"]["ta_none"]
-    _t_act_move      = CONFIG["time"]["ta_move"]
-    _t_act_shoot     = CONFIG["time"]["ta_shoot"]
-    _t_env_any       = CONFIG["time"]["te_any"]
-
-    _row             = CONFIG["grid_shape"]["nrows"]
-    _col             = CONFIG["grid_shape"]["ncols"]
-
-    _empty           = CONFIG["cell_symbols"]["empty"]
-    _burned          = CONFIG["cell_symbols"]["burned"]
-    _tree            = CONFIG["cell_symbols"]["tree"]
-    _fire            = CONFIG["cell_symbols"]["fire"]
-
-    _p_tree          = CONFIG["p_tree"]
-    _p_empty         = CONFIG["p_empty"]
-
-    _wind            = CONFIG["wind"]
-    _effects         = CONFIG["effects"]
-    # fmt: on
+    _row = CONFIG["grid_shape"]["nrows"]
+    _col = CONFIG["grid_shape"]["ncols"]
 
     def _get_defaults_free(self, *args, **kwargs):
         """
         place holder
         """
-        return {}
+        return {
+            "_moves": CONFIG["actions"]["movement"],
+            "_shoots": CONFIG["actions"]["shooting"],
+            "_action_sets": CONFIG["actions"]["sets"],
+            "_empty": CONFIG["cell_symbols"]["empty"],
+            "_burned": CONFIG["cell_symbols"]["burned"],
+            "_tree": CONFIG["cell_symbols"]["tree"],
+            "_fire": CONFIG["cell_symbols"]["fire"],
+            "_p_tree": CONFIG["p_tree"],
+            "_p_empty": CONFIG["p_empty"],
+            "_wind": CONFIG["wind"],
+            "_effects": CONFIG["effects"],
+        }
 
     def _get_defaults_scale(self, nrows, ncols):
         """
         place holder
         """
-        return {}
+        size = (self.nrows + self.ncols) // 2
+        ANY = CONFIG["time"]["te_any"]
+        AUTOMATIC = CONFIG["time"]["automatic_set_up"]
+
+        if AUTOMATIC:
+
+            NONE = 0.0
+            SPEED_HALF = CONFIG["time"]["speed_at_half"]
+            SPEED_FULL = CONFIG["time"]["speed_at_full"]
+
+            MOVE = (1 / (SPEED_HALF * size)) - ANY
+            SHOOT = (1 / (SPEED_FULL * size)) - MOVE
+
+        else:
+            NONE = CONFIG["time"]["ta_none"]
+            MOVE = CONFIG["time"]["ta_move"]
+            SHOOT = CONFIG["time"]["ta_shoot"]
+
+        return {
+            "_t_act_none": NONE,
+            "_t_act_move": MOVE,
+            "_t_act_shoot": SHOOT,
+            "_t_env_any": ANY,
+        }
 
     def __init__(self, nrows=_row, ncols=_col, *args, **kwargs):
+        def get_kwarg(key):
+            try:
+                return kwargs[key]
+            except KeyError:
+                return self._default[key]
 
         super().__init__(nrows, ncols, *args, **kwargs)
+
+        # Set here any kwargs, now that default is defined
+        # self._t_act_shoot = get_kwarg("_t_act_shoot")
 
         self._set_spaces()
         self._init_time_mappings()
@@ -199,6 +217,7 @@ class ForestFireEnvBulldozerV1(CAEnv):
         }
 
     def _noise(self):
+        # A circular deviation of 1/12 of the grid size
         l = ((self._row + self._col) // 2) // 12
         return int(np.random.choice(range(l), size=1))
 
@@ -213,6 +232,7 @@ class ForestFireEnvBulldozerV1(CAEnv):
 
         grid = grid_space.sample()
 
+        # Around the lower left quadrant
         r, c = (3 * self._row // 4), (1 * self._col // 4)
         row, col = self._fire_seed = r + self._noise(), c + self._noise()
 
@@ -223,6 +243,7 @@ class ForestFireEnvBulldozerV1(CAEnv):
     def _initial_context_distribution(self):
         init_time = np.array(0.0)
 
+        # Around the upper right quadrant
         r, c = (1 * self._row // 4), (3 * self._col // 4)
 
         init_row = r + self._noise()
