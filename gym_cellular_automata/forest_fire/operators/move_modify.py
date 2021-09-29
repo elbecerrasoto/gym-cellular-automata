@@ -1,13 +1,7 @@
-from collections.abc import Hashable
-
 import numpy as np
 from gym import logger, spaces
 
 from gym_cellular_automata import Operator
-
-
-def hashable(x):
-    return isinstance(x, Hashable)
 
 
 class Move(Operator):
@@ -42,19 +36,8 @@ class Move(Operator):
 
     def update(self, grid, action, context):
 
-        # ToDo: remove hashable test, seems unnecessary, it is testing for numpy array
-        # Why not test it directly?
-        # Simplify to just cast everything to int?
-        # "Be loose on what you accept and strict on what you return"
-        if not hashable(action):
-            casting = int
-            logger.warn(f"Unhashable Movement Action {action}.\nCasting to {casting}.")
-            action = casting(action)
-
-        if action not in self.movement_set:
-            logger.warn(
-                f"Movement Action {action} not in set {self.movement_set}.\nPosition will not change."
-            )
+        # A common input is a scalar of type ndarray
+        action = int(action)
 
         def get_new_position(position: tuple) -> np.array:
             row, col = position

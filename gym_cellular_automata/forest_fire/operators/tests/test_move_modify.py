@@ -87,34 +87,6 @@ def test_move(move, grid_space, action_space, position_space, directions_sets):
     assert np.all(observed_position == expected_position)
 
 
-def test_move_warnings(
-    move,
-    grid_space,
-    position_space,
-):
-    """
-    Move operator
-    White-box Warning Tests
-    """
-
-    # Magic Variables
-    unhashable = np.array(0)
-    out_of_action_space = "Arbitrary Object"
-
-    grid = grid_space.sample()
-
-    context = position_space.sample()
-
-    with pytest.warns(UserWarning):
-        # Unhashable Warning
-        action = unhashable
-        move(grid, action, context)
-
-        # Out of action space Warning
-        action = out_of_action_space
-        move(grid, action, context)
-
-
 TEST_REPETITIONS = 16
 
 CELL_STATES = 3
