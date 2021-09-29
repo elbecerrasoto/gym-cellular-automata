@@ -66,21 +66,9 @@ def test_move(move, grid_space, action_space, position_space, directions_sets):
     context = position_space.sample()
     row, col = context
 
-    # fmt: off
-    if (action in up_set)    and (row > 0):
-        row -= 1
-
-    if (action in down_set)  and (row < (nrows-1)):
-        row += 1
-
-    if (action in left_set)  and (col > 0):
-        col -= 1
-
-    if (action in right_set) and (col < (ncols-1)):
-        col += 1
-    # fmt: on
-
-    expected_position = np.array([row, col])
+    expected_position = np.array(
+        new_position(row, col, action, grid, up_set, down_set, left_set, right_set)
+    )
 
     grid, observed_position = move(grid, action, context)
 
@@ -128,3 +116,52 @@ def test_modify_cell_at_position(modify, effects, grid_space, position_space):
 
         assert observed_cell == expected_cell
         assert np.all(random_position == position)
+
+
+### Orthogonal new position test
+### Orthogonal: different from the method used on library implementation
+
+
+def new_position(row, col, action, grid, up_set, down_set, left_set, right_set):
+    def are_my_neighbors_a_boundary(grid, pos):
+        """
+        Check if the neighbors of target position are a boundary.
+        Return a tuple of Bools informing which neighbor is a boundary.
+        It checks the up, down, left, and right neighbors.
+        """
+        from collections import namedtuple
+
+        row, col = pos
+        n_row, n_col = grid.shape
+
+        up_offset, down_offset = row + np.array([-1, 1])
+        left_offset, right_offset = col + np.array([-1, 1])
+
+        up = bool(up_offset < 0)
+        down = bool(down_offset > n_row - 1)
+        left = bool(left_offset < 0)
+        right = bool(right_offset > n_col - 1)
+
+        Boundaries = namedtuple("Boundaries", ["up", "down", "left", "right"])
+
+        return Boundaries(up, down, left, right)
+
+    is_boundary = are_my_neighbors_a_boundary(grid, (row, col))
+
+    new_row = (
+        row - 1
+        if not is_boundary.up and int(action) in up_set
+        else row + 1
+        if not is_boundary.down and int(action) in down_set
+        else row
+    )
+
+    new_col = (
+        col - 1
+        if not is_boundary.left and int(action) in left_set
+        else col + 1
+        if not is_boundary.right and int(action) in right_set
+        else col
+    )
+
+    return new_row, new_col
