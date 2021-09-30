@@ -1,41 +1,29 @@
-import warnings
 from pathlib import Path
+from warnings import filterwarnings
 
-from gym.envs.registration import register
 from gym.error import Error as GymError
 
 from gym_cellular_automata.ca_env import CAEnv
 from gym_cellular_automata.grid_space import GridSpace
 from gym_cellular_automata.operator import Operator
-
-# Ignore warnings trigger by Bulldozer Render
-# EmojiFont raises RuntimeWarning
-warnings.filterwarnings("ignore", message="Glyph 108 missing from current font.")
-warnings.filterwarnings("ignore", message="Glyph 112 missing from current font.")
+from gym_cellular_automata.registration import (
+    GYM_MAKE,
+    REGISTERED_CA_ENVS,
+    register_caenvs,
+)
 
 # Global path on current machine
 PROJECT_PATH = Path(__file__).parents[1]
 
-REGISTERED_CA_ENVS = (
-    "ForestFireHelicopter5x5-v1",
-    "ForestFireBulldozer256x256-v2",
-)
-
 try:
-    ffdir = "gym_cellular_automata.forest_fire"
-    register(
-        id=REGISTERED_CA_ENVS[0],
-        entry_point=ffdir + ".helicopter:ForestFireEnvHelicopterV0",
-        kwargs={"nrows": 5, "ncols": 5},
-    )
-
-    register(
-        id=REGISTERED_CA_ENVS[1],
-        entry_point=ffdir + ".bulldozer:ForestFireEnvBulldozerV1",
-        kwargs={"nrows": 256, "ncols": 256},
-    )
-except GymError:  # Avoid annoying Re-register error when working interactively.
+    register_caenvs()
+except GymError:
     pass
 
 
-__all__ = ["CAEnv", "Operator", "GridSpace", "REGISTERED_CA_ENVS"]
+__all__ = ["GYM_MAKE", "REGISTERED_CA_ENVS", "CAEnv", "GridSpace", "Operator"]
+
+# Ignore warnings trigger by Bulldozer Render
+# EmojiFont raises RuntimeWarning
+filterwarnings("ignore", message="Glyph 108 missing from current font.")
+filterwarnings("ignore", message="Glyph 112 missing from current font.")
