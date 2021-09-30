@@ -7,7 +7,7 @@ from gym_cellular_automata.forest_fire.utils.config import (
 )
 
 CONFIG_PATH = (
-    PROJECT_PATH / "./gym_cellular_automata/forest_fire/bulldozer/bulldozer_v1.yaml"
+    PROJECT_PATH / "./gym_cellular_automata/forest_fire/bulldozer/bulldozer.yaml"
 )
 
 

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 import argparse
+import random
 import re
 from pathlib import Path
-import random
 
 import gym
 
-from gym_cellular_automata import PROJECT_PATH, GYM_MAKE
+from gym_cellular_automata import GYM_MAKE, PROJECT_PATH
 
 
 def play_random_policy(env, steps, verbose=False):
