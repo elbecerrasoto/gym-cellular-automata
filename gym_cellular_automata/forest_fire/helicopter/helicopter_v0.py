@@ -13,7 +13,7 @@ from .utils.config import CONFIG
 from .utils.render import render
 
 
-class ForestFireEnvHelicopterV0(CAEnv):
+class ForestFireHelicopterEnv(CAEnv):
     metadata = {"render.modes": ["human"]}
 
     _row = CONFIG["grid_shape"]["nrows"]

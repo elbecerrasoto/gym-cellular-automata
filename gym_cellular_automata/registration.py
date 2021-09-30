@@ -5,11 +5,11 @@ FFDIR = "gym_cellular_automata.forest_fire"
 REGISTERED_CA_ENVS = {
     "ForestFireHelicopter5x5-v1": {
         "kwargs": {"nrows": 5, "ncols": 5},
-        "entry_point": FFDIR + ".helicopter:ForestFireEnvHelicopterV0",
+        "entry_point": FFDIR + ".helicopter:ForestFireHelicopterEnv",
     },
     "ForestFireBulldozer256x256-v2": {
         "kwargs": {"nrows": 256, "ncols": 256},
-        "entry_point": FFDIR + ".bulldozer:ForestFireEnvBulldozerV1",
+        "entry_point": FFDIR + ".bulldozer:ForestFireBulldozerEnv",
     },
 }
 

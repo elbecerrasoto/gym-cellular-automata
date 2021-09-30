@@ -1,14 +1,14 @@
 import pytest
 
 from gym_cellular_automata import GridSpace
-from gym_cellular_automata.forest_fire.bulldozer import ForestFireEnvBulldozerV1
+from gym_cellular_automata.forest_fire.bulldozer import ForestFireBulldozerEnv
 
 THRESHOLD = 12
 
 
 @pytest.fixture
 def env():
-    return ForestFireEnvBulldozerV1()
+    return ForestFireBulldozerEnv()
 
 
 def test_termination_behavior(env):

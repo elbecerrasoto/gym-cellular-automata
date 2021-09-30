@@ -13,7 +13,7 @@ from gym_cellular_automata.forest_fire.operators import (
 from .utils.config import CONFIG
 
 
-class ForestFireEnvBulldozerV1(CAEnv):
+class ForestFireBulldozerEnv(CAEnv):
     metadata = {"render.modes": ["human"]}
 
     _row = CONFIG["grid_shape"]["nrows"]
