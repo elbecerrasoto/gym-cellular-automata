@@ -18,7 +18,7 @@ FIRE = CONFIG["cell_symbols"]["fire"]
 COLOR_EMPTY = "#DDD1D3"  # Gray
 COLOR_TREE = "#A9C499"  # Green
 COLOR_FIRE = "#DFA4A0"  # Red
-# TITLE = "Forest Fire\nHelicopter-v0"
+
 TITLE_SIZE = 42
 TITLE_COLOR = "#B3B3B3"  # Gray 70%
 HELICOPTER_SIZE = 96
