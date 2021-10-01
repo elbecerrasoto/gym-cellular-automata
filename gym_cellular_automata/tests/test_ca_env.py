@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 from gym.spaces import Space
 
-from gym_cellular_automata.ca_env import MockCAEnv
+from gym_cellular_automata.tests.mock_caenv import MockCAEnv
 
 STEPS = 8
 RESETS = 8

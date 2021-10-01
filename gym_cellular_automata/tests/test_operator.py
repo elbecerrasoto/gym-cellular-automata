@@ -1,7 +1,5 @@
 import pytest
 
-from gym_cellular_automata import Operator
-
 # Recyclable function for testing operators
 
 

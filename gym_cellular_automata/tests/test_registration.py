@@ -124,7 +124,7 @@ def test_are_operator_spaces_defined():
         from gym import spaces
 
         from gym_cellular_automata import GridSpace
-        from gym_cellular_automata.operator import Identity
+        from gym_cellular_automata.tests.identity import Identity
 
         gS = GridSpace(values=[55, 66, 77], shape=(2, 2))
         aS = spaces.Discrete(2)
