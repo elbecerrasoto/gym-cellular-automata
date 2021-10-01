@@ -5,12 +5,7 @@ import pytest
 from gym import spaces
 
 from gym_cellular_automata import GridSpace
-from gym_cellular_automata.forest_fire.operators import (
-    Modify,
-    Move,
-    RepeatCA,
-    WindyForestFire,
-)
+from gym_cellular_automata.forest_fire.operators import RepeatCA, WindyForestFire
 
 TESTS = 8
 SEQUENCE = 8
@@ -37,36 +32,6 @@ def ca(grid_space):
 
 
 @pytest.fixture
-def operators(grid_space):
-
-    directions = {
-        "up": {0},
-        "down": {1},
-        "left": {2},
-        "right": {3},
-        "not_move": {4},
-    }
-
-    effects = {EMPTY: TREE, FIRE: EMPTY, BURNED: TREE}
-
-    move = Move(
-        directions,
-        grid_space=grid_space,
-        action_space=spaces.Discrete(5),
-        context_space=spaces.MultiDiscrete([ROW, COL]),
-    )
-
-    modify = Modify(
-        effects,
-        grid_space=grid_space,
-        action_space=spaces.Discrete(2),
-        context_space=spaces.MultiDiscrete([ROW, COL]),
-    )
-
-    return move, modify
-
-
-@pytest.fixture
 def repeat_ca(ca):
     def time_per_action(action):
         return 1.0
@@ -75,6 +40,11 @@ def repeat_ca(ca):
         return 1.0
 
     return RepeatCA(ca, time_per_action, time_per_state)
+
+
+# def test_repeat_ca_is_operator(repeat_ca):
+#     from gym_cellular_automata.tests import assert_operator
+#     assert_operator(repeat_ca)
 
 
 def test_repeat_ca(ca, repeat_ca):

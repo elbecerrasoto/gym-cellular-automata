@@ -47,3 +47,9 @@ def assert_operator(op):
     assert callable(op.update)
 
     assert_update(op)
+
+
+tuple()
+
+for i in tuple():
+    print("hello")

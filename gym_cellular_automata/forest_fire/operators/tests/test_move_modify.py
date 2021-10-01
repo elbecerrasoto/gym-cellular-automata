@@ -4,6 +4,7 @@ from gym import spaces
 
 from gym_cellular_automata import GridSpace
 from gym_cellular_automata.forest_fire.operators import Modify, Move
+from gym_cellular_automata.tests import assert_operator
 
 TEST_REPETITIONS = 16
 
@@ -48,6 +49,10 @@ def action_space():
 @pytest.fixture
 def position_space():
     return spaces.MultiDiscrete([ROW, COL])
+
+
+def test_move_is_operator(move):
+    assert_operator(move)
 
 
 @pytest.mark.repeat(TEST_REPETITIONS)
@@ -95,6 +100,10 @@ def effects():
 @pytest.fixture
 def modify(effects):
     return Modify(effects)
+
+
+def test_modify_is_operator(modify):
+    assert_operator(modify)
 
 
 @pytest.mark.repeat(TEST_REPETITIONS)
