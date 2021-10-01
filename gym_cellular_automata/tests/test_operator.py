@@ -35,6 +35,15 @@ def assert_operator(op):
     assert hasattr(op, "suboperators")
     assert isinstance(op.suboperators, tuple)
 
+    from icecream import ic
+    from objprint import objprint
+
+    objprint(op)
+    ic(op.suboperators)
+
+    for suop in op.suboperators:
+        assert suop is not tuple()
+
     for suop in op.suboperators:
         assert_operator(suop.suboperators)
 
@@ -42,14 +51,9 @@ def assert_operator(op):
         op, bool, "grid_dependant", "action_dependant", "context_dependant"
     )
     assert_optionals(op, Space, "grid_space", "action_space", "context_space")
+    assert_optionals(op, bool, "deterministic")
 
     assert hasattr(op, "update")
     assert callable(op.update)
 
     assert_update(op)
-
-
-tuple()
-
-for i in tuple():
-    print("hello")

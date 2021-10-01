@@ -44,6 +44,7 @@ def repeat_ca(ca):
 
 # def test_repeat_ca_is_operator(repeat_ca):
 #     from gym_cellular_automata.tests import assert_operator
+
 #     assert_operator(repeat_ca)
 
 
