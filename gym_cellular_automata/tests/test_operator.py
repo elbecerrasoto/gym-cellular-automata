@@ -1,31 +1,49 @@
-import pytest
-
-# Recyclable function for testing operators
-
-
-@pytest.mark.skip(reason="WIP")
-@pytest.fixture(scope="session")
-def has_operator_specs():
-    def has_operator_specs(operator) -> bool:
-        """Test Atts, signatures and outputs"""
-        ...
-        return True
-
-    return has_operator_specs
+from gym_cellular_automata import Operator
+from gym_cellular_automata.tests import Identity
 
 
-def operator_subclass():
-    class OperatorSubclass(Operator):
-        def __init__(*args, **kwargs):
-            super.__init__(*args, **kwargs)
-
-        def update(self, grid, action, context):
-            return super.update(grid, action, context)
-
-    return OperatorSubclass()
+def test_operator():
+    assert_operator(Identity())
 
 
-# Module testing
-@pytest.mark.skip(reason="WIP")
-def test_operator(operator_subclass, has_operator_specs):
-    assert has_operator_specs(operator_subclass)
+def assert_operator(op):
+    from gym.spaces import Space
+
+    def assert_optionals(obj, optional_type, *atts):
+        for att in atts:
+            assert hasattr(op, att)
+            if getattr(op, att) is not None:
+                assert isinstance(getattr(op, att), optional_type)
+
+    def assert_update(op):
+        try:
+
+            grid = op.grid_space.sample()
+            action = op.action_space.sample()
+            context = op.context_space.sample()
+
+            grid, context = op.update(grid, action, context)
+
+            assert op.grid_space.contains(grid)
+            assert op.context_space.contains(context)
+
+        except AttributeError:
+            pass
+
+    assert isinstance(op, Operator)
+
+    assert hasattr(op, "suboperators")
+    assert isinstance(op.suboperators, tuple)
+
+    for suop in op.suboperators:
+        assert_operator(suop.suboperators)
+
+    assert_optionals(
+        op, bool, "grid_dependant", "action_dependant", "context_dependant"
+    )
+    assert_optionals(op, Space, "grid_space", "action_space", "context_space")
+
+    assert hasattr(op, "update")
+    assert callable(op.update)
+
+    assert_update(op)
