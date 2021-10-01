@@ -1,7 +1,7 @@
 from gym import spaces
 
 from gym_cellular_automata import CAEnv, GridSpace
-from gym_cellular_automata.tests.identity import Identity
+from gym_cellular_automata.tests import Identity
 
 
 class MockCAEnv(CAEnv):
