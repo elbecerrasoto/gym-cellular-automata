@@ -24,6 +24,28 @@ class ForestFireHelicopterEnv(CAEnv):
         # Sets defaults and runs seed method
         super().__init__(nrows, ncols, **kwargs)
 
+        # Class Variables, set to defaults if not manually entered.
+
+        # Variables, scale free
+        self._p_fire = self._get_kwarg("p_fire", kwargs)
+        self._p_tree = self._get_kwarg("p_tree", kwargs)
+
+        self._empty = self._get_kwarg("empty", kwargs)
+        self._tree = self._get_kwarg("tree", kwargs)
+        self._fire = self._get_kwarg("fire", kwargs)
+
+        self._effects = self._get_kwarg("effects", kwargs)
+
+        self._n_actions = self._get_kwarg("n_actions", kwargs)
+        self._action_sets = self._get_kwarg("action_sets", kwargs)
+
+        self._reward_per_empty = self._get_kwarg("reward_per_empty", kwargs)
+        self._reward_per_tree = self._get_kwarg("reward_per_tree", kwargs)
+        self._reward_per_fire = self._get_kwarg("reward_per_fire", kwargs)
+
+        # Variables, scale dependant variables
+        self._max_freeze = self._get_kwarg("max_freeze", kwargs)
+
         self._set_spaces()
 
         self.cellular_automaton = ForestFire(
@@ -44,27 +66,21 @@ class ForestFireHelicopterEnv(CAEnv):
         )
 
     def _get_defaults_free(self, **kwargs):
-        """
-        place holder
-        """
         return {
-            "_p_fire": CONFIG["ca_params"]["p_fire"],
-            "_p_tree": CONFIG["ca_params"]["p_tree"],
-            "_empty": CONFIG["cell_symbols"]["empty"],
-            "_tree": CONFIG["cell_symbols"]["tree"],
-            "_fire": CONFIG["cell_symbols"]["fire"],
-            "_effects": CONFIG["effects"],
-            "_n_actions": len(CONFIG["actions"]),
-            "_action_sets": CONFIG["actions_sets"],
-            "_reward_per_empty": CONFIG["rewards"]["per_empty"],
-            "_reward_per_tree": CONFIG["rewards"]["per_tree"],
-            "_reward_per_fire": CONFIG["rewards"]["per_fire"],
+            "p_fire": CONFIG["ca_params"]["p_fire"],
+            "p_tree": CONFIG["ca_params"]["p_tree"],
+            "empty": CONFIG["cell_symbols"]["empty"],
+            "tree": CONFIG["cell_symbols"]["tree"],
+            "fire": CONFIG["cell_symbols"]["fire"],
+            "effects": CONFIG["effects"],
+            "n_actions": len(CONFIG["actions"]),
+            "action_sets": CONFIG["actions_sets"],
+            "reward_per_empty": CONFIG["rewards"]["per_empty"],
+            "reward_per_tree": CONFIG["rewards"]["per_tree"],
+            "reward_per_fire": CONFIG["rewards"]["per_fire"],
         }
 
     def _get_defaults_scale(self, nrows, ncols):
-        """
-        place holder
-        """
         if CONFIG["max_freeze"] > -1:
 
             max_freeze = CONFIG["max_freeze"]
@@ -79,7 +95,7 @@ class ForestFireHelicopterEnv(CAEnv):
                 int(ROW_SPEED * nrows) + int(COL_SPEED * ncols)
             ) // MOORE_CORRECTION
 
-        return {"_max_freeze": max_freeze}
+        return {"max_freeze": max_freeze}
 
     @property
     def MDP(self):
