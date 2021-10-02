@@ -123,6 +123,12 @@ class CAEnv(ABC, gym.Env):
         ) in self._defaults:  # Allows bypassing both functions with minimal effort
             self.__dict__[key] = self._defaults[key]
 
+    def _get_kwarg(self, arg, kwargs):
+        try:
+            return kwargs[arg]
+        except KeyError:
+            return self._defaults[arg]
+
     def count_cells(self, grid=None):
         """Returns dict of cell counts"""
         from collections import Counter

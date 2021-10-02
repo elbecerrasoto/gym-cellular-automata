@@ -37,9 +37,9 @@ class ForestFireBulldozerEnv(CAEnv):
     _row = CONFIG["grid_shape"]["nrows"]
     _col = CONFIG["grid_shape"]["ncols"]
 
-    def __init__(self, nrows=_row, ncols=_col, *args, **kwargs):
+    def __init__(self, nrows=_row, ncols=_col, **kwargs):
 
-        super().__init__(nrows, ncols, *args, **kwargs)
+        super().__init__(nrows, ncols, **kwargs)
 
         # Set here any kwargs, now that default is defined
         # self._t_act_shoot = get_kwarg("_t_act_shoot")
@@ -60,6 +60,14 @@ class ForestFireBulldozerEnv(CAEnv):
             self.ca, self.time_per_action, self.time_per_state, **self.repeater_space
         )
         self._MDP = MDP(self.repeater, self.move_modify, **self.MDP_space)
+
+    # Gym API
+    # step, reset & seed methods inherited from parent class
+
+    def render(self, mode="human"):
+        from .utils.render import render
+
+        return render(self)
 
     def _award(self):
         """Reward Function
@@ -100,11 +108,6 @@ class ForestFireBulldozerEnv(CAEnv):
 
     def _report(self):
         return {"hit": self.modify.hit}
-
-    def render(self, mode="human"):
-        from .utils.render import render
-
-        return render(self)
 
     def _get_defaults_free(self, *args, **kwargs):
         return {
@@ -268,12 +271,6 @@ class ForestFireBulldozerEnv(CAEnv):
             "action_space": self.action_space,
             "context_space": self.context_space,
         }
-
-    def get_kwarg(key):
-        try:
-            return kwargs[key]
-        except KeyError:
-            return self._default[key]
 
 
 class MDP(Operator):

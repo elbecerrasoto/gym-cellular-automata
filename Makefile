@@ -62,6 +62,7 @@ clean : # Depends on trash-cli  https://github.com/andreafrancia/trash-cli
 	find ./ -type f -name '*~' | xargs -I{} trash {}
 	find ./ -type f -name 'monkeytype.sqlite3' | xargs -I{} trash {}
 	find ./ -type d -name '.pytest_cache' | xargs -I{} trash {}
+	find ./ -type d -name '.mypy_cache' | xargs -I{} trash {}
 	find ./ -name 'TMP*' | xargs -I{} trash {}
 	git clean -d -n # To remove them change -n to -f
 	echo "\n\nTo remove git untracked files run:\ngit clean -d -f"
