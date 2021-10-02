@@ -16,62 +16,28 @@ from .utils.config import CONFIG
 class ForestFireBulldozerEnv(CAEnv):
     metadata = {"render.modes": ["human"]}
 
+    @property
+    def MDP(self):
+        return self._MDP
+
+    @property
+    def initial_state(self):
+
+        if self._resample_initial:
+
+            self.grid = self._initial_grid_distribution()
+            self.context = self._initial_context_distribution()
+
+            self._initial_state = self.grid, self.context
+
+        self._resample_initial = False
+
+        return self._initial_state
+
     _row = CONFIG["grid_shape"]["nrows"]
     _col = CONFIG["grid_shape"]["ncols"]
 
-    def _get_defaults_free(self, *args, **kwargs):
-        """
-        place holder
-        """
-        return {
-            "_moves": CONFIG["actions"]["movement"],
-            "_shoots": CONFIG["actions"]["shooting"],
-            "_action_sets": CONFIG["actions"]["sets"],
-            "_empty": CONFIG["cell_symbols"]["empty"],
-            "_burned": CONFIG["cell_symbols"]["burned"],
-            "_tree": CONFIG["cell_symbols"]["tree"],
-            "_fire": CONFIG["cell_symbols"]["fire"],
-            "_p_tree": CONFIG["p_tree"],
-            "_p_empty": CONFIG["p_empty"],
-            "_wind": CONFIG["wind"],
-            "_effects": CONFIG["effects"],
-        }
-
-    def _get_defaults_scale(self, nrows, ncols):
-        """
-        place holder
-        """
-        size = (self.nrows + self.ncols) // 2
-        ANY = CONFIG["time"]["te_any"]
-        AUTOMATIC = CONFIG["time"]["automatic_set_up"]
-
-        if AUTOMATIC:
-
-            NONE = 0.0
-            SPEED_HALF = CONFIG["time"]["speed_at_half"]
-            SPEED_FULL = CONFIG["time"]["speed_at_full"]
-
-            MOVE = (1 / (SPEED_HALF * size)) - ANY
-            SHOOT = (1 / (SPEED_FULL * size)) - MOVE
-
-        else:
-            NONE = CONFIG["time"]["ta_none"]
-            MOVE = CONFIG["time"]["ta_move"]
-            SHOOT = CONFIG["time"]["ta_shoot"]
-
-        return {
-            "_t_act_none": NONE,
-            "_t_act_move": MOVE,
-            "_t_act_shoot": SHOOT,
-            "_t_env_any": ANY,
-        }
-
     def __init__(self, nrows=_row, ncols=_col, *args, **kwargs):
-        def get_kwarg(key):
-            try:
-                return kwargs[key]
-            except KeyError:
-                return self._default[key]
 
         super().__init__(nrows, ncols, *args, **kwargs)
 
@@ -94,24 +60,6 @@ class ForestFireBulldozerEnv(CAEnv):
             self.ca, self.time_per_action, self.time_per_state, **self.repeater_space
         )
         self._MDP = MDP(self.repeater, self.move_modify, **self.MDP_space)
-
-    @property
-    def MDP(self):
-        return self._MDP
-
-    @property
-    def initial_state(self):
-
-        if self._resample_initial:
-
-            self.grid = self._initial_grid_distribution()
-            self.context = self._initial_context_distribution()
-
-            self._initial_state = self.grid, self.context
-
-        self._resample_initial = False
-
-        return self._initial_state
 
     def _award(self):
         """Reward Function
@@ -158,66 +106,51 @@ class ForestFireBulldozerEnv(CAEnv):
 
         return render(self)
 
-    def _set_spaces(self):
-        self.grid_space = GridSpace(
-            values=[self._empty, self._burned, self._tree, self._fire],
-            shape=(self._row, self._col),
-        )
-
-        self.ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3))
-        self.position_space = spaces.MultiDiscrete([self._row, self._col])
-        self.time_space = spaces.Box(0.0, float("inf"), shape=tuple())
-
-        self.context_space = spaces.Tuple(
-            (self.ca_params_space, self.position_space, self.time_space)
-        )
-
-        # RL spaces
-
-        m, n = len(self._moves), len(self._shoots)
-        self.action_space = spaces.MultiDiscrete([m, n])
-        self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
-
-        # Suboperators Spaces
-
-        self.ca_space = {
-            "grid_space": self.grid_space,
-            "action_space": self.action_space,
-            "context_space": self.ca_params_space,
+    def _get_defaults_free(self, *args, **kwargs):
+        return {
+            "_moves": CONFIG["actions"]["movement"],
+            "_shoots": CONFIG["actions"]["shooting"],
+            "_action_sets": CONFIG["actions"]["sets"],
+            "_empty": CONFIG["cell_symbols"]["empty"],
+            "_burned": CONFIG["cell_symbols"]["burned"],
+            "_tree": CONFIG["cell_symbols"]["tree"],
+            "_fire": CONFIG["cell_symbols"]["fire"],
+            "_p_tree": CONFIG["p_tree"],
+            "_p_empty": CONFIG["p_empty"],
+            "_wind": CONFIG["wind"],
+            "_effects": CONFIG["effects"],
         }
 
-        self.move_space = {
-            "grid_space": self.grid_space,
-            "action_space": spaces.Discrete(m),
-            "context_space": self.position_space,
-        }
+    def _get_defaults_scale(self, nrows, ncols):
+        size = (self.nrows + self.ncols) // 2
+        ANY = CONFIG["time"]["te_any"]
+        AUTOMATIC = CONFIG["time"]["automatic_set_up"]
 
-        self.modify_space = {
-            "grid_space": self.grid_space,
-            "action_space": spaces.Discrete(n),
-            "context_space": self.position_space,
-        }
+        if AUTOMATIC:
 
-        self.move_modify_space = {
-            "grid_space": self.grid_space,
-            "action_space": self.action_space,
-            "context_space": self.position_space,
-        }
+            NONE = 0.0
+            SPEED_HALF = CONFIG["time"]["speed_at_half"]
+            SPEED_FULL = CONFIG["time"]["speed_at_full"]
 
-        self.repeater_space = {
-            "grid_space": self.grid_space,
-            "action_space": self.action_space,
-            "context_space": spaces.Tuple((self.ca_params_space, self.time_space)),
-        }
+            MOVE = (1 / (SPEED_HALF * size)) - ANY
+            SHOOT = (1 / (SPEED_FULL * size)) - MOVE
 
-        self.MDP_space = {
-            "grid_space": self.grid_space,
-            "action_space": self.action_space,
-            "context_space": self.context_space,
+        else:
+            NONE = CONFIG["time"]["ta_none"]
+            MOVE = CONFIG["time"]["ta_move"]
+            SHOOT = CONFIG["time"]["ta_shoot"]
+
+        return {
+            "_t_act_none": NONE,
+            "_t_act_move": MOVE,
+            "_t_act_shoot": SHOOT,
+            "_t_env_any": ANY,
         }
 
     def _noise(self):
-        # A circular deviation of 1/12 of the grid size
+        """
+        Noise to initial conditions. A circular deviation of 1/12 of the grid size.
+        """
         l = ((self._row + self._col) // 2) // 12
         return int(np.random.choice(range(l), size=1))
 
@@ -277,6 +210,70 @@ class ForestFireBulldozerEnv(CAEnv):
 
         self.time_per_action = time_per_action
         self.time_per_state = lambda s: self._t_env_any
+
+    def _set_spaces(self):
+        self.grid_space = GridSpace(
+            values=[self._empty, self._burned, self._tree, self._fire],
+            shape=(self._row, self._col),
+        )
+
+        self.ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3))
+        self.position_space = spaces.MultiDiscrete([self._row, self._col])
+        self.time_space = spaces.Box(0.0, float("inf"), shape=tuple())
+
+        self.context_space = spaces.Tuple(
+            (self.ca_params_space, self.position_space, self.time_space)
+        )
+
+        # RL spaces
+
+        m, n = len(self._moves), len(self._shoots)
+        self.action_space = spaces.MultiDiscrete([m, n])
+        self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
+
+        # Suboperators Spaces
+
+        self.ca_space = {
+            "grid_space": self.grid_space,
+            "action_space": self.action_space,
+            "context_space": self.ca_params_space,
+        }
+
+        self.move_space = {
+            "grid_space": self.grid_space,
+            "action_space": spaces.Discrete(m),
+            "context_space": self.position_space,
+        }
+
+        self.modify_space = {
+            "grid_space": self.grid_space,
+            "action_space": spaces.Discrete(n),
+            "context_space": self.position_space,
+        }
+
+        self.move_modify_space = {
+            "grid_space": self.grid_space,
+            "action_space": self.action_space,
+            "context_space": self.position_space,
+        }
+
+        self.repeater_space = {
+            "grid_space": self.grid_space,
+            "action_space": self.action_space,
+            "context_space": spaces.Tuple((self.ca_params_space, self.time_space)),
+        }
+
+        self.MDP_space = {
+            "grid_space": self.grid_space,
+            "action_space": self.action_space,
+            "context_space": self.context_space,
+        }
+
+    def get_kwarg(key):
+        try:
+            return kwargs[key]
+        except KeyError:
+            return self._default[key]
 
 
 class MDP(Operator):

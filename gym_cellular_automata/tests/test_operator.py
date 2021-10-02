@@ -59,6 +59,7 @@ def assert_operator(op, strict=False):
     assert_optionals(op, Space, ("grid_space", "action_space", "context_space"), strict)
 
     assert_optionals(op, bool, ("deterministic",), strict)
+    # ToDo: Test deterministic update
 
     assert hasattr(op, "update")
     assert callable(op.update)

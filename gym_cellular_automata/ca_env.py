@@ -17,7 +17,7 @@ class CAEnv(ABC, gym.Env):
         self._resample_initial = False
 
     def __init__(self, nrows, ncols, **kwargs):
-        self.nrows, self.ncols = nrows, ncols
+        self.nrows, self.ncols = nrows, ncols  # nrows & ncols is API
 
         # Set default dict and create atts per key
         self._set_defaults(nrows, ncols, **kwargs)
@@ -76,38 +76,15 @@ class CAEnv(ABC, gym.Env):
 
         return obs
 
+    def seed(self, seed=None):
+        self.np_random, seed = seeding.np_random(seed)
+        return [seed]
+
     def status(self):
         return {
             "steps_elapsed": self.steps_elapsed,
             "reward_accumulated": self.reward_accumulated,
         }
-
-    def seed(self, seed=None):
-        self.np_random, seed = seeding.np_random(seed)
-        return [seed]
-
-    @abstractmethod
-    def _get_defaults_free(self, **kwargs) -> dict:
-        raise NotImplementedError
-
-    @abstractmethod
-    def _get_defaults_scale(self, nrows, ncols) -> dict:
-        raise NotImplementedError
-
-    def _set_defaults(self, nrows, ncols, **kwargs):
-
-        # Scale free parameters default dictionary
-        self._defaults_free = self._get_defaults_free(**kwargs)
-
-        # Scale dependant parameters default dictionary
-        self._defaults_scale = self._get_defaults_scale(nrows, ncols)
-
-        # Parameters Default Dictionary
-        self._defaults = {**self._defaults_free, **self._defaults_scale}
-
-        # Propably unnecessary as it would be defined on init on child
-        for key in self._defaults:
-            self.__dict__[key] = self._defaults[key]
 
     @abstractmethod
     def _award(self):
@@ -120,6 +97,31 @@ class CAEnv(ABC, gym.Env):
     @abstractmethod
     def _report(self):
         raise NotImplementedError
+
+    @abstractmethod
+    def _get_defaults_free(self, **kwargs) -> dict:
+        return {}
+
+    @abstractmethod
+    def _get_defaults_scale(self, nrows, ncols) -> dict:
+        return {}
+
+    def _set_defaults(self, nrows, ncols, **kwargs):
+
+        # Scale free parameters default dictionary
+        self._defaults_free = self._get_defaults_free(**kwargs)
+
+        # Scale dependant parameters default dictionary
+        self._defaults_scale = self._get_defaults_scale(nrows, ncols)
+
+        # Parameters Default Dictionary
+        self._defaults = {**self._defaults_free, **self._defaults_scale}
+
+        # Propably unnecessary as it would be defined on init on child, just have the defaults ready, init them on child
+        for (
+            key
+        ) in self._defaults:  # Allows bypassing both functions with minimal effort
+            self.__dict__[key] = self._defaults[key]
 
     def count_cells(self, grid=None):
         """Returns dict of cell counts"""
