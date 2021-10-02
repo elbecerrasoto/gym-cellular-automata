@@ -11,10 +11,14 @@ from gym_cellular_automata.forest_fire.operators import (
 )
 
 from .utils.config import CONFIG
+from .utils.render import render
 
 
 class ForestFireBulldozerEnv(CAEnv):
     metadata = {"render.modes": ["human"]}
+
+    nrows = CONFIG["grid_shape"]["nrows"]
+    ncols = CONFIG["grid_shape"]["ncols"]
 
     @property
     def MDP(self):
@@ -33,9 +37,6 @@ class ForestFireBulldozerEnv(CAEnv):
         self._resample_initial = False
 
         return self._initial_state
-
-    nrows = CONFIG["grid_shape"]["nrows"]
-    ncols = CONFIG["grid_shape"]["ncols"]
 
     def __init__(self, nrows=nrows, ncols=ncols, **kwargs):
 
@@ -87,8 +88,6 @@ class ForestFireBulldozerEnv(CAEnv):
     # step, reset & seed methods inherited from parent class
 
     def render(self, mode="human"):
-        from .utils.render import render
-
         return render(self)
 
     def _award(self):
