@@ -3,7 +3,7 @@ from gym_cellular_automata.tests import Identity
 
 
 def test_operator():
-    assert_operator(Identity())
+    assert_operator(Identity(), strict=False)
 
 
 def assert_operator(op, strict=False):

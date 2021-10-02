@@ -103,7 +103,7 @@ def modify(effects):
 
 
 def test_modify_is_operator(modify):
-    assert_operator(modify)
+    assert_operator(modify, strict=False)
 
 
 @pytest.mark.repeat(TEST_REPETITIONS)

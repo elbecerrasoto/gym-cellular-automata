@@ -52,7 +52,7 @@ def position_space():
 def test_CAwindy_is_operator(ca):
     from gym_cellular_automata.tests import assert_operator
 
-    assert_operator(ca)
+    assert_operator(ca, strict=False)
 
 
 @pytest.mark.repeat(TESTS)

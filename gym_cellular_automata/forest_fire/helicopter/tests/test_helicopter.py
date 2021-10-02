@@ -76,7 +76,7 @@ def test_forest_fire_env_is_a_gym_env(env):
 def test_helicopterMDP_is_operator(env):
     from gym_cellular_automata.tests import assert_operator
 
-    assert_operator(env.MDP)
+    assert_operator(env.MDP, strict=True)
 
 
 def test_forest_fire_env_private_methods(env, reward_space):
