@@ -73,6 +73,12 @@ def test_forest_fire_env_is_a_gym_env(env):
     assert isinstance(env, gym.Env)
 
 
+def test_helicopterMDP_is_operator(env):
+    from gym_cellular_automata.tests import assert_operator
+
+    assert_operator(env.MDP)
+
+
 def test_forest_fire_env_private_methods(env, reward_space):
     env.reset()
     action = env.action_space.sample()

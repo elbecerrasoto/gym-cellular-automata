@@ -40,3 +40,9 @@ def test_starting_conditions_seed(env):
 
     # Single fire seed
     assert len(grid[grid == env._fire]) == 1
+
+
+def test_bulldozerMDP_is_operator(env):
+    from gym_cellular_automata.tests import assert_operator
+
+    assert_operator(env.MDP)
