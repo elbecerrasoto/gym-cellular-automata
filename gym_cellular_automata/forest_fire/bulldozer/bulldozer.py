@@ -34,15 +34,37 @@ class ForestFireBulldozerEnv(CAEnv):
 
         return self._initial_state
 
-    _row = CONFIG["grid_shape"]["nrows"]
-    _col = CONFIG["grid_shape"]["ncols"]
+    nrows = CONFIG["grid_shape"]["nrows"]
+    ncols = CONFIG["grid_shape"]["ncols"]
 
-    def __init__(self, nrows=_row, ncols=_col, **kwargs):
+    def __init__(self, nrows=nrows, ncols=ncols, **kwargs):
 
         super().__init__(nrows, ncols, **kwargs)
 
-        # Set here any kwargs, now that default is defined
-        # self._t_act_shoot = get_kwarg("_t_act_shoot")
+        # Class Variables, set to defaults if not manually entered.
+
+        # Variables, scale free
+        self._moves = self._get_kwarg("moves", kwargs)
+        self._shoots = self._get_kwarg("shoots", kwargs)
+        self._action_sets = self._get_kwarg("action_sets", kwargs)
+
+        self._empty = self._get_kwarg("empty", kwargs)
+        self._burned = self._get_kwarg("burned", kwargs)
+        self._tree = self._get_kwarg("tree", kwargs)
+        self._fire = self._get_kwarg("fire", kwargs)
+
+        self._p_tree = self._get_kwarg("p_tree", kwargs)
+        self._p_empty = self._get_kwarg("p_empty", kwargs)
+        self._wind = self._get_kwarg("wind", kwargs)
+
+        self._effects = self._get_kwarg("effects", kwargs)
+
+        self._t_env_any = self._get_kwarg("t_env_any", kwargs)
+        self._t_act_none = self._get_kwarg("t_act_none", kwargs)
+
+        # Variables, scale dependant variables
+        self._t_act_move = self._get_kwarg("t_act_move", kwargs)
+        self._t_act_shoot = self._get_kwarg("t_act_shoot", kwargs)
 
         self._set_spaces()
         self._init_time_mappings()
@@ -111,17 +133,17 @@ class ForestFireBulldozerEnv(CAEnv):
 
     def _get_defaults_free(self, *args, **kwargs):
         return {
-            "_moves": CONFIG["actions"]["movement"],
-            "_shoots": CONFIG["actions"]["shooting"],
-            "_action_sets": CONFIG["actions"]["sets"],
-            "_empty": CONFIG["cell_symbols"]["empty"],
-            "_burned": CONFIG["cell_symbols"]["burned"],
-            "_tree": CONFIG["cell_symbols"]["tree"],
-            "_fire": CONFIG["cell_symbols"]["fire"],
-            "_p_tree": CONFIG["p_tree"],
-            "_p_empty": CONFIG["p_empty"],
-            "_wind": CONFIG["wind"],
-            "_effects": CONFIG["effects"],
+            "moves": CONFIG["actions"]["movement"],
+            "shoots": CONFIG["actions"]["shooting"],
+            "action_sets": CONFIG["actions"]["sets"],
+            "empty": CONFIG["cell_symbols"]["empty"],
+            "burned": CONFIG["cell_symbols"]["burned"],
+            "tree": CONFIG["cell_symbols"]["tree"],
+            "fire": CONFIG["cell_symbols"]["fire"],
+            "p_tree": CONFIG["p_tree"],
+            "p_empty": CONFIG["p_empty"],
+            "wind": CONFIG["wind"],
+            "effects": CONFIG["effects"],
         }
 
     def _get_defaults_scale(self, nrows, ncols):
@@ -144,17 +166,17 @@ class ForestFireBulldozerEnv(CAEnv):
             SHOOT = CONFIG["time"]["ta_shoot"]
 
         return {
-            "_t_act_none": NONE,
-            "_t_act_move": MOVE,
-            "_t_act_shoot": SHOOT,
-            "_t_env_any": ANY,
+            "t_act_none": NONE,
+            "t_act_move": MOVE,
+            "t_act_shoot": SHOOT,
+            "t_env_any": ANY,
         }
 
     def _noise(self):
         """
         Noise to initial conditions. A circular deviation of 1/12 of the grid size.
         """
-        l = ((self._row + self._col) // 2) // 12
+        l = ((self.nrows + self.ncols) // 2) // 12
         return int(np.random.choice(range(l), size=1))
 
     def _initial_grid_distribution(self):
@@ -162,14 +184,14 @@ class ForestFireBulldozerEnv(CAEnv):
         grid_space = GridSpace(
             values = [  self._empty,  self._burned,   self._tree,  self._fire],
             probs  = [self._p_empty,           0.0, self._p_tree,         0.0],
-            shape=(self._row, self._col),
+            shape=(self.nrows, self.ncols),
         )
         # fmt: on
 
         grid = grid_space.sample()
 
         # Around the lower left quadrant
-        r, c = (3 * self._row // 4), (1 * self._col // 4)
+        r, c = (3 * self.nrows // 4), (1 * self.ncols // 4)
         row, col = self._fire_seed = r + self._noise(), c + self._noise()
 
         grid[row, col] = self._fire
@@ -180,12 +202,12 @@ class ForestFireBulldozerEnv(CAEnv):
         init_time = np.array(0.0)
 
         # Around the upper right quadrant
-        r, c = (1 * self._row // 4), (3 * self._col // 4)
+        r, c = (1 * self.nrows // 4), (3 * self.ncols // 4)
 
-        init_row = r + self._noise()
-        init_col = c + self._noise()
+        initnrows = r + self._noise()
+        initncols = c + self._noise()
 
-        init_position = np.array([init_row, init_col])
+        init_position = np.array([initnrows, initncols])
 
         init_context = self._wind, init_position, init_time
 
@@ -217,11 +239,11 @@ class ForestFireBulldozerEnv(CAEnv):
     def _set_spaces(self):
         self.grid_space = GridSpace(
             values=[self._empty, self._burned, self._tree, self._fire],
-            shape=(self._row, self._col),
+            shape=(self.nrows, self.ncols),
         )
 
         self.ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3))
-        self.position_space = spaces.MultiDiscrete([self._row, self._col])
+        self.position_space = spaces.MultiDiscrete([self.nrows, self.ncols])
         self.time_space = spaces.Box(0.0, float("inf"), shape=tuple())
 
         self.context_space = spaces.Tuple(

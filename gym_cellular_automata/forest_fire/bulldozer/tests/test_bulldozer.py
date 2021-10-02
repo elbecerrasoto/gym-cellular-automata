@@ -21,7 +21,7 @@ def test_termination_behavior(env):
     env.reset()
 
     cells = env._empty, env._burned, env._tree
-    ncols, nrows = env._col, env._row
+    ncols, nrows = env.ncols, env.nrows
     non_fire = GridSpace(values=[cells], shape=(ncols, nrows)).sample()
 
     env.grid = non_fire

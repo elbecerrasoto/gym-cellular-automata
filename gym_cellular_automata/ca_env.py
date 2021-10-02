@@ -117,12 +117,6 @@ class CAEnv(ABC, gym.Env):
         # Parameters Default Dictionary
         self._defaults = {**self._defaults_free, **self._defaults_scale}
 
-        # Propably unnecessary as it would be defined on init on child, just have the defaults ready, init them on child
-        for (
-            key
-        ) in self._defaults:  # Allows bypassing both functions with minimal effort
-            self.__dict__[key] = self._defaults[key]
-
     def _get_kwarg(self, arg, kwargs):
         try:
             return kwargs[arg]
