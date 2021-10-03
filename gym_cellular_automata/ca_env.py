@@ -19,7 +19,7 @@ class CAEnv(ABC, gym.Env):
     def __init__(self, nrows, ncols, **kwargs):
         self.nrows, self.ncols = nrows, ncols  # nrows & ncols is API
 
-        # Set default dict and create atts per key
+        # Set default dict
         self._set_defaults(nrows, ncols, **kwargs)
 
         # Gym spec method
@@ -98,11 +98,9 @@ class CAEnv(ABC, gym.Env):
     def _report(self):
         raise NotImplementedError
 
-    @abstractmethod
     def _get_defaults_free(self, **kwargs) -> dict:
         return {}
 
-    @abstractmethod
     def _get_defaults_scale(self, nrows, ncols) -> dict:
         return {}
 
