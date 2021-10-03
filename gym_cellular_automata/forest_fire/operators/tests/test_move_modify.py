@@ -4,6 +4,7 @@ from gym import spaces
 
 from gym_cellular_automata import GridSpace
 from gym_cellular_automata.forest_fire.operators import Modify, Move
+from gym_cellular_automata.tests import assert_operator
 
 TEST_REPETITIONS = 16
 
@@ -50,6 +51,10 @@ def position_space():
     return spaces.MultiDiscrete([ROW, COL])
 
 
+def test_move_is_operator(move):
+    assert_operator(move)
+
+
 @pytest.mark.repeat(TEST_REPETITIONS)
 def test_move(move, grid_space, action_space, position_space, directions_sets):
 
@@ -66,53 +71,13 @@ def test_move(move, grid_space, action_space, position_space, directions_sets):
     context = position_space.sample()
     row, col = context
 
-    # fmt: off
-    if (action in up_set)    and (row > 0):
-        row -= 1
-
-    if (action in down_set)  and (row < (nrows-1)):
-        row += 1
-
-    if (action in left_set)  and (col > 0):
-        col -= 1
-
-    if (action in right_set) and (col < (ncols-1)):
-        col += 1
-    # fmt: on
-
-    expected_position = np.array([row, col])
+    expected_position = np.array(
+        new_position(row, col, action, grid, up_set, down_set, left_set, right_set)
+    )
 
     grid, observed_position = move(grid, action, context)
 
     assert np.all(observed_position == expected_position)
-
-
-def test_move_warnings(
-    move,
-    grid_space,
-    position_space,
-):
-    """
-    Move operator
-    White-box Warning Tests
-    """
-
-    # Magic Variables
-    unhashable = np.array(0)
-    out_of_action_space = "Arbitrary Object"
-
-    grid = grid_space.sample()
-
-    context = position_space.sample()
-
-    with pytest.warns(UserWarning):
-        # Unhashable Warning
-        action = unhashable
-        move(grid, action, context)
-
-        # Out of action space Warning
-        action = out_of_action_space
-        move(grid, action, context)
 
 
 TEST_REPETITIONS = 16
@@ -137,6 +102,10 @@ def modify(effects):
     return Modify(effects)
 
 
+def test_modify_is_operator(modify):
+    assert_operator(modify, strict=False)
+
+
 @pytest.mark.repeat(TEST_REPETITIONS)
 def test_modify_cell_at_position(modify, effects, grid_space, position_space):
 
@@ -156,3 +125,52 @@ def test_modify_cell_at_position(modify, effects, grid_space, position_space):
 
         assert observed_cell == expected_cell
         assert np.all(random_position == position)
+
+
+### Orthogonal new position test
+### Orthogonal: different from the method used on library implementation
+
+
+def new_position(row, col, action, grid, up_set, down_set, left_set, right_set):
+    def are_my_neighbors_a_boundary(grid, pos):
+        """
+        Check if the neighbors of target position are a boundary.
+        Return a tuple of Bools informing which neighbor is a boundary.
+        It checks the up, down, left, and right neighbors.
+        """
+        from collections import namedtuple
+
+        row, col = pos
+        n_row, n_col = grid.shape
+
+        up_offset, down_offset = row + np.array([-1, 1])
+        left_offset, right_offset = col + np.array([-1, 1])
+
+        up = bool(up_offset < 0)
+        down = bool(down_offset > n_row - 1)
+        left = bool(left_offset < 0)
+        right = bool(right_offset > n_col - 1)
+
+        Boundaries = namedtuple("Boundaries", ["up", "down", "left", "right"])
+
+        return Boundaries(up, down, left, right)
+
+    is_boundary = are_my_neighbors_a_boundary(grid, (row, col))
+
+    new_row = (
+        row - 1
+        if not is_boundary.up and int(action) in up_set
+        else row + 1
+        if not is_boundary.down and int(action) in down_set
+        else row
+    )
+
+    new_col = (
+        col - 1
+        if not is_boundary.left and int(action) in left_set
+        else col + 1
+        if not is_boundary.right and int(action) in right_set
+        else col
+    )
+
+    return new_row, new_col

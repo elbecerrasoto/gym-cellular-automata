@@ -13,6 +13,11 @@ ca_params:
   p_fire: 0.033
   p_tree: 0.333
 
+# For big grids (ncells > 999)
+# The following values are recommended
+# p_fire: 0.001
+# p_tree: 0.100
+
 # Modifier"s effects
 # Change FIRE to EMPTY
 effects:
@@ -29,8 +34,15 @@ actions:
   down:       7
   down_right: 8
 
-# Steps that the Cellular Automaton remains idle.
-max_freeze: 2
+# Fraction of the grid that the modifier can reach on each direction
+row_speed: 0.5
+col_speed: 0.5
+
+# "Max Freeze" is calculated as:
+# max_freeze = (int(ROW_SPEED * nrows + int(COL_SPEED * ncols)) // 2
+
+# Also "Max Freeze" can be set directly with a value >= 0
+max_freeze: -1
 
 rewards:
   per_empty: 0.0

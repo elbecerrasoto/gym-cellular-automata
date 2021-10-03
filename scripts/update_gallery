@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 import argparse
+import random
 import re
 from pathlib import Path
 
 import gym
 
-from gym_cellular_automata import PROJECT_PATH, REGISTERED_CA_ENVS
+from gym_cellular_automata import GYM_MAKE, PROJECT_PATH
 
 
 def play_random_policy(env, steps, verbose=False):
@@ -30,19 +31,17 @@ def play_random_policy(env, steps, verbose=False):
     return env
 
 
-LIBRARY = "gym_cellular_automata"
-
 # fmt: off
 # Helicopter
 
 OHELICOPTER      = PROJECT_PATH / "./pics/TMPhelicopter.svg"
-CALL_HELICOPTER  = LIBRARY + ":" + REGISTERED_CA_ENVS[0]
+CALL_HELICOPTER  = GYM_MAKE[0]
 RE_HELICOPTER    = re.compile(r"helicopter|heli|hel|ffh|hff", re.IGNORECASE)
 STEPS_HELICOPTER = 0
 
 # Bulldozer
 OBULLDOZER      = PROJECT_PATH / "./pics/TMPbulldozer.svg"
-CALL_BULLDOZER  = LIBRARY + ":" + REGISTERED_CA_ENVS[1]
+CALL_BULLDOZER  = GYM_MAKE[1]
 RE_BULLDOZER    = re.compile(r"bulldozer|bul|blldz|ffb|bff", re.IGNORECASE)
 STEPS_BULLDOZER = 256
 
@@ -201,14 +200,13 @@ if __name__ == "__main__":
                         if OVERWRITE:
                             return file
                         else:
-                            i = 1
                             original = file
-                            while file.exists():
-                                file = original.with_stem(original.stem + f"_{i}")
-                                i += 1
+                            MAGIC = random.randrange(99999)
+                            file = original.with_stem(original.stem + f"_{MAGIC}")
                             return file
 
-                    fig.savefig(path2write(ofile))
+                    ofile = path2write(ofile)
+                    fig.savefig(ofile)
 
                 if VERBOSE:
                     print(f"Saving {kenv} figure to {ofile} after {steps} steps")

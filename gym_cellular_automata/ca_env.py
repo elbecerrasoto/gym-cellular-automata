@@ -1,11 +1,8 @@
 from abc import ABC, abstractmethod
 
 import gym
-from gym import logger, spaces
+from gym import logger
 from gym.utils import seeding
-
-from gym_cellular_automata.grid_space import GridSpace
-from gym_cellular_automata.operator import Identity
 
 
 class CAEnv(ABC, gym.Env):
@@ -19,7 +16,12 @@ class CAEnv(ABC, gym.Env):
     def initial_state(self):
         self._resample_initial = False
 
-    def __init__(self):
+    def __init__(self, nrows, ncols, **kwargs):
+        self.nrows, self.ncols = nrows, ncols  # nrows & ncols is API
+
+        # Set default dict
+        self._set_defaults(nrows, ncols, **kwargs)
+
         # Gym spec method
         self.seed()
 
@@ -40,6 +42,10 @@ class CAEnv(ABC, gym.Env):
             reward = self._award()
             done = self.done
             info = self._report()
+
+            # Status method
+            self.steps_elapsed += 1
+            self.reward_accumulated += reward
 
             return obs, reward, done, info
 
@@ -62,6 +68,8 @@ class CAEnv(ABC, gym.Env):
     def reset(self):
 
         self.done = False
+        self.steps_elapsed = 0
+        self.reward_accumulated = 0.0
         self.steps_beyond_done = 0
         self._resample_initial = True
         obs = self.state = self.grid, self.context = self.initial_state
@@ -72,6 +80,12 @@ class CAEnv(ABC, gym.Env):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
+    def status(self):
+        return {
+            "steps_elapsed": self.steps_elapsed,
+            "reward_accumulated": self.reward_accumulated,
+        }
+
     @abstractmethod
     def _award(self):
         raise NotImplementedError
@@ -83,6 +97,29 @@ class CAEnv(ABC, gym.Env):
     @abstractmethod
     def _report(self):
         raise NotImplementedError
+
+    def _get_defaults_free(self, **kwargs) -> dict:
+        return {}
+
+    def _get_defaults_scale(self, nrows, ncols) -> dict:
+        return {}
+
+    def _set_defaults(self, nrows, ncols, **kwargs):
+
+        # Scale free parameters default dictionary
+        self._defaults_free = self._get_defaults_free(**kwargs)
+
+        # Scale dependant parameters default dictionary
+        self._defaults_scale = self._get_defaults_scale(nrows, ncols)
+
+        # Parameters Default Dictionary
+        self._defaults = {**self._defaults_free, **self._defaults_scale}
+
+    def _get_kwarg(self, arg, kwargs):
+        try:
+            return kwargs[arg]
+        except KeyError:
+            return self._defaults[arg]
 
     def count_cells(self, grid=None):
         """Returns dict of cell counts"""
@@ -90,57 +127,3 @@ class CAEnv(ABC, gym.Env):
 
         grid = self.grid if grid is None else grid
         return Counter(grid.flatten().tolist())
-
-
-class MockCAEnv(CAEnv):
-    _nrows = 8
-    _ncols = 8
-    _states = 8
-
-    def __init__(self, *args, **kwargs):
-
-        super().__init__(*args, **kwargs)
-
-        self._set_spaces()
-
-        # Composite Operators
-        self._MDP = Identity(**self.MDP_space)
-
-    @property
-    def MDP(self):
-        return self._MDP
-
-    @property
-    def initial_state(self):
-
-        if self._resample_initial:
-
-            self.grid = self.grid_space.sample()
-            self.context = self.context_space.sample()
-
-            self._initial_state = self.grid, self.context
-            self._resample_initial = False
-
-        return self._initial_state
-
-    def _award(self):
-        return 0.0
-
-    def _is_done(self):
-        return False
-
-    def _report(self):
-        return {}
-
-    def _set_spaces(self):
-        self.grid_space = GridSpace(n=self._states, shape=(self._nrows, self._ncols))
-        self.action_space = spaces.Discrete(self._states)
-        self.context_space = spaces.Discrete(self._states)
-
-        self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
-
-        self.MDP_space = {
-            "grid_space": self.grid_space,
-            "action_space": self.action_space,
-            "context_space": self.context_space,
-        }

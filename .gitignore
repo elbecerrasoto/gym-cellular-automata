@@ -1,7 +1,8 @@
 # GYMCA ignores
 
-# Gallery temporal files
-pics/TMP*.svg
+# gymca temporal files
+# For prototyping or gallery pics
+TMP*
 
 # Custom ignores
 

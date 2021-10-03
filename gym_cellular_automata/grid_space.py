@@ -62,9 +62,9 @@ class GridSpace(Space):
 
     def sample(self) -> np.ndarray:
 
-        return np.random.choice(a=self.values, size=self.size, p=self.probs).reshape(
-            self.shape
-        )
+        return self.np_random.choice(
+            a=self.values, size=self.size, p=self.probs
+        ).reshape(self.shape)
 
     def contains(self, x) -> bool:
 

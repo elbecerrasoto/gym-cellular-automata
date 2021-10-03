@@ -28,7 +28,6 @@ class RepeatCA(Operator):
 
         self.ca = cellular_automaton
         self.suboperators = (self.ca,)
-
         self.deterministic = self.ca.deterministic
 
     def update(self, grid, action, context):

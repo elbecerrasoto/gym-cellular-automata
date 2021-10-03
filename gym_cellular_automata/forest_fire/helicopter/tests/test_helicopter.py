@@ -4,7 +4,7 @@ import pytest
 from gym import spaces
 
 from gym_cellular_automata import GridSpace
-from gym_cellular_automata.forest_fire.helicopter import ForestFireEnvHelicopterV0
+from gym_cellular_automata.forest_fire.helicopter import ForestFireHelicopterEnv
 from gym_cellular_automata.forest_fire.helicopter.utils.config import CONFIG
 
 RANDOM_POLICY_ITERATIONS = 12
@@ -38,7 +38,7 @@ P_TREE = CONFIG["ca_params"]["p_tree"]
 
 @pytest.fixture
 def env():
-    return ForestFireEnvHelicopterV0()
+    return ForestFireHelicopterEnv()
 
 
 @pytest.fixture
@@ -71,6 +71,12 @@ def reward_space():
 
 def test_forest_fire_env_is_a_gym_env(env):
     assert isinstance(env, gym.Env)
+
+
+def test_helicopterMDP_is_operator(env):
+    from gym_cellular_automata.tests import assert_operator
+
+    assert_operator(env.MDP, strict=True)
 
 
 def test_forest_fire_env_private_methods(env, reward_space):
@@ -160,7 +166,7 @@ def test_forest_fire_env_hit_info(env, all_fire_grid):
 def manual_assesment(verbose=False):
     from time import sleep
 
-    env = ForestFireEnvHelicopterV0()
+    env = ForestFireHelicopterEnv()
 
     obs = env.reset()
 

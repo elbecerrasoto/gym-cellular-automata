@@ -13,36 +13,60 @@ from .utils.config import CONFIG
 from .utils.render import render
 
 
-class ForestFireEnvHelicopterV0(CAEnv):
+class ForestFireHelicopterEnv(CAEnv):
     metadata = {"render.modes": ["human"]}
 
-    # fmt: off
-    _empty           = CONFIG["cell_symbols"]["empty"]
-    _tree            = CONFIG["cell_symbols"]["tree"]
-    _fire            = CONFIG["cell_symbols"]["fire"]
+    nrows = CONFIG["grid_shape"]["nrows"]
+    ncols = CONFIG["grid_shape"]["ncols"]
 
+    @property
+    def MDP(self):
+        return self._MDP
 
-    _row              = CONFIG["grid_shape"]["nrows"]
-    _col              = CONFIG["grid_shape"]["ncols"]
+    @property
+    def initial_state(self):
 
-    _p_fire           = CONFIG["ca_params"]["p_fire"]
-    _p_tree           = CONFIG["ca_params"]["p_tree"]
+        if self._resample_initial:
 
-    _effects          = CONFIG["effects"]
+            self.grid = self.grid_space.sample()
 
-    _max_freeze       = CONFIG["max_freeze"]
+            ca_params = np.array([self._p_fire, self._p_tree])
+            pos = np.array([self.nrows // 2, self.ncols // 2])
+            freeze = np.array(self._max_freeze)
+            self.context = ca_params, pos, freeze
 
-    _n_actions        = len(CONFIG["actions"])
-    _action_sets      = CONFIG["actions_sets"]
+            self._initial_state = self.grid, self.context
 
-    _reward_per_empty = CONFIG["rewards"]["per_empty"]
-    _reward_per_tree  = CONFIG["rewards"]["per_tree"]
-    _reward_per_fire  = CONFIG["rewards"]["per_fire"]
-    # fmt: on
+        self._resample_initial = False
 
-    def __init__(self, *args, **kwargs):
+        return self._initial_state
 
-        super().__init__(*args, **kwargs)
+    def __init__(self, nrows=nrows, ncols=ncols, **kwargs):
+
+        # Sets defaults and runs seed method
+        super().__init__(nrows, ncols, **kwargs)
+
+        # Class Variables, set to defaults if not manually entered.
+
+        # Variables, scale free
+        self._p_fire = self._get_kwarg("p_fire", kwargs)
+        self._p_tree = self._get_kwarg("p_tree", kwargs)
+
+        self._empty = self._get_kwarg("empty", kwargs)
+        self._tree = self._get_kwarg("tree", kwargs)
+        self._fire = self._get_kwarg("fire", kwargs)
+
+        self._effects = self._get_kwarg("effects", kwargs)
+
+        self._n_actions = self._get_kwarg("n_actions", kwargs)
+        self._action_sets = self._get_kwarg("action_sets", kwargs)
+
+        self._reward_per_empty = self._get_kwarg("reward_per_empty", kwargs)
+        self._reward_per_tree = self._get_kwarg("reward_per_tree", kwargs)
+        self._reward_per_fire = self._get_kwarg("reward_per_fire", kwargs)
+
+        # Variables, scale dependant variables
+        self._max_freeze = self._get_kwarg("max_freeze", kwargs)
 
         self._set_spaces()
 
@@ -63,40 +87,28 @@ class ForestFireEnvHelicopterV0(CAEnv):
             **self.MDP_space,
         )
 
-    @property
-    def MDP(self):
-        return self._MDP
+    # Gym API
+    # step, reset & seed methods inherited from parent class
 
-    @property
-    def initial_state(self):
-
-        if self._resample_initial:
-
-            self.grid = self.grid_space.sample()
-
-            ca_params = np.array([self._p_fire, self._p_tree])
-            pos = np.array([self._row // 2, self._col // 2])
-            freeze = np.array(self._max_freeze)
-            self.context = ca_params, pos, freeze
-
-            self._initial_state = self.grid, self.context
-
-        self._resample_initial = False
-
-        return self._initial_state
+    def render(self, mode="human"):
+        return render(self)
 
     def _award(self):
+        ncells = self.nrows * self.ncols
+
         dict_counts = self.count_cells(self.grid)
 
         cell_counts = np.array(
             [dict_counts[self._empty], dict_counts[self._tree], dict_counts[self._fire]]
         )
 
+        cell_counts_relative = cell_counts / ncells
+
         reward_weights = np.array(
             [self._reward_per_empty, self._reward_per_tree, self._reward_per_fire]
         )
 
-        return np.dot(reward_weights, cell_counts)
+        return np.dot(reward_weights, cell_counts_relative)
 
     def _is_done(self):
         return False
@@ -104,21 +116,41 @@ class ForestFireEnvHelicopterV0(CAEnv):
     def _report(self):
         return {"hit": self.modify.hit}
 
-    def render(self, mode="human"):
+    def _get_defaults_free(self, **kwargs):
+        return {
+            "p_fire": CONFIG["ca_params"]["p_fire"],
+            "p_tree": CONFIG["ca_params"]["p_tree"],
+            "empty": CONFIG["cell_symbols"]["empty"],
+            "tree": CONFIG["cell_symbols"]["tree"],
+            "fire": CONFIG["cell_symbols"]["fire"],
+            "effects": CONFIG["effects"],
+            "n_actions": len(CONFIG["actions"]),
+            "action_sets": CONFIG["actions_sets"],
+            "reward_per_empty": CONFIG["rewards"]["per_empty"],
+            "reward_per_tree": CONFIG["rewards"]["per_tree"],
+            "reward_per_fire": CONFIG["rewards"]["per_fire"],
+        }
 
-        if mode == "human":
+    def _get_defaults_scale(self, nrows, ncols):
+        if CONFIG["max_freeze"] > -1:
 
-            return render(self)
+            max_freeze = CONFIG["max_freeze"]
 
         else:
 
-            logger.warn(
-                f"Undefined mode.\nAvailable modes {self.metadata['render.modes']}"
-            )
+            ROW_SPEED = CONFIG["row_speed"]
+            COL_SPEED = CONFIG["col_speed"]
+
+            MOORE_CORRECTION = 2  # Cause moving diagonally
+            max_freeze = (
+                int(ROW_SPEED * nrows) + int(COL_SPEED * ncols)
+            ) // MOORE_CORRECTION
+
+        return {"max_freeze": max_freeze}
 
     def _set_spaces(self):
         self.ca_params_space = spaces.Box(0.0, 1.0, shape=(2,))
-        self.position_space = spaces.MultiDiscrete([self._row, self._col])
+        self.position_space = spaces.MultiDiscrete([self.nrows, self.ncols])
         self.freeze_space = spaces.Discrete(self._max_freeze + 1)
 
         self.context_space = spaces.Tuple(
@@ -127,7 +159,7 @@ class ForestFireEnvHelicopterV0(CAEnv):
 
         self.grid_space = GridSpace(
             values=[self._empty, self._tree, self._fire],
-            shape=(self._row, self._col),
+            shape=(self.nrows, self.ncols),
         )
 
         # RL spaces

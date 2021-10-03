@@ -4,11 +4,9 @@ import pytest
 from gym.spaces import Space
 from matplotlib import pyplot as plt
 
-from gym_cellular_automata import REGISTERED_CA_ENVS
+from gym_cellular_automata import GYM_MAKE, REGISTERED_CA_ENVS
 
 matplotlib.interactive(False)
-
-LIBRARY = "gym_cellular_automata"
 
 STEPS = 3
 RESETS = 2
@@ -19,7 +17,7 @@ PLOT_EACH = 256
 
 @pytest.fixture
 def envs():
-    return (gym.make(LIBRARY + ":" + ca_env) for ca_env in REGISTERED_CA_ENVS)
+    return (gym.make(env_call) for env_call in GYM_MAKE)
 
 
 # @pytest.mark.skip(reason="debugging")
@@ -126,7 +124,7 @@ def test_are_operator_spaces_defined():
         from gym import spaces
 
         from gym_cellular_automata import GridSpace
-        from gym_cellular_automata.operator import Identity
+        from gym_cellular_automata.tests import Identity
 
         gS = GridSpace(values=[55, 66, 77], shape=(2, 2))
         aS = spaces.Discrete(2)

@@ -40,13 +40,17 @@ class ForestFire(Operator):
 
                 elif cell == self.tree:
                     # Sample for lightning strike
-                    strike = np.random.choice([True, False], p=[p_fire, 1 - p_fire])
+                    strike = self.np_random.choice(
+                        [True, False], p=[p_fire, 1 - p_fire]
+                    )
 
                     new_grid[row][col] = self.fire if strike else cell
 
                 elif cell == self.empty:
                     # Sample to grow a tree
-                    growth = np.random.choice([True, False], p=[p_tree, 1 - p_tree])
+                    growth = self.np_random.choice(
+                        [True, False], p=[p_tree, 1 - p_tree]
+                    )
 
                     new_grid[row][col] = self.tree if growth else cell
 

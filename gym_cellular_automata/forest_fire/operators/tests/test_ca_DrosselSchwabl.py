@@ -22,11 +22,6 @@ ROW, COL = 4, 4
 
 
 @pytest.fixture
-def ca():
-    return ForestFire(EMPTY, TREE, FIRE)
-
-
-@pytest.fixture
 def grid_space():
     return GridSpace(
         values=[EMPTY, TREE, FIRE],
@@ -42,6 +37,25 @@ def ca_params_space():
 @pytest.fixture
 def position_space():
     return spaces.MultiDiscrete([ROW, COL])
+
+
+@pytest.fixture
+def ca(grid_space, ca_params_space):
+    dummy_space = ca_params_space
+    return ForestFire(
+        EMPTY,
+        TREE,
+        FIRE,
+        grid_space=grid_space,
+        action_space=dummy_space,
+        context_space=ca_params_space,
+    )
+
+
+def test_drosselSchwabl_is_operator(ca):
+    from gym_cellular_automata.tests import assert_operator
+
+    assert_operator(ca, strict=False)
 
 
 @pytest.mark.repeat(TESTS)

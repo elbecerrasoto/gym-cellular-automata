@@ -49,6 +49,12 @@ def position_space():
     return spaces.MultiDiscrete([ROW, COL])
 
 
+def test_CAwindy_is_operator(ca):
+    from gym_cellular_automata.tests import assert_operator
+
+    assert_operator(ca, strict=False)
+
+
 @pytest.mark.repeat(TESTS)
 def test_windy_forest_fire_update(ca, grid_space, wind, position_space):
 

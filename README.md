@@ -5,7 +5,7 @@
     <a href="pics/gym_cellular_automata.svg"><img src="pics/gym_cellular_automata.svg"></a>
     <br />
     <br />
-    <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-v0.5.2-blue" alt="Semantic Versioning"></a>
+    <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-v0.5.3-blue" alt="Semantic Versioning"></a>
     <a href="http://choosealicense.com/licenses/mit/"><img src="https://img.shields.io/badge/license-MIT-red.svg?style=flat" alt="MIT License"></a>
     <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a>
     <a href="https://gitmoji.dev"><img src="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg" alt="Gitmoji"></a>
@@ -35,7 +35,7 @@ pip install -e gym-cellular-automata
 ```python
 import gym
 
-env = gym.make("gym_cellular_automata:ForestFireHelicopter-v0")
+env = gym.make("gym_cellular_automata:ForestFireHelicopter5x5-v1")
 obs = env.reset()
 
 total_reward = 0.0
@@ -83,6 +83,7 @@ print(gymca.REGISTERED_CA_ENVS)
 
 + [Forest Fire Environment Helicopter V0](./gym_cellular_automata/forest_fire/helicopter/README.md)
 + [Forest Fire Environment Bulldozer V1](./gym_cellular_automata/forest_fire/bulldozer/README.md)
++ [Architecture](./docs/architecture.md)
 
 ## Releases
 

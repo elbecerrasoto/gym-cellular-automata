@@ -6,7 +6,7 @@ from gym_cellular_automata.forest_fire.utils.config import (
 )
 
 CONFIG_PATH = (
-    PROJECT_PATH / "./gym_cellular_automata/forest_fire/helicopter/helicopter_v0.yaml"
+    PROJECT_PATH / "./gym_cellular_automata/forest_fire/helicopter/helicopter.yaml"
 )
 
 

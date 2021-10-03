@@ -4,6 +4,7 @@ from typing import Any, Optional
 
 import numpy as np
 from gym.spaces import Space
+from gym.utils import seeding
 
 
 class Operator(ABC):
@@ -26,10 +27,12 @@ class Operator(ABC):
     ) -> None:
 
         # fmt: off
-        self.grid_space    = grid_space    if grid_space    is not None else None
-        self.action_space  = action_space  if action_space  is not None else None
-        self.context_space = context_space if context_space is not None else None
+        self.grid_space    = grid_space
+        self.action_space  = action_space
+        self.context_space = context_space
         # fmt: on
+
+        self.seed()
 
     @abstractmethod
     def update(
@@ -69,29 +72,6 @@ class Operator(ABC):
     def __call__(self, *args, **kwargs):
         return self.update(*args, **kwargs)
 
-
-class Identity(Operator):
-    """The identity operator.
-    It returns a hard copy grid and context.
-
-    Shows the minimal implementation of an grid Operator.
-
-    Useful for mocking grid Operators during testing.
-
-        Example::
-
-            >>> Identity()
-
-    """
-
-    grid_dependant = True
-    action_dependant = False
-    context_dependant = True
-
-    deterministic = True
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def update(self, grid, action, context):
-        return super().update(grid, action, context)
+    def seed(self, seed=None):
+        self.np_random, seed = seeding.np_random(seed)
+        return [seed]

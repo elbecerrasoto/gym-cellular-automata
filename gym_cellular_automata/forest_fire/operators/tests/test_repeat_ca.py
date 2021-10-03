@@ -5,12 +5,7 @@ import pytest
 from gym import spaces
 
 from gym_cellular_automata import GridSpace
-from gym_cellular_automata.forest_fire.operators import (
-    Modify,
-    Move,
-    RepeatCA,
-    WindyForestFire,
-)
+from gym_cellular_automata.forest_fire.operators import RepeatCA, WindyForestFire
 
 TESTS = 8
 SEQUENCE = 8
@@ -29,52 +24,45 @@ def grid_space():
 
 
 @pytest.fixture
-def ca(grid_space):
-    dummy_space = spaces.Discrete(1)
+def dummy_space():
+    return spaces.Discrete(1)
+
+
+@pytest.fixture
+def ca(grid_space, dummy_space):
     return WindyForestFire(
         EMPTY, BURNED, TREE, FIRE, grid_space=grid_space, action_space=dummy_space
     )
 
 
 @pytest.fixture
-def operators(grid_space):
-
-    directions = {
-        "up": {0},
-        "down": {1},
-        "left": {2},
-        "right": {3},
-        "not_move": {4},
-    }
-
-    effects = {EMPTY: TREE, FIRE: EMPTY, BURNED: TREE}
-
-    move = Move(
-        directions,
-        grid_space=grid_space,
-        action_space=spaces.Discrete(5),
-        context_space=spaces.MultiDiscrete([ROW, COL]),
-    )
-
-    modify = Modify(
-        effects,
-        grid_space=grid_space,
-        action_space=spaces.Discrete(2),
-        context_space=spaces.MultiDiscrete([ROW, COL]),
-    )
-
-    return move, modify
+def context_space(ca):
+    accu_time_space = spaces.Box(np.array(0.0), np.array(1.0))
+    return spaces.Tuple((ca.context_space, accu_time_space))
 
 
 @pytest.fixture
-def repeat_ca(ca):
+def repeat_ca(ca, grid_space, dummy_space, context_space):
     def time_per_action(action):
         return 1.0
 
     def time_per_state(state):
         return 1.0
 
-    return RepeatCA(ca, time_per_action, time_per_state)
+    return RepeatCA(
+        ca,
+        time_per_action,
+        time_per_state,
+        grid_space=grid_space,
+        action_space=dummy_space,
+        context_space=context_space,
+    )
+
+
+def test_repeat_ca_is_operator(repeat_ca):
+    from gym_cellular_automata.tests import assert_operator
+
+    assert_operator(repeat_ca, strict=True)
 
 
 def test_repeat_ca(ca, repeat_ca):

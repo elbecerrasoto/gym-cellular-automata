@@ -30,7 +30,6 @@ from .config import CONFIG
 FIGSIZE = (15, 12)
 FIGSTYLE = "seaborn-whitegrid"
 
-TITLE = "Forest Fire\nBulldozer-v1"
 TITLE_SIZE = 42
 TITLE_POS = {"x": 0.121, "y": 0.96}
 TITLE_ALIGN = "left"
@@ -74,6 +73,8 @@ def render(env):
 
     local_grid = moore_n(N_LOCAL, pos, grid, EMPTY)
     pos_fseed = env._fire_seed
+
+    TITLE = env.spec.id
 
     plt.style.use(FIGSTYLE)
     fig_shape = (12, 14)
