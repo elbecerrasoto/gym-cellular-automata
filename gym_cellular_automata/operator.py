@@ -4,6 +4,7 @@ from typing import Any, Optional
 
 import numpy as np
 from gym.spaces import Space
+from gym.utils import seeding
 
 
 class Operator(ABC):
@@ -30,6 +31,8 @@ class Operator(ABC):
         self.action_space  = action_space
         self.context_space = context_space
         # fmt: on
+
+        self.seed()
 
     @abstractmethod
     def update(
@@ -68,3 +71,7 @@ class Operator(ABC):
 
     def __call__(self, *args, **kwargs):
         return self.update(*args, **kwargs)
+
+    def seed(self, seed=None):
+        self.np_random, seed = seeding.np_random(seed)
+        return [seed]

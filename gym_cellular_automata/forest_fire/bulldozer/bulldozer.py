@@ -176,7 +176,7 @@ class ForestFireBulldozerEnv(CAEnv):
         Noise to initial conditions. A circular deviation of 1/12 of the grid size.
         """
         l = ((self.nrows + self.ncols) // 2) // 12
-        return int(np.random.choice(range(l), size=1))
+        return int(self.np_random.choice(range(l), size=1))
 
     def _initial_grid_distribution(self):
         # fmt: off

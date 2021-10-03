@@ -18,6 +18,7 @@
   + _ForestFireHelicopter-v0_
   + _ForestFireBulldozer-v1_
 + Operator test
++ Hotfix: gym seeding utility (*np_random* instead of *np.random*)
 + Registration code maintenance
 
 
