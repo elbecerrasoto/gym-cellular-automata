@@ -57,9 +57,10 @@ def parse_wind(windD: dict) -> np.ndarray:
             [ windD["down_left"], windD["down"], windD["down_right"] ],
         ]
     )
-    # fmt: on
-    wind_space = spaces.Box(0.0, 1.0, shape=(3, 3))
 
-    assert wind_space.contains(wind), "Bad Wind Data, check ranges [0.0-1.0]"
+    # fmt: on
+    wind_space = spaces.Box(0.0, 1.0, shape=(3, 3), dtype=np.float64)
+
+    assert wind_space.contains(wind), "Bad Wind Data, check ranges [0.0, 1.0]"
 
     return wind
