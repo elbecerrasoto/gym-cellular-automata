@@ -28,6 +28,8 @@ class ForestFireBulldozerEnv(CAEnv):
     def initial_state(self):
 
         if self._resample_initial:
+            self.nrows = CONFIG["grid_shape"]["nrows"]
+            self.ncols = CONFIG["grid_shape"]["ncols"]
 
             self.grid = self._initial_grid_distribution()
             self.context = self._initial_context_distribution()
