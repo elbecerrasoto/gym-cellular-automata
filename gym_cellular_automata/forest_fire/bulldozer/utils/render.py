@@ -43,6 +43,9 @@ EMPTY = CONFIG["cell_symbols"]["empty"]
 BURNED = CONFIG["cell_symbols"]["burned"]
 TREE = CONFIG["cell_symbols"]["tree"]
 FIRE = CONFIG["cell_symbols"]["fire"]
+NROWS = CONFIG["grid_shape"]["nrows"]
+NCOLS = CONFIG["grid_shape"]["ncols"]
+
 
 # Assumes that cells values are in ascending order and paired with its colors
 COLORS = [COLOR_EMPTY, COLOR_BURNED, COLOR_TREE, COLOR_FIRE]
@@ -74,7 +77,7 @@ def render(env):
     local_grid = moore_n(N_LOCAL, pos, grid, EMPTY)
     pos_fseed = env._fire_seed
 
-    TITLE = env.spec.id
+    TITLE =  "ForestFireBulldozer"+str(NROWS)+"x"+str(NCOLS)+"-v2"
 
     plt.style.use(FIGSTYLE)
     fig_shape = (12, 14)
