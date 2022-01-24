@@ -10,6 +10,7 @@ install-develop : # sudo make install-develop
 
 git-aliases : # `git br` shows branchs descriptions `git root` goes to project root
 	git config --global alias.br !git-br # git branch --edit-description
+	git config --global alias.br-describe 'branch --edit-description'
 	git config --global alias.root 'rev-parse --show-toplevel'
 
 conda_env :
