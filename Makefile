@@ -13,7 +13,10 @@ git-aliases :
 	git config --global alias.root 'rev-parse --show-toplevel'
 
 conda_env :
-	conda env create --file "environment.yaml"
+	conda env create --file "environment.yaml" python="3.9"
+
+conda_env_rm :
+	conda remove --name gymca --all
 
 hooks :
 	pre-commit install
@@ -32,7 +35,7 @@ style :
 test :
 	pytest -m "not slow" --maxfail=3 ./gym_cellular_automata
 
-test-debug :
+test-debug : # Depends on pip install pytest-ipdb
 	pytest -m "not slow" --ipdb ./gym_cellular_automata
 
 test-coverage :
@@ -71,4 +74,4 @@ count :
 	# Counts lines of code
 	find ./ -name '*.py' -print | xargs cat | sed '/^$$/ d' | perl -ne 'if(not /^ *?#/){print $$_}' | wc -l
 
-.PHONY : help install install-develop git-aliases conda_env hooks hooks-dry hooks-update style test test-debug test-coverage test-slow test-visual linter patch gallery clean count
+.PHONY : help install install-develop git-aliases conda_env conda_env_rm hooks hooks-dry hooks-update style test test-debug test-coverage test-slow test-visual linter patch gallery clean count

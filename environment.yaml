@@ -9,8 +9,8 @@ dependencies:
   - scipy
   - seaborn
   - pyyaml
+  - svgpath2mpl
 # Development
-  - pip
   - black
   - isort
   - mypy
@@ -19,10 +19,6 @@ dependencies:
   - pytest-cov
   - pre-commit
   - ipdb
-  - pip:
-    # Dependencies
-    - svgpath2mpl
-    # Development
-    - pytest-randomly
-    - pytest-ipdb
-    - icecream
+  - objprint
+  - pytest-randomly
+  - icecream

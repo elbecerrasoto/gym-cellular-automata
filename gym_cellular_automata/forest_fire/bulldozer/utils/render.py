@@ -77,7 +77,7 @@ def render(env):
     local_grid = moore_n(N_LOCAL, pos, grid, EMPTY)
     pos_fseed = env._fire_seed
 
-    TITLE =  "ForestFireBulldozer"+str(NROWS)+"x"+str(NCOLS)+"-v2"
+    TITLE = "ForestFireBulldozer" + str(NROWS) + "x" + str(NCOLS) + "-v2"
 
     plt.style.use(FIGSTYLE)
     fig_shape = (12, 14)
