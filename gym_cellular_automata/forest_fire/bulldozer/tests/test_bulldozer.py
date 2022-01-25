@@ -5,10 +5,12 @@ from gym_cellular_automata.forest_fire.bulldozer import ForestFireBulldozerEnv
 
 THRESHOLD = 12
 
+NROWS, NCOLS = 256, 256
+
 
 @pytest.fixture
 def env():
-    return ForestFireBulldozerEnv()
+    return ForestFireBulldozerEnv(nrows=NROWS, ncols=NCOLS)
 
 
 def test_bulldozerMDP_is_operator(env):

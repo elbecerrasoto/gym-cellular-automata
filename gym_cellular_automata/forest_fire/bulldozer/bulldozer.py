@@ -18,9 +18,6 @@ from .utils.render import render
 class ForestFireBulldozerEnv(CAEnv):
     metadata = {"render.modes": ["human"]}
 
-    nrows = CONFIG["grid_shape"]["nrows"]
-    ncols = CONFIG["grid_shape"]["ncols"]
-
     @property
     def MDP(self):
         return self._MDP
@@ -29,8 +26,6 @@ class ForestFireBulldozerEnv(CAEnv):
     def initial_state(self):
 
         if self._resample_initial:
-            self.nrows = CONFIG["grid_shape"]["nrows"]
-            self.ncols = CONFIG["grid_shape"]["ncols"]
 
             self.grid = self._initial_grid_distribution()
             self.context = self._initial_context_distribution()
@@ -41,7 +36,7 @@ class ForestFireBulldozerEnv(CAEnv):
 
         return self._initial_state
 
-    def __init__(self, nrows=nrows, ncols=ncols, **kwargs):
+    def __init__(self, nrows, ncols, **kwargs):
 
         super().__init__(nrows, ncols, **kwargs)
 

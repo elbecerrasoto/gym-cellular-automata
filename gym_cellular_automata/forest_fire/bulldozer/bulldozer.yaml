@@ -5,11 +5,6 @@ cell_symbols:
   fire:  25
 
 
-grid_shape:
-  nrows: 256
-  ncols: 256
-
-
 # Fire seed initialized to a single cell
 # Everything else is uniformly sampled
 p_tree: 0.90

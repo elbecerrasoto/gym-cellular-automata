@@ -39,19 +39,6 @@ COLOR_BURNED = "#DFA4A0"  # Light-Red
 COLOR_TREE = "#A9C499"  # Green
 COLOR_FIRE = "#E68181"  # Salmon-Red
 
-EMPTY = CONFIG["cell_symbols"]["empty"]
-BURNED = CONFIG["cell_symbols"]["burned"]
-TREE = CONFIG["cell_symbols"]["tree"]
-FIRE = CONFIG["cell_symbols"]["fire"]
-NROWS = CONFIG["grid_shape"]["nrows"]
-NCOLS = CONFIG["grid_shape"]["ncols"]
-
-
-# Assumes that cells values are in ascending order and paired with its colors
-COLORS = [COLOR_EMPTY, COLOR_BURNED, COLOR_TREE, COLOR_FIRE]
-CELLS = [EMPTY, BURNED, TREE, FIRE]
-NORM, CMAP = get_norm_cmap(CELLS, COLORS)
-
 # Local Grid
 N_LOCAL = 3  # n x n local grid size
 MARKBULL_SIZE = 52
@@ -71,13 +58,41 @@ BURNED_SYMBOL = "\ue08a"
 
 
 def render(env):
+
+    # Globals are ugly, but
+    # reading them from the config file is uglier
+    # better to get them at run time.
+    # Maybe refactor them into locals.
+
+    global EMPTY
+    global BURNED
+    global NROWS
+    global NCOLS
+    global COLORS
+    global CELLS
+    global NORM
+    global CMAP
+
+    NROWS = env.nrows
+    NCOLS = env.ncols
+
+    EMPTY = env._empty
+    BURNED = env._burned
+    TREE = env._tree
+    FIRE = env._fire
+
+    # Assumes that cells values are in ascending order and paired with its colors
+    COLORS = [COLOR_EMPTY, COLOR_BURNED, COLOR_TREE, COLOR_FIRE]
+    CELLS = [EMPTY, BURNED, TREE, FIRE]
+    NORM, CMAP = get_norm_cmap(CELLS, COLORS)
+
     grid = env.grid
     ca_params, pos, time = env.context
 
     local_grid = moore_n(N_LOCAL, pos, grid, EMPTY)
     pos_fseed = env._fire_seed
 
-    TITLE = "ForestFireBulldozer" + str(NROWS) + "x" + str(NCOLS) + "-v2"
+    TITLE = "ForestFireBulldozer" + str(NROWS) + "x" + str(NCOLS)
 
     plt.style.use(FIGSTYLE)
     fig_shape = (12, 14)
