@@ -20,12 +20,6 @@ def envs():
     return (gym.make(env_call) for env_call in GYM_MAKE)
 
 
-# @pytest.mark.skip(reason="debugging")
-def test_operator_spaces(envs):
-    for env in envs:
-        assert are_operator_spaces_defined(env.MDP)
-
-
 def test_gym_api_light(envs):
     assert_gym_api(envs, RESETS, STEPS, PLOT_EACH)
 
@@ -85,68 +79,3 @@ def assert_gym_api(envs, resets, steps, plot_each):
                 assert isinstance(info, dict)
 
         env.close()
-
-
-def are_operator_spaces_defined(operator):
-    spaces = "grid_space", "action_space", "context_space"
-    from objprint import objprint as obp
-
-    def check_op(operator):
-
-        for space in spaces:
-            space = getattr(operator, space)
-
-            if not isinstance(space, Space):
-                obp(operator)  # Debug print
-                return False
-
-        return True
-
-    # Base Case. Empty Tuple
-    if not operator.suboperators:
-        return check_op(operator)
-
-    else:
-
-        for subop in operator.suboperators:
-
-            current_level = check_op(subop)
-            lower_level = are_operator_spaces_defined(subop)
-
-            if not (current_level and lower_level):
-                return False
-
-        return True
-
-
-def test_are_operator_spaces_defined():
-    def generate_deep_suboperators(spaces_defined=True):
-        from gym import spaces
-
-        from gym_cellular_automata import GridSpace
-        from gym_cellular_automata.tests import Identity
-
-        gS = GridSpace(values=[55, 66, 77], shape=(2, 2))
-        aS = spaces.Discrete(2)
-        cS = spaces.Discrete(3)
-
-        I = lambda: Identity(gS, aS, cS)
-        main = I()
-
-        deep_call = I if spaces_defined else Identity
-
-        Li = list()
-        lj = list()
-        for i in range(2):
-            for j in range(3):
-                lj.append(deep_call())
-            tmp = I()
-            tmp.suboperators = tuple(lj)
-            Li.append(tmp)
-        main.suboperators = tuple(Li)
-        return main
-
-    epass = generate_deep_suboperators(spaces_defined=True)
-    efail = generate_deep_suboperators(spaces_defined=False)
-    assert are_operator_spaces_defined(epass)
-    assert not are_operator_spaces_defined(efail)
