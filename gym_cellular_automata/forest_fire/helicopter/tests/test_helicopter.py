@@ -11,8 +11,7 @@ RANDOM_POLICY_ITERATIONS = 12
 TEST_GRID_ROWS = 3
 TEST_GRID_COLS = 3
 
-ROW = CONFIG["grid_shape"]["nrows"]
-COL = CONFIG["grid_shape"]["nrows"]
+ROW, COL = 5, 5
 
 ACTION_NOT_MOVE = CONFIG["actions"]["not_move"]
 
@@ -38,7 +37,7 @@ P_TREE = CONFIG["ca_params"]["p_tree"]
 
 @pytest.fixture
 def env():
-    return ForestFireHelicopterEnv()
+    return ForestFireHelicopterEnv(ROW, COL)
 
 
 @pytest.fixture

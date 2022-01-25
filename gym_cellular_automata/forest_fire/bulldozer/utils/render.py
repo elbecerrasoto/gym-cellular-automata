@@ -24,7 +24,6 @@ from gym_cellular_automata.forest_fire.utils.render import (
 )
 
 from . import svg_paths
-from .config import CONFIG
 
 # Figure Globals
 FIGSIZE = (15, 12)
@@ -92,7 +91,7 @@ def render(env):
     local_grid = moore_n(N_LOCAL, pos, grid, EMPTY)
     pos_fseed = env._fire_seed
 
-    TITLE = "ForestFireBulldozer" + str(NROWS) + "x" + str(NCOLS)
+    TITLE = env.spec.id
 
     plt.style.use(FIGSTYLE)
     fig_shape = (12, 14)

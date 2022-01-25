@@ -5,10 +5,6 @@ cell_symbols:
   tree:  1
   fire:  2
 
-grid_shape:
-  nrows: 5
-  ncols: 5
-
 ca_params:
   p_fire: 0.033
   p_tree: 0.333

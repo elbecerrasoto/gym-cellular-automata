@@ -17,9 +17,6 @@ from .utils.render import render
 class ForestFireHelicopterEnv(CAEnv):
     metadata = {"render.modes": ["human"]}
 
-    nrows = CONFIG["grid_shape"]["nrows"]
-    ncols = CONFIG["grid_shape"]["ncols"]
-
     @property
     def MDP(self):
         return self._MDP
@@ -42,7 +39,7 @@ class ForestFireHelicopterEnv(CAEnv):
 
         return self._initial_state
 
-    def __init__(self, nrows=nrows, ncols=ncols, **kwargs):
+    def __init__(self, nrows, ncols, **kwargs):
 
         # Sets defaults and runs seed method
         super().__init__(nrows, ncols, **kwargs)

@@ -8,12 +8,7 @@ from gym_cellular_automata.forest_fire.utils.render import (
     plot_grid,
 )
 
-from .config import CONFIG
 from .helicopter_shape import SVG_PATH
-
-EMPTY = CONFIG["cell_symbols"]["empty"]
-TREE = CONFIG["cell_symbols"]["tree"]
-FIRE = CONFIG["cell_symbols"]["fire"]
 
 COLOR_EMPTY = "#DDD1D3"  # Gray
 COLOR_TREE = "#A9C499"  # Green
@@ -23,9 +18,6 @@ TITLE_SIZE = 42
 TITLE_COLOR = "#B3B3B3"  # Gray 70%
 HELICOPTER_SIZE = 96
 HELICOPTER_COLOR = "#FFFFFF"  # White
-
-CELLS = [EMPTY, TREE, FIRE]
-COLORS = [COLOR_EMPTY, COLOR_TREE, COLOR_FIRE]
 
 
 def render(env):
@@ -37,6 +29,13 @@ def render(env):
     fig, ax = plt.subplots(figsize=(15, 12))
 
     TITLE = env.spec.id
+
+    EMPTY = env._empty
+    TREE = env._tree
+    FIRE = env._fire
+
+    CELLS = [EMPTY, TREE, FIRE]
+    COLORS = [COLOR_EMPTY, COLOR_TREE, COLOR_FIRE]
 
     # Title
     fig.suptitle(
