@@ -4,6 +4,7 @@ from typing import Callable
 import numpy as np
 
 from gym_cellular_automata import Operator
+from gym_cellular_automata.forest_fire.utils.config import TYPE
 
 
 class RepeatCA(Operator):
@@ -43,4 +44,4 @@ class RepeatCA(Operator):
         for repeat in range(int(repeats)):
             grid, ca_params = self.ca(grid, action, ca_params)
 
-        return grid, (ca_params, np.array(accu_time))
+        return grid, (ca_params, np.array(accu_time, dtype=TYPE))

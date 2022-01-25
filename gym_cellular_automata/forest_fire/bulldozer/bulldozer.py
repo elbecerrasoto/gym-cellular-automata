@@ -9,6 +9,7 @@ from gym_cellular_automata.forest_fire.operators import (
     RepeatCA,
     WindyForestFire,
 )
+from gym_cellular_automata.forest_fire.utils.config import TYPE
 
 from .utils.config import CONFIG
 from .utils.render import render
@@ -210,7 +211,7 @@ class ForestFireBulldozerEnv(CAEnv):
 
         init_position = np.array([initnrows, initncols])
 
-        init_context = self._wind, init_position, init_time
+        init_context = self._wind, init_position, np.array(init_time, dtype=TYPE)
 
         return init_context
 

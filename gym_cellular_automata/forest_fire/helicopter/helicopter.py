@@ -8,6 +8,7 @@ from gym_cellular_automata.forest_fire.operators import (
     Move,
     MoveModify,
 )
+from gym_cellular_automata.forest_fire.utils.config import TYPE
 
 from .utils.config import CONFIG
 from .utils.render import render
@@ -30,7 +31,7 @@ class ForestFireHelicopterEnv(CAEnv):
 
             self.grid = self.grid_space.sample()
 
-            ca_params = np.array([self._p_fire, self._p_tree])
+            ca_params = np.array([self._p_fire, self._p_tree], dtype=TYPE)
             pos = np.array([self.nrows // 2, self.ncols // 2])
             freeze = np.array(self._max_freeze)
             self.context = ca_params, pos, freeze
