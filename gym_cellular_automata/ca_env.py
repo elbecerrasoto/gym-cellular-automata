@@ -16,7 +16,7 @@ class CAEnv(ABC, gym.Env):
     def initial_state(self):
         self._resample_initial = False
 
-    def __init__(self, nrows, ncols, **kwargs):
+    def __init__(self, nrows, ncols, debug=False, **kwargs):
         self.nrows, self.ncols = nrows, ncols  # nrows & ncols is API
 
         # Set default dict
@@ -24,6 +24,10 @@ class CAEnv(ABC, gym.Env):
 
         # Gym spec method
         self.seed()
+
+        self._debug = debug
+        if self._debug:
+            print("Perhaps you forgot to do env.reset()")
 
     def step(self, action):
 

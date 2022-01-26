@@ -38,7 +38,7 @@ P_TREE = CONFIG["ca_params"]["p_tree"]
 
 @pytest.fixture
 def env():
-    return ForestFireHelicopterEnv(ROW, COL)
+    return ForestFireHelicopterEnv(ROW, COL, debug=True)
 
 
 @pytest.fixture

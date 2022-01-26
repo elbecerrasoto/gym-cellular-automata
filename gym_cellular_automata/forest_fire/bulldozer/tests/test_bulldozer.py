@@ -11,7 +11,7 @@ NROWS, NCOLS = 256, 256
 
 @pytest.fixture
 def env():
-    return ForestFireBulldozerEnv(nrows=NROWS, ncols=NCOLS)
+    return ForestFireBulldozerEnv(nrows=NROWS, ncols=NCOLS, debug=True)
 
 
 def test_bulldozerMDP_is_operator(env):
