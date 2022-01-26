@@ -1,6 +1,7 @@
 import numpy as np
 
-TYPE = np.float32
+from gym_cellular_automata import TYPE_BOX
+
 
 # Load the YAML configuration file into a python dict
 def get_config_dict(file):
@@ -56,11 +57,11 @@ def parse_wind(windD: dict) -> np.ndarray:
             [ windD["up_left"]  , windD["up"]  , windD["up_right"]   ],
             [ windD["left"]     ,    0.0       , windD["right"]      ],
             [ windD["down_left"], windD["down"], windD["down_right"] ],
-        ], dtype=TYPE
+        ], dtype=TYPE_BOX
     )
 
     # fmt: on
-    wind_space = spaces.Box(0.0, 1.0, shape=(3, 3), dtype=TYPE)
+    wind_space = spaces.Box(0.0, 1.0, shape=(3, 3))
 
     assert wind_space.contains(wind), "Bad Wind Data, check ranges [0.0, 1.0]"
 

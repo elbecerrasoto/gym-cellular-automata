@@ -1,7 +1,7 @@
 import numpy as np
 from gym import spaces
 
-from gym_cellular_automata import CAEnv, GridSpace, Operator
+from gym_cellular_automata import TYPE_BOX, CAEnv, GridSpace, Operator
 from gym_cellular_automata.forest_fire.operators import (
     Modify,
     Move,
@@ -9,7 +9,6 @@ from gym_cellular_automata.forest_fire.operators import (
     RepeatCA,
     WindyForestFire,
 )
-from gym_cellular_automata.forest_fire.utils.config import TYPE
 
 from .utils.config import CONFIG
 from .utils.render import render
@@ -206,7 +205,7 @@ class ForestFireBulldozerEnv(CAEnv):
 
         init_position = np.array([initnrows, initncols])
 
-        init_context = self._wind, init_position, np.array(init_time, dtype=TYPE)
+        init_context = self._wind, init_position, np.array(init_time, dtype=TYPE_BOX)
 
         return init_context
 

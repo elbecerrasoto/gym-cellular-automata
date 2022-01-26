@@ -1,7 +1,9 @@
 from pathlib import Path
 from warnings import filterwarnings
 
+import numpy as np
 from gym.error import Error as GymError
+from gym.spaces import Box
 
 from gym_cellular_automata.ca_env import CAEnv
 from gym_cellular_automata.grid_space import GridSpace
@@ -15,13 +17,25 @@ from gym_cellular_automata.registration import (
 # Global path on current machine
 PROJECT_PATH = Path(__file__).parents[1]
 
+# Delegating explicit typing as much as possible
+__ = np.array(0.0)
+TYPE_BOX = Box(__, __).dtype
+
+# Avoids annoying error when working interactively
 try:
     register_caenvs()
 except GymError:
     pass
 
 
-__all__ = ["GYM_MAKE", "REGISTERED_CA_ENVS", "CAEnv", "GridSpace", "Operator"]
+__all__ = [
+    "GYM_MAKE",
+    "REGISTERED_CA_ENVS",
+    "CAEnv",
+    "GridSpace",
+    "Operator",
+    "TYPE_BOX",
+]
 
 # Ignore warnings trigger by Bulldozer Render
 # EmojiFont raises RuntimeWarning
