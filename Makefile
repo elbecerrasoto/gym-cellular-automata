@@ -14,7 +14,7 @@ git-aliases : # `git br` shows branchs descriptions `git root` goes to project r
 	git config --global alias.root 'rev-parse --show-toplevel'
 
 conda_env :
-	conda env create --file "environment.yaml" python="3.9"
+	conda env create --file "environment.yaml"
 
 conda_env_rm :
 	conda remove --name gymca --all
