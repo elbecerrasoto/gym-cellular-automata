@@ -17,9 +17,10 @@ from gym_cellular_automata.registration import (
 # Global path on current machine
 PROJECT_PATH = Path(__file__).parents[1]
 
-# Delegating explicit typing as much as possible
-__ = np.array(0.0)
-TYPE_BOX = Box(__, __).dtype
+
+# Delegation of explicit typing as much as possible
+# For floats using the spaces Box default
+TYPE_BOX = np.float32
 
 # Avoids annoying error when working interactively
 try:
