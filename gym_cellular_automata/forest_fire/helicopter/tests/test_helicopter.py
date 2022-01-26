@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from gym import spaces
 
-from gym_cellular_automata import GridSpace
+from gym_cellular_automata import TYPE_BOX, GridSpace
 from gym_cellular_automata.forest_fire.helicopter import ForestFireHelicopterEnv
 from gym_cellular_automata.forest_fire.helicopter.utils.config import CONFIG
 
@@ -26,7 +26,7 @@ REWARD_PER_EMPTY = CONFIG["rewards"]["per_empty"]
 REWARD_PER_TREE = CONFIG["rewards"]["per_tree"]
 REWARD_PER_FIRE = CONFIG["rewards"]["per_fire"]
 
-REWARD_TYPE = np.float32
+REWARD_TYPE = TYPE_BOX
 
 EMPTY = CONFIG["cell_symbols"]["empty"]
 TREE = CONFIG["cell_symbols"]["tree"]
@@ -85,7 +85,8 @@ def test_forest_fire_env_private_methods(env, reward_space):
     env.step(action)
 
     assert hasattr(env, "_award")
-    assert reward_space.contains(env._award())
+    reward = np.array(env._award(), dtype=TYPE_BOX)
+    assert reward_space.contains(reward)
 
     assert hasattr(env, "_is_done")
     assert isinstance(env._is_done(), bool)
@@ -120,6 +121,8 @@ def test_forest_fire_env_output_spaces(env, reward_space):
 
 
 def assert_observation_and_reward_spaces(env, obs, reward, reward_space):
+    reward = np.array(reward, dtype=TYPE_BOX)
+
     assert env.observation_space.contains(obs)
     assert reward_space.contains(reward)
 
