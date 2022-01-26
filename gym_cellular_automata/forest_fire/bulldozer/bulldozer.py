@@ -39,6 +39,8 @@ class ForestFireBulldozerEnv(CAEnv):
 
         super().__init__(nrows, ncols, **kwargs)
 
+        self.title = "ForestFireBulldozer" + str(nrows) + "x" + str(ncols)
+
         # Class Variables, set to defaults if not manually entered.
 
         # Variables, scale free

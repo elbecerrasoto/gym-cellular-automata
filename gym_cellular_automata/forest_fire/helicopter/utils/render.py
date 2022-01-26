@@ -34,8 +34,7 @@ def render(env):
     # Why two titles?
     # The env was registered (benchmark) or
     # The env was directly created (prototype)
-    title_default = "ForestFireHelicopter" + str(NROWS) + "x" + str(NCOLS)
-    TITLE = env.spec.id if env.spec is not None else title_default
+    TITLE = env.spec.id if env.spec is not None else env.title
 
     EMPTY = env._empty
     TREE = env._tree

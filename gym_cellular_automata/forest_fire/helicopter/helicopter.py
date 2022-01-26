@@ -43,6 +43,8 @@ class ForestFireHelicopterEnv(CAEnv):
         # Sets defaults and runs seed method
         super().__init__(nrows, ncols, **kwargs)
 
+        self.title = "ForestFireHelicopter" + str(nrows) + "x" + str(ncols)
+
         # Class Variables, set to defaults if not manually entered.
 
         # Variables, scale free
