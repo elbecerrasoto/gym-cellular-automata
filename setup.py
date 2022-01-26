@@ -1,5 +1,7 @@
 from setuptools import setup
 
+# Don't import gym_cellular_automata module here, since deps may not be installed
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "gym_cellular_automata"))
 from version import VERSION
 
 setup(

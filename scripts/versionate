@@ -3,7 +3,7 @@
 import argparse
 import re
 import sys
-from os import getcwd, remove
+from os import getcwd, remove, path
 from pathlib import Path
 from shutil import copymode, move
 from tempfile import mkstemp
@@ -14,9 +14,12 @@ PROGRAM = "versionate"
 GYMCA_REPO = Path(__file__).parents[1]
 
 sys.path.insert(0, str(GYMCA_REPO))
+
+# Don't import gym_cellular_automata module here, since deps may not be installed
+sys.path.insert(0, path.join(path.dirname(__file__), "../gym_cellular_automata"))
 from version import VERSION
 
-VERSION_FILE = GYMCA_REPO / "version.py"
+VERSION_FILE = GYMCA_REPO / "gym_cellular_automata" / "version.py"
 README = GYMCA_REPO / "README.md"
 
 # Files to edit
@@ -24,7 +27,7 @@ FILES = [VERSION_FILE, README]
 
 # fmt: off
 RE_VERSION = re.compile(
-    r"""v  ([0-9] +) # major
+    r"""   ([0-9] +) # major
         \. ([0-9] +) # minor
         \. ([0-9] +) # patch
      """,
@@ -33,7 +36,7 @@ RE_VERSION = re.compile(
 # fmt: on
 
 if not re.match(RE_VERSION, VERSION):
-    print("Malformed version string. Please check {VERSION_FILE}.")
+    print(f"Malformed version string. Please check {VERSION_FILE}.")
     sys.exit()
 
 
