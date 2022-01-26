@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from copy import copy
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 
 import numpy as np
 from gym.spaces import Space
@@ -10,7 +10,7 @@ from gym.utils import seeding
 class Operator(ABC):
 
     # Set these in ALL subclasses
-    suboperators: tuple = tuple()
+    suboperators: Tuple = tuple()
 
     grid_dependant: Optional[bool] = None
     action_dependant: Optional[bool] = None
@@ -37,7 +37,7 @@ class Operator(ABC):
     @abstractmethod
     def update(
         self, grid: np.ndarray, action: Any, context: Any
-    ) -> tuple[np.ndarray, Any]:
+    ) -> Tuple[np.ndarray, Any]:
 
         """Update a Cellular Automaton's Lattice (Grid) by using a provided action and context.
 
