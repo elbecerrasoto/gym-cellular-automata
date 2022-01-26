@@ -77,7 +77,11 @@ def render(env):
     local_grid = moore_n(N_LOCAL, pos, grid, EMPTY)
     pos_fseed = env._fire_seed
 
-    TITLE = env.spec.id
+    # Why two titles?
+    # The env was registered (benchmark) or
+    # The env was directly created (prototype)
+    title_default = "ForestFireHelicopter" + str(NROWS) + "x" + str(NCOLS)
+    TITLE = env.spec.id if env.spec is not None else title_default
 
     def main():
 

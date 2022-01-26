@@ -1,3 +1,4 @@
+import matplotlib
 import pytest
 
 from gym_cellular_automata import GridSpace
@@ -48,3 +49,8 @@ def test_starting_conditions_seed(env):
 
     # Single fire seed
     assert len(grid[grid == env._fire]) == 1
+
+
+def test_env_render(env):
+    env.reset()
+    assert isinstance(env.render(), matplotlib.figure.Figure)

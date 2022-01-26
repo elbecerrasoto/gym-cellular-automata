@@ -28,7 +28,14 @@ def render(env):
     plt.style.use("seaborn-whitegrid")
     fig, ax = plt.subplots(figsize=(15, 12))
 
-    TITLE = env.spec.id
+    NROWS = env.nrows
+    NCOLS = env.ncols
+
+    # Why two titles?
+    # The env was registered (benchmark) or
+    # The env was directly created (prototype)
+    title_default = "ForestFireHelicopter" + str(NROWS) + "x" + str(NCOLS)
+    TITLE = env.spec.id if env.spec is not None else title_default
 
     EMPTY = env._empty
     TREE = env._tree

@@ -1,4 +1,5 @@
 import gym
+import matplotlib
 import numpy as np
 import pytest
 from gym import spaces
@@ -160,6 +161,11 @@ def test_forest_fire_env_hit_info(env, all_fire_grid):
         obs, reward, done, info = env.action(ACTION_DOWN)
 
         assert info["hit"] is True
+
+
+def test_env_render(env):
+    env.reset()
+    assert isinstance(env.render(), matplotlib.figure.Figure)
 
 
 def manual_assesment(verbose=False):
