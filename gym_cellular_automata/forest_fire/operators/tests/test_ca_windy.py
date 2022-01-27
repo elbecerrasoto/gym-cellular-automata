@@ -16,7 +16,6 @@ CHECKS_PER_STEP = 4
 
 # Cell values
 EMPTY = 0
-BURNED = 1
 TREE = 3
 FIRE = 25
 
@@ -27,7 +26,7 @@ COL = 4
 
 @pytest.fixture
 def ca():
-    return WindyForestFire(EMPTY, BURNED, TREE, FIRE)
+    return WindyForestFire(EMPTY, TREE, FIRE)
 
 
 # Deterministic Wind
@@ -39,7 +38,7 @@ def wind(ca):
 @pytest.fixture
 def grid_space():
     return GridSpace(
-        values=[EMPTY, BURNED, TREE, FIRE],
+        values=[EMPTY, TREE, FIRE],
         shape=(ROW, COL),
     )
 
@@ -98,16 +97,12 @@ def assert_forest_fire_update_at_positionrows_col(grid, new_grid, row, col):
         else:
             assert new_cell_value == TREE, "Keep some TREE (failed)" + log_error
 
-    # FIRE -> BURNED
+    # FIRE -> EMPTY
     if old_cell_value == FIRE:
-        assert new_cell_value == BURNED, "FIRE Consumption (failed)" + log_error
+        assert new_cell_value == EMPTY, "FIRE Consumption (failed)" + log_error
 
     # Implicit rules (Staying the same)
 
     # EMPTY -> EMPTY
     if old_cell_value == EMPTY:
         assert new_cell_value == EMPTY, "EMPTY is EMPTY forever (failed)" + log_error
-
-    # BURNED -> BURNED
-    if old_cell_value == BURNED:
-        assert new_cell_value == BURNED, "BURNED is BURNED forever (failed)" + log_error

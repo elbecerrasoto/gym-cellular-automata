@@ -23,17 +23,18 @@ class WindyForestFire(Operator):
     _row_k = 3
     _col_k = 3
 
-    def __init__(self, empty=0, burned=1, tree=3, fire=25, *args, **kwargs):
+    def __init__(self, empty=0, tree=3, fire=25, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
 
         # Cell Values
         self._empty = empty
-        self._burned = burned
         self._tree = tree
         self._fire = fire
 
         self._assert_correctness()
+
+        self.breaks = self._get_breaks()
 
         if self.context_space is None:
             self.context_space = spaces.Box(0.0, 1.0, shape=(3, 3))
@@ -47,7 +48,7 @@ class WindyForestFire(Operator):
 
         grid_signal = self._convolve(grid, kernel)
 
-        new_grid = self._translate_analogic_to_discrete(grid_signal, self._get_breaks())
+        new_grid = self._translate_analogic_to_discrete(grid_signal, self.breaks)
 
         return new_grid, wind
 
@@ -82,11 +83,8 @@ class WindyForestFire(Operator):
 
     def _get_breaks(self):
         """
-        4 breaks needed for 5 rules.
+        3 breaks needed for 4 rules.
         """
-
-        # "Unborn / Dead"
-        dead_break = self._identity * self._burned
 
         # "Dead / Keep"
         keep_break = self._identity * self._tree
@@ -97,9 +95,9 @@ class WindyForestFire(Operator):
         # "Propagate / Consume"
         consume_break = self._identity * self._fire
 
-        Breaks = namedtuple("Breaks", ["dead", "keep", "propagate", "consume"])
+        Breaks = namedtuple("Breaks", ["keep", "propagate", "consume"])
 
-        return Breaks(dead_break, keep_break, propagate_break, consume_break)
+        return Breaks(keep_break, propagate_break, consume_break)
 
     def _translate_analogic_to_discrete(self, grid, breaks):
         row, col = grid.shape
@@ -108,35 +106,35 @@ class WindyForestFire(Operator):
         empty = np.array(self._empty)
         new_grid = np.repeat(empty, row * col).reshape(row, col)
 
-        # 5 Rules to carry out:
+        # Preallocation of comparisons
+        moreq_keep = grid >= breaks.keep
 
-        # 1. Unborn
+        less_propagate = grid < breaks.propagate
+        moreq_propagate = np.logical_not(less_propagate)
+
+        less_consume = grid < breaks.consume
+        moreq_consume = np.logical_not(less_consume)
+
+        # 4 Rules to carry out:
+
+        # 1. Dead
         # EMPTY -> EMPTY
         # Implicitly defined by default values
 
-        less_keep = grid < breaks.keep
-        less_propagate = grid < breaks.propagate
-        less_consume = grid < breaks.consume
-
-        # 2. Dead
-        # BURNED -> BURNED
-        dead_mask = np.logical_and(grid >= breaks.dead, less_keep)
-        new_grid[dead_mask] = self._burned
-
-        # 3. Keep
+        # 2. Keep
         # TREE -> TREE
-        keep_mask = np.logical_and(np.logical_not(less_keep), less_propagate)
+        keep_mask = np.logical_and(moreq_keep, less_propagate)
         new_grid[keep_mask] = self._tree
 
-        # 4. Propagate
+        # 3. Propagate
         # TREE -> FIRE
-        propagate_mask = np.logical_and(np.logical_not(less_propagate), less_consume)
+        propagate_mask = np.logical_and(moreq_propagate, less_consume)
         new_grid[propagate_mask] = self._fire
 
         # 4. Consume
-        # FIRE -> BURNED
-        propagate_mask = np.logical_not(less_consume)
-        new_grid[propagate_mask] = self._burned
+        # FIRE -> EMPTY
+        propagate_mask = moreq_consume
+        new_grid[propagate_mask] = self._empty
 
         return new_grid
 
@@ -154,28 +152,23 @@ class WindyForestFire(Operator):
 
         # Values
         E = self._empty
-        B = self._burned
         T = self._tree
         F = self._fire
 
         # Ordering of cell values
-        assert E < B
-        assert B < T
-        assert T < F
+        assert E < T and T < F
 
         # Ordering of Weights
         assert p < i
 
-        # Test the boundaries of the 5 intervals
-        # Interval Names:
-        # Unborn, Dead, Keep, Propagate, Consume
+        # Test the 3 boundaries of the 4 intervals
 
+        # Worst case of being surronded by fire
         worst = n * p * F
 
-        assert i * E + worst < i * B, "Unborn / Dead"
-        assert i * B + worst < i * T, "Dead / Keep"
+        assert i * E + worst < i * T, "Dead / Keep"
 
-        # Key Assert, a TREE cell is subject to two different rules
+        # A TREE cell is subject to two different rules
         assert i * T + n * p * T < i * T + p * F, "Keep / Propagate"
 
         assert i * T + worst < i * F, "Propagate / Consume"
