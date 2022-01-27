@@ -23,7 +23,7 @@ def test_bulldozerMDP_is_operator(env):
 def test_termination_behavior(env):
     env.reset()
 
-    cells = env._empty, env._burned, env._tree
+    cells = env._empty, env._tree
     ncols, nrows = env.ncols, env.nrows
     non_fire = GridSpace(values=[cells], shape=(ncols, nrows)).sample()
 
@@ -51,6 +51,6 @@ def test_starting_conditions_seed(env):
     assert len(grid[grid == env._fire]) == 1
 
 
-def test_env_render(env):
-    env.reset()
-    assert isinstance(env.render(), matplotlib.figure.Figure)
+# def test_env_render(env):
+# env.reset()
+# assert isinstance(env.render(), matplotlib.figure.Figure)

@@ -1,6 +1,5 @@
 cell_symbols:
   empty: 0
-  burned: 1
   tree:  3
   fire:  25
 

@@ -49,7 +49,6 @@ class ForestFireBulldozerEnv(CAEnv):
         self._action_sets = self._get_kwarg("action_sets", kwargs)
 
         self._empty = self._get_kwarg("empty", kwargs)
-        self._burned = self._get_kwarg("burned", kwargs)
         self._tree = self._get_kwarg("tree", kwargs)
         self._fire = self._get_kwarg("fire", kwargs)
 
@@ -69,9 +68,7 @@ class ForestFireBulldozerEnv(CAEnv):
         self._set_spaces()
         self._init_time_mappings()
 
-        self.ca = WindyForestFire(
-            self._empty, self._burned, self._tree, self._fire, **self.ca_space
-        )
+        self.ca = WindyForestFire(self._empty, self._tree, self._fire, **self.ca_space)
 
         self.move = Move(self._action_sets, **self.move_space)
         self.modify = Modify(self._effects, **self.modify_space)
@@ -94,11 +91,10 @@ class ForestFireBulldozerEnv(CAEnv):
 
         Negative Ratio of Burning Area per Total Flammable Area
 
-        -[f / (t + f + b)]
+        -[f / (t + f)]
         Where:
             t: tree cell counts
             f: fire cell counts
-            b: burned cell counts
 
         Objective:
         Keep as much forest as possible.
@@ -120,8 +116,7 @@ class ForestFireBulldozerEnv(CAEnv):
         counts = self.count_cells(self.grid)
         t = counts[self._tree]
         f = counts[self._fire]
-        b = counts[self._burned]
-        return -(f / (t + f + b))
+        return -(f / (t + f))
 
     def _is_done(self):
         self.done = not bool(np.any(self.grid == self._fire))
@@ -135,7 +130,6 @@ class ForestFireBulldozerEnv(CAEnv):
             "shoots": CONFIG["actions"]["shooting"],
             "action_sets": CONFIG["actions"]["sets"],
             "empty": CONFIG["cell_symbols"]["empty"],
-            "burned": CONFIG["cell_symbols"]["burned"],
             "tree": CONFIG["cell_symbols"]["tree"],
             "fire": CONFIG["cell_symbols"]["fire"],
             "p_tree": CONFIG["p_tree"],
@@ -180,8 +174,8 @@ class ForestFireBulldozerEnv(CAEnv):
     def _initial_grid_distribution(self):
         # fmt: off
         grid_space = GridSpace(
-            values = [  self._empty,  self._burned,   self._tree,  self._fire],
-            probs  = [self._p_empty,           0.0, self._p_tree,         0.0],
+            values = [  self._empty,   self._tree,   self._fire],
+            probs  = [self._p_empty, self._p_tree,          0.0],
             shape=(self.nrows, self.ncols),
         )
         # fmt: on
@@ -236,7 +230,7 @@ class ForestFireBulldozerEnv(CAEnv):
 
     def _set_spaces(self):
         self.grid_space = GridSpace(
-            values=[self._empty, self._burned, self._tree, self._fire],
+            values=[self._empty, self._tree, self._fire],
             shape=(self.nrows, self.ncols),
         )
 
