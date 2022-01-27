@@ -34,7 +34,6 @@ TITLE_POS = {"x": 0.121, "y": 0.96}
 TITLE_ALIGN = "left"
 
 COLOR_EMPTY = "#DDD1D3"  # Gray
-COLOR_BURNED = "#DFA4A0"  # Light-Red
 COLOR_TREE = "#A9C499"  # Green
 COLOR_FIRE = "#E68181"  # Salmon-Red
 
@@ -62,13 +61,12 @@ def render(env):
     NCOLS = env.ncols
 
     EMPTY = env._empty
-    BURNED = env._burned
     TREE = env._tree
     FIRE = env._fire
 
     # Assumes that cells values are in ascending order and paired with its colors
-    COLORS = [COLOR_EMPTY, COLOR_BURNED, COLOR_TREE, COLOR_FIRE]
-    CELLS = [EMPTY, BURNED, TREE, FIRE]
+    COLORS = [COLOR_EMPTY, COLOR_TREE, COLOR_FIRE]
+    CELLS = [EMPTY, TREE, FIRE]
     NORM, CMAP = get_norm_cmap(CELLS, COLORS)
 
     grid = env.grid
@@ -108,7 +106,7 @@ def render(env):
         plot_gauge(ax_gauge, time)
 
         d = env.count_cells()
-        counts = d[EMPTY], d[BURNED], d[TREE], d[FIRE]
+        counts = d[EMPTY], d[TREE], d[FIRE]
         plot_counts(ax_counts, *counts)
 
         return plt.gcf()
@@ -180,18 +178,18 @@ def render(env):
 
         clear_ax(ax, yticks=False)
 
-    def plot_counts(ax, counts_empty, counts_burned, counts_tree, counts_fire):
+    def plot_counts(ax, counts_empty, counts_tree, counts_fire):
 
-        counts_total = sum((counts_empty, counts_burned, counts_tree, counts_fire))
+        counts_total = sum((counts_empty, counts_tree, counts_fire))
 
         commons = {"x": [0, 1], "width": 0.1}
         pc = "1.0"  # placeholder color
 
-        lv1y = [counts_tree, counts_empty]
-        lv1c = [COLOR_TREE, COLOR_EMPTY]
+        lv1y = [counts_tree, 0]
+        lv1c = [COLOR_TREE, pc]
 
-        lv2y = [0, counts_burned]  # level 2 y axis
-        lv2c = [pc, COLOR_BURNED]  # level 2 colors
+        lv2y = [0, counts_empty]  # level 2 y axis
+        lv2c = [pc, COLOR_EMPTY]  # level 2 colors
         lv2b = lv1y  # level 2 bottom
 
         lv3y = [0, counts_fire]
@@ -211,7 +209,7 @@ def render(env):
         ax.set_xticks(np.arange(2))
         ax.set_xticklabels([TREE_SYMBOL, BURNED_SYMBOL], font=EMOJIFONT, size=34)
         # Same colors as bars
-        for label, color in zip(ax.get_xticklabels(), [COLOR_TREE, COLOR_BURNED]):
+        for label, color in zip(ax.get_xticklabels(), [COLOR_TREE, COLOR_FIRE]):
             label.set_color(color)
 
         # Mess with x,y limits for aethetics reasons

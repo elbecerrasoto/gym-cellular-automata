@@ -2,13 +2,24 @@ from gym.envs.registration import register
 
 FFDIR = "gym_cellular_automata.forest_fire"
 
+HELR, HELC = 5, 5
+BULR, BULC = 256, 256
+
 REGISTERED_CA_ENVS = {
-    "ForestFireHelicopter5x5-v1": {
-        "kwargs": {"nrows": 5, "ncols": 5},
+    "ForestFireHelicopter"
+    + str(HELR)
+    + "x"
+    + str(HELC)
+    + "-v1": {
+        "kwargs": {"nrows": HELR, "ncols": HELC},
         "entry_point": FFDIR + ".helicopter:ForestFireHelicopterEnv",
     },
-    "ForestFireBulldozer256x256-v2": {
-        "kwargs": {"nrows": 256, "ncols": 256},
+    "ForestFireBulldozer"
+    + str(BULR)
+    + "x"
+    + str(BULC)
+    + "-v3": {
+        "kwargs": {"nrows": BULR, "ncols": BULC},
         "entry_point": FFDIR + ".bulldozer:ForestFireBulldozerEnv",
     },
 }
