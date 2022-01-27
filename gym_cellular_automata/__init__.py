@@ -1,5 +1,4 @@
 from pathlib import Path
-from warnings import filterwarnings
 
 import numpy as np
 from gym.error import Error as GymError
@@ -14,6 +13,8 @@ from gym_cellular_automata.registration import (
     register_caenvs,
 )
 from gym_cellular_automata.version import VERSION as __version__
+
+# from gym_cellular_automata.forest_fire.bulldozer import Bulldozer
 
 # Global path on current machine
 PROJECT_PATH = Path(__file__).parents[1]
@@ -38,8 +39,3 @@ __all__ = [
     "Operator",
     "TYPE_BOX",
 ]
-
-# Ignore warnings trigger by Bulldozer Render
-# EmojiFont raises RuntimeWarning
-filterwarnings("ignore", message="Glyph 108 missing from current font.")
-filterwarnings("ignore", message="Glyph 112 missing from current font.")

@@ -9,6 +9,8 @@ The render of the bulldozer consists of four subplots:
 4. Counts
     + Shows Forest vs No Forest cell counts. Translates on how well the agent is doing.
 """
+from warnings import filterwarnings
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -53,6 +55,12 @@ CYCLE_SIZE = 32
 # Counts
 TREE_SYMBOL = "\U0001f332"
 BURNED_SYMBOL = "\ue08a"
+
+
+# Ignore warnings trigger by Bulldozer Render
+# EmojiFont raises RuntimeWarning
+filterwarnings("ignore", message="Glyph 108")
+filterwarnings("ignore", message="Glyph 112")
 
 
 def render(env):
