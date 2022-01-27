@@ -11,7 +11,6 @@ TESTS = 8
 SEQUENCE = 8
 
 EMPTY = 0
-BURNED = 1
 TREE = 3
 FIRE = 25
 
@@ -20,7 +19,7 @@ ROW, COL = 8, 8
 
 @pytest.fixture
 def grid_space():
-    return GridSpace(values=[EMPTY, BURNED, TREE, FIRE], shape=(ROW, COL))
+    return GridSpace(values=[EMPTY, TREE, FIRE], shape=(ROW, COL))
 
 
 @pytest.fixture
@@ -31,7 +30,7 @@ def dummy_space():
 @pytest.fixture
 def ca(grid_space, dummy_space):
     return WindyForestFire(
-        EMPTY, BURNED, TREE, FIRE, grid_space=grid_space, action_space=dummy_space
+        EMPTY, TREE, FIRE, grid_space=grid_space, action_space=dummy_space
     )
 
 
