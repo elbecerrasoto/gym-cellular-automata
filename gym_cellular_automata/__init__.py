@@ -5,7 +5,6 @@ import numpy as np
 from gym.error import Error as GymError
 from gym.spaces import Box
 
-from gym_cellular_automata.version import VERSION as __version__
 from gym_cellular_automata.ca_env import CAEnv
 from gym_cellular_automata.grid_space import GridSpace
 from gym_cellular_automata.operator import Operator
@@ -14,6 +13,7 @@ from gym_cellular_automata.registration import (
     REGISTERED_CA_ENVS,
     register_caenvs,
 )
+from gym_cellular_automata.version import VERSION as __version__
 
 # Global path on current machine
 PROJECT_PATH = Path(__file__).parents[1]

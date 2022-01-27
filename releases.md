@@ -2,6 +2,24 @@
 
 :drum:
 
+## 0.5.4
+
+> Theme: Update to _gym 0.21.0_
+
++ Casting observations to _float32_ to pass tests
+  + _space.Box.contains_ returns _False_ when comparing different float types
++ _To Do List_ file to help development
++ Refactor to input _rows_ and _cols_ on registration code
+  + Specification of _rows_ an _cols_ removed from _yaml files_
++ `gym_cellular_automata.__version__` variable
+  + Dropping the _v_ from the version number e.g. _0.5.4_ instead of _v0.5.4_
++ Render title refactors
+  + Different titles for manually created and registered environments
++ Soft linking to find the _CAEnvs_ on expected location
+  + envs directory
++ Debug flag on CAEnv base class
+
+
 ## 0.5.3
 
 > Theme: Environment difficulty level via _nrows_ & _ncols_

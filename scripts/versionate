@@ -3,7 +3,7 @@
 import argparse
 import re
 import sys
-from os import getcwd, remove, path
+from os import getcwd, path, remove
 from pathlib import Path
 from shutil import copymode, move
 from tempfile import mkstemp
@@ -115,7 +115,7 @@ def get_new_version(sem_version, order):
 
     major, minor, patch = sem_version
 
-    return f"v{major}.{minor}.{patch}"
+    return f"{major}.{minor}.{patch}"
 
 
 def version_to_int_list(version):
@@ -165,7 +165,7 @@ if __name__ == "__main__":
             new_version = SET
             update_version_on_files(FILES, new_version)
         else:
-            print(r"Invalid string. It should be like: v[0-9]+\.[0-9]+\.[0-9]+")
+            print(r"Invalid string. It should be like: [0-9]+\.[0-9]+\.[0-9]+")
             sys.exit()
 
     if DO:
