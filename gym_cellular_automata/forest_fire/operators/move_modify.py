@@ -1,7 +1,7 @@
 import numpy as np
 from gym import logger, spaces
 
-from gym_cellular_automata import Operator
+from gym_cellular_automata.operator import Operator
 
 
 class Move(Operator):

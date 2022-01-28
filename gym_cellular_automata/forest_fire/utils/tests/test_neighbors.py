@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 from gym import spaces
 
-from gym_cellular_automata import GridSpace
 from gym_cellular_automata.forest_fire.utils.neighbors import moore_n, neighborhood_at
+from gym_cellular_automata.grid_space import GridSpace
 
 ROW = 4
 COL = 3

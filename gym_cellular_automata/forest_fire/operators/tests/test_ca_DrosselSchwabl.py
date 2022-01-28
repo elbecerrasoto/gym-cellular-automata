@@ -1,9 +1,9 @@
 import pytest
 from gym import spaces
 
-from gym_cellular_automata import GridSpace
 from gym_cellular_automata.forest_fire.operators.ca_DrosselSchwabl import ForestFire
 from gym_cellular_automata.forest_fire.utils.neighbors import neighborhood_at
+from gym_cellular_automata.grid_space import GridSpace
 
 # Number of random grids to test
 TESTS = 16

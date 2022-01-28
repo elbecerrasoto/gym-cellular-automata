@@ -1,4 +1,4 @@
-from gym_cellular_automata import Operator
+from gym_cellular_automata.operator import Operator
 
 
 class Identity(Operator):

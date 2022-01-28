@@ -1,8 +1,8 @@
 import numpy as np
 from gym import spaces
 
-from gym_cellular_automata import Operator
 from gym_cellular_automata.forest_fire.utils.neighbors import neighborhood_at
+from gym_cellular_automata.operator import Operator
 
 
 class ForestFire(Operator):

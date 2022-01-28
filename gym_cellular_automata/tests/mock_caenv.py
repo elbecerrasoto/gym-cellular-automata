@@ -1,6 +1,7 @@
 from gym import spaces
 
-from gym_cellular_automata import CAEnv, GridSpace
+from gym_cellular_automata.ca_env import CAEnv
+from gym_cellular_automata.grid_space import GridSpace
 from gym_cellular_automata.tests import Identity
 
 

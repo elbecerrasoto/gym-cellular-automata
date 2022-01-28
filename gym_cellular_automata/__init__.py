@@ -27,6 +27,11 @@ from gym_cellular_automata.registration import (
 )
 from gym_cellular_automata.version import VERSION as __version__
 
+# Do NOT import anything from here
+# otherwise a circular import will be triggered
+# These are exports for external code
+
+
 # Avoids annoying error when working interactively
 try:
     register_caenvs()
@@ -34,4 +39,4 @@ except GymError:
     pass
 
 
-__all__ = ["REGISTERED_CA_ENVS", "CAEnv", "GridSpace", "Operator", "envs"]
+__all__ = ["REGISTERED_CA_ENVS", "GYM_MAKE", "CAEnv", "GridSpace", "Operator", "envs"]

@@ -4,8 +4,8 @@ import numpy as np
 import pytest
 from gym import spaces
 
-from gym_cellular_automata import GridSpace
 from gym_cellular_automata.forest_fire.operators import RepeatCA, WindyForestFire
+from gym_cellular_automata.grid_space import GridSpace
 
 TESTS = 8
 SEQUENCE = 8

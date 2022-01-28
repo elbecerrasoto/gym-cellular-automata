@@ -4,7 +4,7 @@ import numpy as np
 from gym import spaces
 from scipy.signal import convolve2d
 
-from gym_cellular_automata import Operator
+from gym_cellular_automata.operator import Operator
 
 
 class WindyForestFire(Operator):

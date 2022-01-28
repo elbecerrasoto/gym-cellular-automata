@@ -3,8 +3,8 @@ from typing import Callable
 
 import numpy as np
 
-from gym_cellular_automata import Operator
 from gym_cellular_automata._config import TYPE_BOX
+from gym_cellular_automata.operator import Operator
 
 
 class RepeatCA(Operator):

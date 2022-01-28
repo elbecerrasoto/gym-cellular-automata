@@ -4,7 +4,7 @@ import pytest
 from gym.spaces import Space
 from matplotlib import pyplot as plt
 
-from gym_cellular_automata import GYM_MAKE, REGISTERED_CA_ENVS
+from gym_cellular_automata.registration import GYM_MAKE, REGISTERED_CA_ENVS
 
 matplotlib.interactive(False)
 

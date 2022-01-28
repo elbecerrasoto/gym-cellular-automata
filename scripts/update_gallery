@@ -6,7 +6,8 @@ from pathlib import Path
 
 import gym
 
-from gym_cellular_automata import GYM_MAKE, PROJECT_PATH
+from gym_cellular_automata._config import PROJECT_PATH
+from gym_cellular_automata.registration import GYM_MAKE
 
 
 def play_random_policy(env, steps, verbose=False):

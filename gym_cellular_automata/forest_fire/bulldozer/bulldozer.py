@@ -1,8 +1,8 @@
 import numpy as np
 from gym import spaces
 
-from gym_cellular_automata import CAEnv, GridSpace, Operator
 from gym_cellular_automata._config import TYPE_BOX
+from gym_cellular_automata.ca_env import CAEnv
 from gym_cellular_automata.forest_fire.operators import (
     Modify,
     Move,
@@ -10,6 +10,8 @@ from gym_cellular_automata.forest_fire.operators import (
     RepeatCA,
     WindyForestFire,
 )
+from gym_cellular_automata.grid_space import GridSpace
+from gym_cellular_automata.operator import Operator
 
 from .utils.config import CONFIG
 from .utils.render import render
