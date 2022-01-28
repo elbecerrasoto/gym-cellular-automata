@@ -16,13 +16,14 @@ See https://github.com/elbecerrasoto/gym-cellular-automata for documentation.
 """
 from gym.error import Error as GymError
 
-from gym_cellular_automata import envs
 from gym_cellular_automata.ca_env import CAEnv
 from gym_cellular_automata.grid_space import GridSpace
 from gym_cellular_automata.operator import Operator
+from gym_cellular_automata.registration import GYM_MAKE
+from gym_cellular_automata.registration import GYM_MAKE as envs
 from gym_cellular_automata.registration import (
-    GYM_MAKE,
     REGISTERED_CA_ENVS,
+    prototypes,
     register_caenvs,
 )
 from gym_cellular_automata.version import VERSION as __version__
