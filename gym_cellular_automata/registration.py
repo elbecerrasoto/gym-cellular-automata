@@ -36,7 +36,7 @@ REGISTERED_CA_ENVS = {
 GYM_MAKE = tuple(LIBRARY + ":" + ca_env for ca_env in REGISTERED_CA_ENVS)
 
 
-def register_caenvs():
+def _register_caenvs():
     for ca_env in REGISTERED_CA_ENVS:
         register(
             ca_env,

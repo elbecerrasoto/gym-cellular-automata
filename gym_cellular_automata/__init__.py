@@ -19,25 +19,19 @@ from gym.error import Error as GymError
 from gym_cellular_automata.ca_env import CAEnv
 from gym_cellular_automata.grid_space import GridSpace
 from gym_cellular_automata.operator import Operator
-from gym_cellular_automata.registration import GYM_MAKE
 from gym_cellular_automata.registration import GYM_MAKE as envs
-from gym_cellular_automata.registration import (
-    REGISTERED_CA_ENVS,
-    prototypes,
-    register_caenvs,
-)
+from gym_cellular_automata.registration import _register_caenvs, prototypes
 from gym_cellular_automata.version import VERSION as __version__
 
-# Do NOT import anything from here
-# otherwise a circular import will be triggered
-# These are exports for external code
-
+# Exports for user code
+# do NOT import from here into gymca
+# as it would trigger a circular ImportError
 
 # Avoids annoying error when working interactively
 try:
-    register_caenvs()
+    _register_caenvs()
 except GymError:
     pass
 
 
-__all__ = ["REGISTERED_CA_ENVS", "GYM_MAKE", "CAEnv", "GridSpace", "Operator", "envs"]
+__all__ = ["envs", "prototypes", "CAEnv", "GridSpace", "Operator"]
