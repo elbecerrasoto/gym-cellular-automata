@@ -17,7 +17,7 @@
 
 _Gym Cellular Automata_ is a collection of _Reinforcement Learning Environments_ (RLEs) that follow the [OpenAI Gym API](https://gym.openai.com/docs).
 
-The available RLEs are based on [Cellular Automata](https://en.wikipedia.org/wiki/Cellular_automaton) (CAs). On them an _Agent_ interacts with a CA, by changing its cell states, in a attempt to drive the emergent properties of its grid to a desired configuration.
+The available RLEs are based on [Cellular Automata](https://en.wikipedia.org/wiki/Cellular_automaton) (CAs). On them an _Agent_ interacts with a CA, by changing its cell states, in a attempt to drive the emergent properties of its grid.
 
 ## Installation
 
@@ -26,16 +26,58 @@ git clone https://github.com/elbecerrasoto/gym-cellular-automata
 pip install -e gym-cellular-automata
 ```
 
-## Basic Usage
+## Usage
 
-### Random Policy
+:carousel_horse: :carousel_horse: :carousel_horse:
 
-:game_die:
+> Prototype & Benchmark, the two modes of _gymca_...
 
 ```python
 import gym
+import gym_cellular_automata as gymca
 
-env = gym.make("gym_cellular_automata:ForestFireHelicopter5x5-v1")
+# benchmark mode
+env_id = gymca.envs[0]
+env = gym.make(env_id)
+
+# prototype mode
+ProtoEnv = gymca.prototypes[0]
+env = ProtoEnv(nrows=42, ncols=42)
+```
+
+The tuple `gymca.envs` contains calling strings for `gym.make`.
+
+`gym.make` generates an instance of a registered environment.
+
+A registered environment is inflexible as it cannot be
+customized. This is on purpose, since the _gym library_ is
+about benchmarking _RL algorithms_. A benchmark must not change
+if it wants to provide meaningful comparisons.
+
+Even more if the benchmark is well understood, it should highlight
+strengths and shortcomings of the algorithms.
+
+However `gym.make` and `gym.envs.registration.register`
+assume that a well understood environment is available.
+They tell nothing about on how to create a new interesting one,
+but nothing in the world does.
+
+Nonetheless I believe that creating an interesting environment
+involves a lot of parameter tweaking. Thus the prototype mode is just that,
+it exposes the _Environment_ to configuration.
+
+The size of the grid serves as a _proxy_ for task difficulty,
+so two parameters are required on prototype mode _nrows_ and _ncols_.
+
+### Random Policy
+
+```python
+import gym
+import gym_cellular_automata as gymca
+
+env_id = gymca.envs[0]
+gym.make(env_id)
+
 obs = env.reset()
 
 total_reward = 0.0
@@ -50,17 +92,9 @@ while not done and step < threshold:
     total_reward += reward
     step += 1
 
+print(f"{env_id}")
 print(f"Total Steps: {step}")
 print(f"Total Reward: {total_reward}")
-```
-
-### Available CA envs
-
-```python
-import gym_cellular_automata as gymca
-
-# Print available CA envs
-print(gymca.REGISTERED_CA_ENVS)
 ```
 
 ## Gallery
@@ -98,7 +132,7 @@ For contributions check [contributing](./CONTRIBUTING.md) and [the to do list](t
 
 Contributions to _Gym Cellular Automata_ are always welcome. Feel free to open _pull requests_.
 
-:zebra: :lion: :monkey: :elephant: We aim to have a _zoo_ of Cellular Automata Environments. Thus _the more the merrier_.
+:zebra: :lion: :monkey: :elephant: I aiming for a _zoo_ of Cellular Automata Environments. Thus _the more the merrier_.
 
 This project adheres to the following practices:
 
