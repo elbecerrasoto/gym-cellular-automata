@@ -4,7 +4,8 @@ import numpy as np
 import pytest
 from gym import spaces
 
-from gym_cellular_automata import TYPE_BOX, GridSpace
+from gym_cellular_automata import GridSpace
+from gym_cellular_automata._config import TYPE_BOX
 from gym_cellular_automata.forest_fire.helicopter import ForestFireHelicopterEnv
 from gym_cellular_automata.forest_fire.helicopter.utils.config import CONFIG
 

@@ -1,6 +1,6 @@
 import numpy as np
 
-from gym_cellular_automata import PROJECT_PATH
+from gym_cellular_automata._config import PROJECT_PATH
 
 EMOJIFONT = PROJECT_PATH / "fonts/OpenMoji-Black.ttf"
 TITLEFONT = PROJECT_PATH / "fonts/FrederickatheGreat-Regular.ttf"

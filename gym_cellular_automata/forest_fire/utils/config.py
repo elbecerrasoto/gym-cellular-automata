@@ -1,6 +1,6 @@
 import numpy as np
 
-from gym_cellular_automata import TYPE_BOX
+from gym_cellular_automata._config import TYPE_BOX
 
 
 # Load the YAML configuration file into a python dict

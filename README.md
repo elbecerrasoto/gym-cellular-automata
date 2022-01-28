@@ -81,8 +81,8 @@ print(gymca.REGISTERED_CA_ENVS)
 
 :construction_worker: Documentation is in progress.
 
-+ [Forest Fire Environment Helicopter V0](./gym_cellular_automata/forest_fire/helicopter/README.md)
-+ [Forest Fire Environment Bulldozer V1](./gym_cellular_automata/forest_fire/bulldozer/README.md)
++ [Forest Fire Environment Helicopter](./gym_cellular_automata/forest_fire/helicopter/README.md)
++ [Forest Fire Environment Bulldozer](./gym_cellular_automata/forest_fire/bulldozer/README.md)
 + [Architecture](./docs/architecture.md)
 
 ## Releases

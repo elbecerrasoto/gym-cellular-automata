@@ -1,7 +1,8 @@
 import numpy as np
 from gym import logger, spaces
 
-from gym_cellular_automata import TYPE_BOX, CAEnv, GridSpace, Operator
+from gym_cellular_automata import CAEnv, GridSpace, Operator
+from gym_cellular_automata._config import TYPE_BOX
 from gym_cellular_automata.forest_fire.operators import (
     ForestFire,
     Modify,
