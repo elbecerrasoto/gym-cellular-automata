@@ -2,7 +2,7 @@
 
 ## Short Term
 
-- [ ] Reduce windy forest fire to three cells
+- [x] Reduce windy forest fire to three cells
 
   - The fourth cell is for visualization, but three cells are more elegant
 

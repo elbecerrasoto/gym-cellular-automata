@@ -5,7 +5,7 @@
     <a href="pics/gym_cellular_automata.svg"><img src="pics/gym_cellular_automata.svg"></a>
     <br />
     <br />
-    <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-0.5.4-blue" alt="Semantic Versioning"></a>
+    <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-0.5.5-blue" alt="Semantic Versioning"></a>
     <a href="http://choosealicense.com/licenses/mit/"><img src="https://img.shields.io/badge/license-MIT-red.svg?style=flat" alt="MIT License"></a>
     <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a>
     <a href="https://gitmoji.dev"><img src="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg" alt="Gitmoji"></a>
@@ -131,8 +131,6 @@ print(f"Total Reward: {total_reward}")
 For contributions check [contributing](./CONTRIBUTING.md) and [the to do list](todo.md).
 
 Contributions to _Gym Cellular Automata_ are always welcome. Feel free to open _pull requests_.
-
-:zebra: :lion: :monkey: :elephant: I aiming for a _zoo_ of Cellular Automata Environments. Thus _the more the merrier_.
 
 This project adheres to the following practices:
 

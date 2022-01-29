@@ -2,6 +2,18 @@
 
 :drum:
 
+## 0.5.5
+
+> Theme: Prototype & Benchmark modes
+
++ Prototype & Benchmark mode.
+    + _gymca_ can be called in two ways
+    + `gymca.prototypes` & `gymca.envs`
++ New _env_ version  "ForestFireBulldozer256xx256-v3"
+    + Windy Forest Fire was rolled back to 3 cells
++ `__init__.py` clean up
+
+
 ## 0.5.4
 
 > Theme: Update to _gym 0.21.0_
