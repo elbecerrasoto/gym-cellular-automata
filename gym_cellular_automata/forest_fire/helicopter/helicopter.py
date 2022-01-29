@@ -119,38 +119,6 @@ class ForestFireHelicopterEnv(CAEnv):
     def _report(self):
         return {"hit": self.modify.hit}
 
-    def _get_defaults_free(self, **kwargs):
-        return {
-            "p_fire": CONFIG["ca_params"]["p_fire"],
-            "p_tree": CONFIG["ca_params"]["p_tree"],
-            "empty": CONFIG["cell_symbols"]["empty"],
-            "tree": CONFIG["cell_symbols"]["tree"],
-            "fire": CONFIG["cell_symbols"]["fire"],
-            "effects": CONFIG["effects"],
-            "n_actions": len(CONFIG["actions"]),
-            "action_sets": CONFIG["actions_sets"],
-            "reward_per_empty": CONFIG["rewards"]["per_empty"],
-            "reward_per_tree": CONFIG["rewards"]["per_tree"],
-            "reward_per_fire": CONFIG["rewards"]["per_fire"],
-        }
-
-    def _get_defaults_scale(self, nrows, ncols):
-        if CONFIG["max_freeze"] > -1:
-
-            max_freeze = CONFIG["max_freeze"]
-
-        else:
-
-            ROW_SPEED = CONFIG["row_speed"]
-            COL_SPEED = CONFIG["col_speed"]
-
-            MOORE_CORRECTION = 2  # Cause moving diagonally
-            max_freeze = (
-                int(ROW_SPEED * nrows) + int(COL_SPEED * ncols)
-            ) // MOORE_CORRECTION
-
-        return {"max_freeze": max_freeze}
-
     def _set_spaces(self):
         self.ca_params_space = spaces.Box(0.0, 1.0, shape=(2,))
         self.position_space = spaces.MultiDiscrete([self.nrows, self.ncols])
