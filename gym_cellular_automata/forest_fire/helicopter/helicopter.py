@@ -51,24 +51,25 @@ class ForestFireHelicopterEnv(CAEnv):
         # Class Variables, set to defaults if not manually entered.
 
         # Variables, scale free
-        self._p_fire = self._get_kwarg("p_fire", kwargs)
-        self._p_tree = self._get_kwarg("p_tree", kwargs)
+        self._p_fire = CONFIG["ca_params"]["p_fire"]
+        self._p_tree = CONFIG["ca_params"]["p_tree"]
 
-        self._empty = self._get_kwarg("empty", kwargs)
-        self._tree = self._get_kwarg("tree", kwargs)
-        self._fire = self._get_kwarg("fire", kwargs)
+        self._empty = CONFIG["cell_symbols"]["empty"]
+        self._tree = CONFIG["cell_symbols"]["tree"]
+        self._fire = CONFIG["cell_symbols"]["fire"]
 
-        self._effects = self._get_kwarg("effects", kwargs)
+        self._effects = CONFIG["effects"]
 
-        self._n_actions = self._get_kwarg("n_actions", kwargs)
-        self._action_sets = self._get_kwarg("action_sets", kwargs)
+        self._n_actions = len(CONFIG["actions"])
+        self._action_sets = CONFIG["actions_sets"]
 
-        self._reward_per_empty = self._get_kwarg("reward_per_empty", kwargs)
-        self._reward_per_tree = self._get_kwarg("reward_per_tree", kwargs)
-        self._reward_per_fire = self._get_kwarg("reward_per_fire", kwargs)
+        self._reward_per_empty = CONFIG["rewards"]["per_empty"]
+        self._reward_per_tree = CONFIG["rewards"]["per_tree"]
+        self._reward_per_fire = CONFIG["rewards"]["per_fire"]
 
         # Variables, scale dependant variables
-        self._max_freeze = self._get_kwarg("max_freeze", kwargs)
+        # -1 for automatic wip
+        self._max_freeze = 1
 
         self._set_spaces()
 
