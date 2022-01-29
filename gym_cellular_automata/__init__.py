@@ -10,7 +10,20 @@ The available RLEs are based on Cellular Automata (CAs).
 On them an Agent interacts with a CA,
 by changing its cell states,
 in a attempt to drive the emergent properties
-of its grid to a desired configuration.
+of its grid.
+
+```python
+import gym
+import gym_cellular_automata as gymca
+
+# benchmark mode
+env_id = gymca.envs[0]
+env = gym.make(env_id)
+
+# prototype mode
+ProtoEnv = gymca.prototypes[0]
+env = ProtoEnv(nrows=42, ncols=42)
+```
 
 See https://github.com/elbecerrasoto/gym-cellular-automata for documentation.
 """

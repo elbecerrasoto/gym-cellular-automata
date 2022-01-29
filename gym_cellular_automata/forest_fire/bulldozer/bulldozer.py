@@ -47,26 +47,28 @@ class ForestFireBulldozerEnv(CAEnv):
         # Class Variables, set to defaults if not manually entered.
 
         # Variables, scale free
-        self._moves = self._get_kwarg("moves", kwargs)
-        self._shoots = self._get_kwarg("shoots", kwargs)
-        self._action_sets = self._get_kwarg("action_sets", kwargs)
+        # fmt: off
+        self._moves       = CONFIG["actions"]["movement"]
+        self._shoots      = CONFIG["actions"]["shooting"]
+        self._action_sets = CONFIG["actions"]["sets"]
 
-        self._empty = self._get_kwarg("empty", kwargs)
-        self._tree = self._get_kwarg("tree", kwargs)
-        self._fire = self._get_kwarg("fire", kwargs)
+        self._empty = CONFIG["cell_symbols"]["empty"]
+        self._tree = CONFIG["cell_symbols"]["tree"]
+        self._fire = CONFIG["cell_symbols"]["fire"]
 
-        self._p_tree = self._get_kwarg("p_tree", kwargs)
-        self._p_empty = self._get_kwarg("p_empty", kwargs)
-        self._wind = self._get_kwarg("wind", kwargs)
+        self._p_tree = CONFIG["p_tree"]
+        self._p_empty = CONFIG["p_empty"]
+        self._wind = CONFIG["wind"]
 
-        self._effects = self._get_kwarg("effects", kwargs)
+        self._effects = CONFIG["effects"]
 
-        self._t_env_any = self._get_kwarg("t_env_any", kwargs)
-        self._t_act_none = self._get_kwarg("t_act_none", kwargs)
+        self._t_env_any = CONFIG["time"]["te_any"]
+        self._t_act_none = CONFIG["time"]["ta_none"]
 
         # Variables, scale dependant variables
-        self._t_act_move = self._get_kwarg("t_act_move", kwargs)
-        self._t_act_shoot = self._get_kwarg("t_act_shoot", kwargs)
+        self._t_act_move = CONFIG["time"]["ta_move"]
+        self._t_act_shoot = CONFIG["time"]["ta_shoot"]
+        # fmt: on
 
         self._set_spaces()
         self._init_time_mappings()
@@ -94,7 +96,7 @@ class ForestFireBulldozerEnv(CAEnv):
 
         Negative Ratio of Burning Area per Total Flammable Area
 
-        -[f / (t + f)]
+        -(f / (t + f))
         Where:
             t: tree cell counts
             f: fire cell counts
@@ -115,6 +117,9 @@ class ForestFireBulldozerEnv(CAEnv):
         Disadvantages:
         1. Lack of experimental results.
         2. Is it equivalent with Sparse Reward?
+
+        The sparse reward is alive trees at epidose's end:
+        t / (e + t + f)
         """
         counts = self.count_cells(self.grid)
         t = counts[self._tree]
