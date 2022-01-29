@@ -132,46 +132,6 @@ class ForestFireBulldozerEnv(CAEnv):
     def _report(self):
         return {"hit": self.modify.hit}
 
-    def _get_defaults_free(self, *args, **kwargs):
-        return {
-            "moves": CONFIG["actions"]["movement"],
-            "shoots": CONFIG["actions"]["shooting"],
-            "action_sets": CONFIG["actions"]["sets"],
-            "empty": CONFIG["cell_symbols"]["empty"],
-            "tree": CONFIG["cell_symbols"]["tree"],
-            "fire": CONFIG["cell_symbols"]["fire"],
-            "p_tree": CONFIG["p_tree"],
-            "p_empty": CONFIG["p_empty"],
-            "wind": CONFIG["wind"],
-            "effects": CONFIG["effects"],
-        }
-
-    def _get_defaults_scale(self, nrows, ncols):
-        size = (self.nrows + self.ncols) // 2
-        ANY = CONFIG["time"]["te_any"]
-        AUTOMATIC = CONFIG["time"]["automatic_set_up"]
-
-        if AUTOMATIC:
-
-            NONE = 0.0
-            SPEED_HALF = CONFIG["time"]["speed_at_half"]
-            SPEED_FULL = CONFIG["time"]["speed_at_full"]
-
-            MOVE = (1 / (SPEED_HALF * size)) - ANY
-            SHOOT = (1 / (SPEED_FULL * size)) - MOVE
-
-        else:
-            NONE = CONFIG["time"]["ta_none"]
-            MOVE = CONFIG["time"]["ta_move"]
-            SHOOT = CONFIG["time"]["ta_shoot"]
-
-        return {
-            "t_act_none": NONE,
-            "t_act_move": MOVE,
-            "t_act_shoot": SHOOT,
-            "t_env_any": ANY,
-        }
-
     def _noise(self):
         """
         Noise to initial conditions. A circular deviation of 1/12 of the grid size.
