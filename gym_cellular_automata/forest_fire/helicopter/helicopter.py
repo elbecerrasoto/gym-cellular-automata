@@ -12,7 +12,6 @@ from gym_cellular_automata.forest_fire.operators import (
 from gym_cellular_automata.grid_space import GridSpace
 from gym_cellular_automata.operator import Operator
 
-from .utils.config import CONFIG
 from .utils.render import render
 
 
@@ -51,24 +50,41 @@ class ForestFireHelicopterEnv(CAEnv):
         # Class Variables, set to defaults if not manually entered.
 
         # Variables, scale free
-        self._p_fire = CONFIG["ca_params"]["p_fire"]
-        self._p_tree = CONFIG["ca_params"]["p_tree"]
+        self._p_fire = 0.033
+        self._p_tree = 0.333
 
-        self._empty = CONFIG["cell_symbols"]["empty"]
-        self._tree = CONFIG["cell_symbols"]["tree"]
-        self._fire = CONFIG["cell_symbols"]["fire"]
+        self._empty = 0
+        self._tree = 1
+        self._fire = 2
 
-        self._effects = CONFIG["effects"]
+        self._effects = {self._fire: self._empty}
 
-        self._n_actions = len(CONFIG["actions"])
-        self._action_sets = CONFIG["actions_sets"]
+        self._n_actions = 9
 
-        self._reward_per_empty = CONFIG["rewards"]["per_empty"]
-        self._reward_per_tree = CONFIG["rewards"]["per_tree"]
-        self._reward_per_fire = CONFIG["rewards"]["per_fire"]
+        up_left = 0
+        up = 1
+        up_right = 2
+        left = 3
+        not_move = 4
+        right = 5
+        down_left = 6
+        down = 7
+        down_right = 8
+
+        self._action_sets = {
+            "up": {up_left, up, up_right},
+            "down": {down_left, down, down_right},
+            "left": {up_left, left, down_left},
+            "right": {up_right, right, down_right},
+            "not_move": {not_move},
+        }
+
+        self._reward_per_empty = 0.0
+        self._reward_per_tree = 1.0
+        self._reward_per_fire = -1.0
 
         # Variables, scale dependant variables
-        # -1 for automatic wip
+        # -1 for automatic
         self._max_freeze = 1
 
         self._set_spaces()
