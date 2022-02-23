@@ -16,12 +16,9 @@
   - Add the corresponding tests
   - Test operator _deterministic attribute_
 
+_Doing_
 - [ ] Refactor _Envs globals_
-
-  - To something like this
-  ```python
-  self._globalv = DEFAULT if globalv is None else globalv
-  ```
+- [ ] Remove YAML
 
 - [ ] Add gifs of the _Envs_ in action
 
@@ -39,7 +36,9 @@
 
   - Implementation via scripting [Golly](http://golly.sourceforge.net/)
 
-- [ ] :goggles: Any wild idea!
+- [ ] Check this library [cellpylib](https://github.com/lantunes/cellpylib)
+
+- :goggles: Any wild idea!
 
 ## Secondary
 
