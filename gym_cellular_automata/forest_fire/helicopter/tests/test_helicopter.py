@@ -6,7 +6,6 @@ from gym import spaces
 
 from gym_cellular_automata._config import TYPE_BOX
 from gym_cellular_automata.forest_fire.helicopter import ForestFireHelicopterEnv
-from gym_cellular_automata.forest_fire.helicopter.utils.config import CONFIG
 from gym_cellular_automata.grid_space import GridSpace
 
 RANDOM_POLICY_ITERATIONS = 12
@@ -15,26 +14,36 @@ TEST_GRID_COLS = 3
 
 ROW, COL = 5, 5
 
-ACTION_NOT_MOVE = CONFIG["actions"]["not_move"]
+up_left = 0
+up = 1
+up_right = 2
+left = 3
+not_move = 4
+right = 5
+down_left = 6
+down = 7
+down_right = 8
 
-ACTION_LEFT = CONFIG["actions"]["left"]
-ACTION_RIGHT = CONFIG["actions"]["right"]
+ACTION_NOT_MOVE = {not_move}
 
-ACTION_UP = CONFIG["actions"]["up"]
-ACTION_DOWN = CONFIG["actions"]["down"]
+ACTION_LEFT = ({up_left, left, down_left},)
+ACTION_RIGHT = ({up_right, right, down_right},)
 
-REWARD_PER_EMPTY = CONFIG["rewards"]["per_empty"]
-REWARD_PER_TREE = CONFIG["rewards"]["per_tree"]
-REWARD_PER_FIRE = CONFIG["rewards"]["per_fire"]
+ACTION_UP = ({up_left, up, up_right},)
+ACTION_DOWN = ({down_left, down, down_right},)
+
+REWARD_PER_EMPTY = 0.0
+REWARD_PER_TREE = 1.0
+REWARD_PER_FIRE = -1.0
 
 REWARD_TYPE = TYPE_BOX
 
-EMPTY = CONFIG["cell_symbols"]["empty"]
-TREE = CONFIG["cell_symbols"]["tree"]
-FIRE = CONFIG["cell_symbols"]["fire"]
+EMPTY = 0
+TREE = 1
+FIRE = 2
 
-P_FIRE = CONFIG["ca_params"]["p_fire"]
-P_TREE = CONFIG["ca_params"]["p_tree"]
+P_FIRE = 0.033
+P_TREE = 0.333
 
 
 @pytest.fixture

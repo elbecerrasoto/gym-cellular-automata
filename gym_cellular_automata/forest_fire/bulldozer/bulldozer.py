@@ -47,22 +47,34 @@ class ForestFireBulldozerEnv(CAEnv):
         # Class Variables, set to defaults if not manually entered.
 
         # Variables, scale free
+
         self._moves = CONFIG["actions"]["movement"]
         self._shoots = CONFIG["actions"]["shooting"]
+
+        up_left = 0
+        up = 1
+        up_right = 2
+        left = 3
+        not_move = 4
+        right = 5
+        down_left = 6
+        down = 7
+        down_right = 8
+
         self._action_sets = CONFIG["actions"]["sets"]
 
-        self._empty = CONFIG["cell_symbols"]["empty"]
-        self._tree = CONFIG["cell_symbols"]["tree"]
-        self._fire = CONFIG["cell_symbols"]["fire"]
+        self._empty = 0
+        self._tree = 3
+        self._fire = 25
 
-        self._p_tree = CONFIG["p_tree"]
-        self._p_empty = CONFIG["p_empty"]
+        self._p_tree = 0.90
+        self._p_empty = 0.10
         self._wind = CONFIG["wind"]
 
-        self._effects = CONFIG["effects"]
+        self._effects = {self._tree: self._empty}
 
-        self._t_env_any = CONFIG["time"]["te_any"]
-        self._t_act_none = CONFIG["time"]["ta_none"]
+        self._t_env_any = 0.001
+        self._t_act_none = 0.0
 
         # Variables, scale dependant variables
         self._t_act_move = CONFIG["time"]["ta_move"]
