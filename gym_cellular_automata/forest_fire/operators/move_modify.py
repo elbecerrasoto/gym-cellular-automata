@@ -1,3 +1,5 @@
+from typing import Dict, Set
+
 import numpy as np
 from gym import logger, spaces
 
@@ -14,7 +16,7 @@ class Move(Operator):
 
     deterministic = True
 
-    def __init__(self, directions_sets, *args, **kwargs):
+    def __init__(self, directions_sets: Dict[str, Set], *args, **kwargs):
 
         super().__init__(*args, **kwargs)
 
