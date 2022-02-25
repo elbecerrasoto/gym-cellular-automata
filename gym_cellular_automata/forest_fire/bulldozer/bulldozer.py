@@ -102,9 +102,22 @@ class ForestFireBulldozerEnv(CAEnv):
         # On Cellular Automaton (CA) updates units
         # e.g. 1 equals to 1 CA update
 
-        self._t_env_any = t_any  # Time regardless of anything
+        self._t_env_any = t_any  # Time regardless of anything, guarantees termination
+        self._t_act_none = 0.0  # Time of doing NOTHING
 
-        # Scale dependant times
+        # Scale dependent times
+        # They depend on grid scale and speed
+
+        # Two speed params are defined
+
+        # speed_move:
+        # percent of the grid that the bulldozer can cover by only moving
+        # before an update happens
+
+        # speed_act:
+        # percent of the grid that the bulldozer can cover while acting and moving
+        # before an update happens
+
         scale = (self.nrows + self.ncols) // 2
         # Time of moving
         self._t_act_move = (
@@ -114,8 +127,6 @@ class ForestFireBulldozerEnv(CAEnv):
         self._t_act_shoot = (
             (1 / (speed_act * scale)) - self._t_act_move if t_shoot is None else t_shoot
         )
-
-        self._t_act_none = 0.0  # Time of doing NOTHING
 
         # For `_init_time_mappings`
         self._moves = {
@@ -201,12 +212,17 @@ class ForestFireBulldozerEnv(CAEnv):
     def _report(self):
         return {"hit": self.modify.hit}
 
-    def _noise(self):
+    def _noise(self, ax_len):
         """
-        Noise to initial conditions. A circular deviation of 1/12 of the grid size.
+        Noise to initial conditions.
         """
-        l = ((self.nrows + self.ncols) // 2) // 12
-        return int(self.np_random.choice(range(l), size=1))
+        AX_PERCENT = 1 / 12
+        upper = int(ax_len * AX_PERCENT)
+
+        if upper > 0:
+            return int(self.np_random.choice(range(upper), size=1))
+        else:
+            return 0
 
     def _initial_grid_distribution(self):
         # fmt: off
@@ -219,9 +235,12 @@ class ForestFireBulldozerEnv(CAEnv):
 
         grid = grid_space.sample()
 
+        # Fire Position
         # Around the lower left quadrant
         r, c = (3 * self.nrows // 4), (1 * self.ncols // 4)
-        row, col = self._fire_seed = r + self._noise(), c + self._noise()
+        row, col = self._fire_seed = r + self._noise(self.nrows), c + self._noise(
+            self.ncols
+        )
 
         grid[row, col] = self._fire
 
@@ -230,11 +249,12 @@ class ForestFireBulldozerEnv(CAEnv):
     def _initial_context_distribution(self):
         init_time = np.array(0.0)
 
+        # Bulldozer Position
         # Around the upper right quadrant
         r, c = (1 * self.nrows // 4), (3 * self.ncols // 4)
 
-        initnrows = r + self._noise()
-        initncols = c + self._noise()
+        initnrows = r + self._noise(self.nrows)
+        initncols = c + self._noise(self.ncols)
 
         init_position = np.array([initnrows, initncols])
 

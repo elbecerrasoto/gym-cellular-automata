@@ -18,5 +18,7 @@ def test_gymca():
 
     # Prototype mode
     for ProtoEnv in gymca.prototypes:
-        env = ProtoEnv(nrows=42, ncols=42)
-        assert isinstance(env, gym.Env)
+        for rc in ((1, 1), (8, 8), (42, 42), (1024, 1024)):
+            env = ProtoEnv(*rc)
+            env.reset()
+            assert isinstance(env, gym.Env)
