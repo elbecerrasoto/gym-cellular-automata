@@ -5,7 +5,7 @@
     <a href="pics/gym_cellular_automata.svg"><img src="pics/gym_cellular_automata.svg"></a>
     <br />
     <br />
-    <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-0.5.5-blue" alt="Semantic Versioning"></a>
+    <a href="https://semver.org/"><img src="https://img.shields.io/badge/version-0.5.6-blue" alt="Semantic Versioning"></a>
     <a href="http://choosealicense.com/licenses/mit/"><img src="https://img.shields.io/badge/license-MIT-red.svg?style=flat" alt="MIT License"></a>
     <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a>
     <a href="https://gitmoji.dev"><img src="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg" alt="Gitmoji"></a>
@@ -51,23 +51,14 @@ The tuple `gymca.envs` contains calling strings for `gym.make`.
 
 A registered environment is inflexible as it cannot be
 customized. This is on purpose, since the _gym library_ is
-about benchmarking _RL algorithms_. A benchmark must not change
+about benchmarking _RL algorithms_—a benchmark must not change
 if it wants to provide meaningful comparisons.
 
-Even more if the benchmark is well understood, it should highlight
-strengths and shortcomings of the algorithms.
+_CA Envs_ are experimental—they need to mature into worth-solving _RL tasks_. For this to happen fast prototyping is needed. This involves parameter tweaking and module combination.
 
-However `gym.make` and `gym.envs.registration.register`
-assume that a well understood environment is available.
-They tell nothing about on how to create a new interesting one,
-but nothing in the world does.
+_gym-cellular-automata_ strives to be an _environment-design_ library, this is the motivation behind the _prototype mode_, which does not register the environment, but exposes it to configuration.
 
-Nonetheless I believe that creating an interesting environment
-involves a lot of parameter tweaking. Thus the prototype mode is just that,
-it exposes the _Environment_ to configuration.
-
-The size of the grid serves as a _proxy_ for task difficulty,
-so two parameters are required on prototype mode _nrows_ and _ncols_.
+Grid size (_nrows, ncols_) is one of the most changed parameters so it is required. Other parameters are optional and differ from class to class. Grid size is a _proxy_ for task difficulty, bigger grids are usually harder.
 
 ### Random Policy
 

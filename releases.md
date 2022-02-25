@@ -2,6 +2,18 @@
 
 :drum:
 
+## 0.5.6
+
+> Theme: Remove YAML globals
+
++ Simplification of globals
+  + Import parameters into _env init method_
+  + Globals are read directly, instead from config files
+  + Remove dependency on YAML
+  + Simplification of _CAEnv ABC_
++ Fix definition of bulldozer to any grid size _[1-n]_
+
+
 ## 0.5.5
 
 > Theme: Prototype & Benchmark modes

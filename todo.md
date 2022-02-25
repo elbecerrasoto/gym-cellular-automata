@@ -17,8 +17,8 @@
   - Test operator _deterministic attribute_
 
 _Doing_
-- [ ] Refactor _Envs globals_
-- [ ] Remove YAML
+- [x] Refactor _Envs globals_
+- [x] Remove YAML
 
 - [ ] Add gifs of the _Envs_ in action
 

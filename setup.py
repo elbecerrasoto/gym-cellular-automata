@@ -18,7 +18,6 @@ setup(
         "numpy",
         "matplotlib",
         "scipy",
-        "pyyaml",
         "svgpath2mpl",
     ],
     tests_require=["pytest", "pytest-cov", "pytest-repeat", "pytest-randomly"],
