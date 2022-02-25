@@ -93,8 +93,10 @@ class ForestFireBulldozerEnv(CAEnv):
 
         # Initial Condition Parameters
 
-        self._pos_bull = pos_bull  # Initial position of bulldozer
-        self._pos_fire = pos_fire  # Initial position of fire
+        self._pos_bull = (
+            pos_bull  # Initial position of bulldozer, default at `initial_context`
+        )
+        self._pos_fire = pos_fire  # Initial position of fire, default at `initial_fire`
 
         self._p_tree = p_tree  # Initial Tree probability
         self._p_empty = p_empty  # Initial Empty probality
@@ -246,13 +248,10 @@ class ForestFireBulldozerEnv(CAEnv):
         # Around the lower left quadrant
         if self._pos_fire is None:
             r, c = (3 * self.nrows // 4), (1 * self.ncols // 4)
-            frow, fcol = self._fire_seed = r + self._noise(self.nrows), c + self._noise(
-                self.ncols
-            )
-        else:
-            frow, fcol = self._fire_seed = self._pos_fire
+            self._pos_fire = r + self._noise(self.nrows), c + self._noise(self.ncols)
 
-        grid[frow, fcol] = self._fire
+        r, c = self._pos_fire
+        grid[r, c] = self._fire
 
         return grid
 
@@ -264,11 +263,12 @@ class ForestFireBulldozerEnv(CAEnv):
             # Around the upper right quadrant
             r, c = (1 * self.nrows // 4), (3 * self.ncols // 4)
 
-            initnrows = r + self._noise(self.nrows)
-            initncols = c + self._noise(self.ncols)
+            r = r + self._noise(self.nrows)
+            c = c + self._noise(self.ncols)
 
-        init_position = np.array([initnrows, initncols])
+            self._pos_bull = r, c
 
+        init_position = np.array(self._pos_bull)
         init_context = self._wind, init_position, np.array(init_time, dtype=TYPE_BOX)
 
         return init_context

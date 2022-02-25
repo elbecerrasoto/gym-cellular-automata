@@ -81,7 +81,7 @@ def render(env):
     ca_params, pos, time = env.context
 
     local_grid = moore_n(N_LOCAL, pos, grid, EMPTY)
-    pos_fseed = env._fire_seed
+    pos_fseed = env._pos_fire
 
     # Why two titles?
     # The env was registered (benchmark) or
