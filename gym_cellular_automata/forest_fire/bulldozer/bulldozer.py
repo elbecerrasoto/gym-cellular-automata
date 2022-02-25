@@ -37,24 +37,61 @@ class ForestFireBulldozerEnv(CAEnv):
 
         return self._initial_state
 
-    def __init__(self, nrows, ncols, **kwargs):
+    def __init__(
+        self,
+        nrows,
+        ncols,
+        p_tree=0.90,
+        p_empty=0.10,
+        wind={
+            "up_left": 0.48,
+            "up": 0.64,
+            "up_right": 0.98,
+            "left": 0.12,
+            "right": 0.64,
+            "down_left": 0.06,
+            "down": 0.12,
+            "down_right": 0.48,
+        },
+        **kwargs
+    ):
 
         super().__init__(nrows, ncols, **kwargs)
 
         self.title = "ForestFireBulldozer" + str(nrows) + "x" + str(ncols)
 
-        # Class Variables, set to defaults if not manually entered.
-
         # Variables, scale free
-        up_left = 0
-        up = 1
-        up_right = 2
-        left = 3
-        not_move = 4
-        right = 5
-        down_left = 6
-        down = 7
-        down_right = 8
+        (
+            up_left,
+            up,
+            up_right,
+            left,
+            not_move,
+            right,
+            down_left,
+            down,
+            down_right,
+        ) = range(9)
+
+        self._shoots = {"shoot": 1, "none": 0}
+
+        self._empty = 0
+        self._tree = 3
+        self._fire = 25
+
+        self._p_tree = p_tree
+        self._p_empty = p_empty
+
+        self._wind = self.parse_wind(wind)
+
+        self._effects = {self._tree: self._empty}
+
+        self._t_env_any = 0.001
+        self._t_act_none = 0.0
+
+        # Variables, scale dependant variables
+        self._t_act_move = 0.04
+        self._t_act_shoot = 0.12
 
         self._moves = {
             "up_left": up_left,
@@ -68,63 +105,13 @@ class ForestFireBulldozerEnv(CAEnv):
             "down_right": down_right,
         }
 
-        self._shoots = {"shoot": 1, "none": 0}
-
-        self._action_sets = self._action_sets = {
+        self._action_sets = {
             "up": {up_left, up, up_right},
             "down": {down_left, down, down_right},
             "left": {up_left, left, down_left},
             "right": {up_right, right, down_right},
             "not_move": {not_move},
         }
-
-        self._empty = 0
-        self._tree = 3
-        self._fire = 25
-
-        self._p_tree = 0.90
-        self._p_empty = 0.10
-
-        def parse_wind(windD: dict) -> np.ndarray:
-            from gym import spaces
-
-            # fmt: off
-            wind = np.array(
-                [
-                    [ windD["up_left"]  , windD["up"]  , windD["up_right"]   ],
-                    [ windD["left"]     ,    0.0       , windD["right"]      ],
-                    [ windD["down_left"], windD["down"], windD["down_right"] ],
-                ], dtype=TYPE_BOX
-            )
-
-            # fmt: on
-            wind_space = spaces.Box(0.0, 1.0, shape=(3, 3))
-
-            assert wind_space.contains(wind), "Bad Wind Data, check ranges [0.0, 1.0]"
-
-            return wind
-
-        windD = {
-            "up_left": 0.48,
-            "up": 0.64,
-            "up_right": 0.98,
-            "left": 0.12,
-            "right": 0.64,
-            "down_left": 0.06,
-            "down": 0.12,
-            "down_right": 0.48,
-        }
-
-        self._wind = parse_wind(windD)
-
-        self._effects = {self._tree: self._empty}
-
-        self._t_env_any = 0.001
-        self._t_act_none = 0.0
-
-        # Variables, scale dependant variables
-        self._t_act_move = 0.04
-        self._t_act_shoot = 0.12
 
         self._set_spaces()
         self._init_time_mappings()
@@ -251,6 +238,25 @@ class ForestFireBulldozerEnv(CAEnv):
 
         self.time_per_action = time_per_action
         self.time_per_state = lambda s: self._t_env_any
+
+    def parse_wind(self, windD: dict) -> np.ndarray:
+        from gym import spaces
+
+        # fmt: off
+        wind = np.array(
+            [
+                [ windD["up_left"]  , windD["up"]  , windD["up_right"]   ],
+                [ windD["left"]     ,    0.0       , windD["right"]      ],
+                [ windD["down_left"], windD["down"], windD["down_right"] ],
+            ], dtype=TYPE_BOX
+        )
+
+        # fmt: on
+        wind_space = spaces.Box(0.0, 1.0, shape=(3, 3))
+
+        assert wind_space.contains(wind), "Bad Wind Data, check ranges [0.0, 1.0]"
+
+        return wind
 
     def _set_spaces(self):
         self.grid_space = GridSpace(
