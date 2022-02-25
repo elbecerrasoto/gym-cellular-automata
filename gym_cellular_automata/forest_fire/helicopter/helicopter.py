@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from gym import logger, spaces
 
@@ -40,7 +42,9 @@ class ForestFireHelicopterEnv(CAEnv):
 
         return self._initial_state
 
-    def __init__(self, nrows, ncols, **kwargs):
+    def __init__(
+        self, nrows, ncols, speed: float = 0.5, freeze: Optional[int] = None, **kwargs
+    ):
 
         # Sets defaults and runs seed method
         super().__init__(nrows, ncols, **kwargs)
@@ -85,7 +89,8 @@ class ForestFireHelicopterEnv(CAEnv):
 
         # Variables, scale dependant variables
         # -1 for automatic
-        self._max_freeze = 1
+        scale = (nrows + ncols) // 2
+        self._max_freeze = int(speed * scale) if freeze is None else freeze
 
         self._set_spaces()
 
