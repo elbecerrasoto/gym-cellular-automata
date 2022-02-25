@@ -13,7 +13,6 @@ from gym_cellular_automata.forest_fire.operators import (
 from gym_cellular_automata.grid_space import GridSpace
 from gym_cellular_automata.operator import Operator
 
-from .utils.config import CONFIG
 from .utils.render import render
 
 
@@ -47,10 +46,6 @@ class ForestFireBulldozerEnv(CAEnv):
         # Class Variables, set to defaults if not manually entered.
 
         # Variables, scale free
-
-        self._moves = CONFIG["actions"]["movement"]
-        self._shoots = CONFIG["actions"]["shooting"]
-
         up_left = 0
         up = 1
         up_right = 2
@@ -61,7 +56,27 @@ class ForestFireBulldozerEnv(CAEnv):
         down = 7
         down_right = 8
 
-        self._action_sets = CONFIG["actions"]["sets"]
+        self._moves = {
+            "up_left": up_left,
+            "up": up,
+            "up_right": up_right,
+            "left": left,
+            "not_move": not_move,
+            "right": right,
+            "down_left": down_left,
+            "down": down,
+            "down_right": down_right,
+        }
+
+        self._shoots = {"shoot": 1, "none": 0}
+
+        self._action_sets = self._action_sets = {
+            "up": {up_left, up, up_right},
+            "down": {down_left, down, down_right},
+            "left": {up_left, left, down_left},
+            "right": {up_right, right, down_right},
+            "not_move": {not_move},
+        }
 
         self._empty = 0
         self._tree = 3
@@ -69,7 +84,38 @@ class ForestFireBulldozerEnv(CAEnv):
 
         self._p_tree = 0.90
         self._p_empty = 0.10
-        self._wind = CONFIG["wind"]
+
+        def parse_wind(windD: dict) -> np.ndarray:
+            from gym import spaces
+
+            # fmt: off
+            wind = np.array(
+                [
+                    [ windD["up_left"]  , windD["up"]  , windD["up_right"]   ],
+                    [ windD["left"]     ,    0.0       , windD["right"]      ],
+                    [ windD["down_left"], windD["down"], windD["down_right"] ],
+                ], dtype=TYPE_BOX
+            )
+
+            # fmt: on
+            wind_space = spaces.Box(0.0, 1.0, shape=(3, 3))
+
+            assert wind_space.contains(wind), "Bad Wind Data, check ranges [0.0, 1.0]"
+
+            return wind
+
+        windD = {
+            "up_left": 0.48,
+            "up": 0.64,
+            "up_right": 0.98,
+            "left": 0.12,
+            "right": 0.64,
+            "down_left": 0.06,
+            "down": 0.12,
+            "down_right": 0.48,
+        }
+
+        self._wind = parse_wind(windD)
 
         self._effects = {self._tree: self._empty}
 
@@ -77,8 +123,8 @@ class ForestFireBulldozerEnv(CAEnv):
         self._t_act_none = 0.0
 
         # Variables, scale dependant variables
-        self._t_act_move = CONFIG["time"]["ta_move"]
-        self._t_act_shoot = CONFIG["time"]["ta_shoot"]
+        self._t_act_move = 0.04
+        self._t_act_shoot = 0.12
 
         self._set_spaces()
         self._init_time_mappings()
