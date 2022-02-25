@@ -51,30 +51,42 @@ class ForestFireHelicopterEnv(CAEnv):
 
         self.title = "ForestFireHelicopter" + str(nrows) + "x" + str(ncols)
 
-        # Class Variables, set to defaults if not manually entered.
+        # Env Representation Parameters
 
-        # Variables, scale free
-        self._p_fire = 0.033
-        self._p_tree = 0.333
+        actions = (
+            up_left,
+            up,
+            up_right,
+            left,
+            not_move,
+            right,
+            down_left,
+            down,
+            down_right,
+        ) = range(9)
 
+        self._n_actions = len(actions)
+
+        self._reward_per_empty = 0.0
+        self._reward_per_tree = 1.0
+        self._reward_per_fire = -1.0
+
+        # Cells
         self._empty = 0
         self._tree = 1
         self._fire = 2
 
+        # Env Behavior Parameters
+
+        self._p_fire = 0.033
+        self._p_tree = 0.333
+
         self._effects = {self._fire: self._empty}
 
-        self._n_actions = 9
+        scale = (nrows + ncols) // 2
+        self._max_freeze = int(speed * scale) if freeze is None else freeze
 
-        up_left = 0
-        up = 1
-        up_right = 2
-        left = 3
-        not_move = 4
-        right = 5
-        down_left = 6
-        down = 7
-        down_right = 8
-
+        # For `MoveModify`
         self._action_sets = {
             "up": {up_left, up, up_right},
             "down": {down_left, down, down_right},
@@ -82,15 +94,6 @@ class ForestFireHelicopterEnv(CAEnv):
             "right": {up_right, right, down_right},
             "not_move": {not_move},
         }
-
-        self._reward_per_empty = 0.0
-        self._reward_per_tree = 1.0
-        self._reward_per_fire = -1.0
-
-        # Variables, scale dependant variables
-        # -1 for automatic
-        scale = (nrows + ncols) // 2
-        self._max_freeze = int(speed * scale) if freeze is None else freeze
 
         self._set_spaces()
 
