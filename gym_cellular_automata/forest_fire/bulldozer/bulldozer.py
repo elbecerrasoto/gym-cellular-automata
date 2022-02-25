@@ -41,6 +41,11 @@ class ForestFireBulldozerEnv(CAEnv):
         self,
         nrows,
         ncols,
+        speed_move=0.12,
+        speed_act=0.03,
+        t_move=None,
+        t_shoot=None,
+        t_any=0.001,
         p_tree=0.90,
         p_empty=0.10,
         wind={
@@ -60,7 +65,8 @@ class ForestFireBulldozerEnv(CAEnv):
 
         self.title = "ForestFireBulldozer" + str(nrows) + "x" + str(ncols)
 
-        # Variables, scale free
+        # Env Representation Parameters
+
         (
             up_left,
             up,
@@ -71,28 +77,47 @@ class ForestFireBulldozerEnv(CAEnv):
             down_left,
             down,
             down_right,
-        ) = range(9)
+        ) = range(
+            9
+        )  # Move actions
 
-        self._shoots = {"shoot": 1, "none": 0}
+        self._shoots = {"shoot": 1, "none": 0}  # Shoot actions
 
-        self._empty = 0
-        self._tree = 3
-        self._fire = 25
+        self._empty = 0  # Empty cell
+        self._tree = 3  # Tree cell
+        self._fire = 25  # Fire cell
 
-        self._p_tree = p_tree
-        self._p_empty = p_empty
+        # Initial Condition Parameters
 
-        self._wind = self.parse_wind(wind)
+        self._p_tree = p_tree  # Initial Tree probability
+        self._p_empty = p_empty  # Initial Empty probality
 
-        self._effects = {self._tree: self._empty}
+        # Env Behavior Parameters
 
-        self._t_env_any = 0.001
-        self._t_act_none = 0.0
+        self._wind = self._parse_wind(wind)  # Fire Propagation Probabilities
 
-        # Variables, scale dependant variables
-        self._t_act_move = 0.04
-        self._t_act_shoot = 0.12
+        self._effects = {self._tree: self._empty}  # Substitution Effect
 
+        # Time to do things
+        # On Cellular Automaton (CA) updates units
+        # e.g. 1 equals to 1 CA update
+
+        self._t_env_any = t_any  # Time regardless of anything
+
+        # Scale dependant times
+        scale = (self.nrows + self.ncols) // 2
+        # Time of moving
+        self._t_act_move = (
+            (1 / (speed_move * scale)) - t_any if t_move is None else t_move
+        )
+        # Time of shooting
+        self._t_act_shoot = (
+            (1 / (speed_act * scale)) - self._t_act_move if t_shoot is None else t_shoot
+        )
+
+        self._t_act_none = 0.0  # Time of doing NOTHING
+
+        # For `_init_time_mappings`
         self._moves = {
             "up_left": up_left,
             "up": up,
@@ -105,6 +130,7 @@ class ForestFireBulldozerEnv(CAEnv):
             "down_right": down_right,
         }
 
+        # For `MoveModify`
         self._action_sets = {
             "up": {up_left, up, up_right},
             "down": {down_left, down, down_right},
@@ -239,7 +265,7 @@ class ForestFireBulldozerEnv(CAEnv):
         self.time_per_action = time_per_action
         self.time_per_state = lambda s: self._t_env_any
 
-    def parse_wind(self, windD: dict) -> np.ndarray:
+    def _parse_wind(self, windD: dict) -> np.ndarray:
         from gym import spaces
 
         # fmt: off
