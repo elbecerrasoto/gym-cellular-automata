@@ -1,3 +1,5 @@
+from typing import Optional, Tuple
+
 import numpy as np
 from gym import spaces
 
@@ -43,8 +45,10 @@ class ForestFireBulldozerEnv(CAEnv):
         ncols,
         speed_move=0.12,
         speed_act=0.03,
-        t_move=None,
-        t_shoot=None,
+        pos_bull: Optional[Tuple] = None,
+        pos_fire: Optional[Tuple] = None,
+        t_move: Optional[float] = None,
+        t_shoot: Optional[float] = None,
         t_any=0.001,
         p_tree=0.90,
         p_empty=0.10,
@@ -88,6 +92,9 @@ class ForestFireBulldozerEnv(CAEnv):
         self._fire = 25  # Fire cell
 
         # Initial Condition Parameters
+
+        self._pos_bull = pos_bull  # Initial position of bulldozer
+        self._pos_fire = pos_fire  # Initial position of fire
 
         self._p_tree = p_tree  # Initial Tree probability
         self._p_empty = p_empty  # Initial Empty probality
@@ -237,24 +244,28 @@ class ForestFireBulldozerEnv(CAEnv):
 
         # Fire Position
         # Around the lower left quadrant
-        r, c = (3 * self.nrows // 4), (1 * self.ncols // 4)
-        row, col = self._fire_seed = r + self._noise(self.nrows), c + self._noise(
-            self.ncols
-        )
+        if self._pos_fire is None:
+            r, c = (3 * self.nrows // 4), (1 * self.ncols // 4)
+            frow, fcol = self._fire_seed = r + self._noise(self.nrows), c + self._noise(
+                self.ncols
+            )
+        else:
+            frow, fcol = self._fire_seed = self._pos_fire
 
-        grid[row, col] = self._fire
+        grid[frow, fcol] = self._fire
 
         return grid
 
     def _initial_context_distribution(self):
         init_time = np.array(0.0)
 
-        # Bulldozer Position
-        # Around the upper right quadrant
-        r, c = (1 * self.nrows // 4), (3 * self.ncols // 4)
+        if self._pos_bull is None:
+            # Bulldozer Position
+            # Around the upper right quadrant
+            r, c = (1 * self.nrows // 4), (3 * self.ncols // 4)
 
-        initnrows = r + self._noise(self.nrows)
-        initncols = c + self._noise(self.ncols)
+            initnrows = r + self._noise(self.nrows)
+            initncols = c + self._noise(self.ncols)
 
         init_position = np.array([initnrows, initncols])
 
