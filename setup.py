@@ -1,3 +1,5 @@
+import sys
+import os
 from setuptools import setup
 
 # Don't import gym_cellular_automata module here, since deps may not be installed
@@ -8,7 +10,7 @@ setup(
     name="gym_cellular_automata",
     packages=["gym_cellular_automata"],
     version=VERSION,
-    description="Cellular Automata Environments for Reinforcement Learning following the OpenAI Gym API",
+    description="Cellular Automata Environments for Reinforcement Learning",
     url="https://github.com/elbecerrasoto/gym-cellular-automata",
     author="Emanuel Becerra Soto",
     author_email="elbecerrasoto@gmail.com",

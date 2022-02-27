@@ -1,0 +1,4 @@
+include fonts/*
+include docs/*
+include *.md
+include pics/*

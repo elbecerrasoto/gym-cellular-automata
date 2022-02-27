@@ -18,9 +18,8 @@ The cell states are the following:
 1. *empty*
 2. *burned*
 3. *tree*
-4. *fire*
 
-A _tree_ cell changes to *empty* when removed by the *bulldozer* and to *burned* when consumed by fire.
+A _tree_ cell changes to *empty* when removed by the *bulldozer* or consumed by fire.
 
 An internal clock is maintained so after some *bulldozer* actions the fire keeps spreading into its surroundings.
 

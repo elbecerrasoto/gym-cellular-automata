@@ -8,7 +8,10 @@ install-develop : # sudo make install-develop
 	npm i -g gitmoji-cli
 	npm install git-br -g
 
-git-aliases : # `git br` shows branchs descriptions `git root` goes to project root
+build :
+	python -m build
+
+git-aliases : # `git br` shows branchs descriptions `git root` prints the project root
 	git config --global alias.br !git-br # git branch --edit-description
 	git config --global alias.br-describe 'branch --edit-description'
 	git config --global alias.root 'rev-parse --show-toplevel'
@@ -71,8 +74,11 @@ clean : # Depends on trash-cli  https://github.com/andreafrancia/trash-cli
 	git clean -d -n # To remove them change -n to -f
 	echo "\n\nTo remove git untracked files run:\ngit clean -d -f"
 
+trailing-spaces:
+	find gym_cellular_automata -name "*.py" -exec perl -pi -e 's/[ \t]*$$//' {} \;
+
 count :
 	# Counts lines of code
 	find ./ -name '*.py' -print | xargs cat | sed '/^$$/ d' | perl -ne 'if(not /^ *?#/){print $$_}' | wc -l
 
-.PHONY : help install install-develop git-aliases conda_env conda_env_rm hooks hooks-dry hooks-update style test test-debug test-coverage test-slow test-visual linter patch gallery clean count
+.PHONY : help install install-develop build git-aliases conda_env conda_env_rm hooks hooks-dry hooks-update style test test-debug test-coverage test-slow test-visual linter patch gallery clean count
