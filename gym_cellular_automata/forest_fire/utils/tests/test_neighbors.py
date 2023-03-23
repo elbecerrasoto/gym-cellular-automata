@@ -145,14 +145,12 @@ def neighborhood_at2(grid, pos, invariant=0):
         trow, tcol = row + roffset, col + coffset
 
         try:
-
             if trow < 0 or tcol < 0:
                 raise IndexError
 
             return grid[trow, tcol]
 
         except IndexError:
-
             return invariant
 
     row, col = pos

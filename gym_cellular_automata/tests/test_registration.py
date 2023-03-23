@@ -33,9 +33,7 @@ def test_gym_api_heavy(envs):
 
 
 def assert_gym_api(envs, resets, steps, plot_each):
-
     for env in envs:
-
         assert isinstance(env, gym.Env)
         assert isinstance(env.observation_space, Space)
         assert isinstance(env.action_space, Space)
@@ -57,7 +55,6 @@ def assert_gym_api(envs, resets, steps, plot_each):
 
             # Random Policy for at most "threshold" steps
             while not done and step < steps:
-
                 if max_steps is not None:
                     if step > max_steps:
                         break

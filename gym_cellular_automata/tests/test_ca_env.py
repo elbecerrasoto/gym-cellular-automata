@@ -46,7 +46,6 @@ def assert_step(env, step_out):
 
 
 def test_gym_if_done_behave_gracefully(env):
-
     env.reset()
     env.done = True
 
@@ -61,7 +60,6 @@ def test_gym_if_done_behave_gracefully(env):
 
 
 def test_counts(env):
-
     obs = env.reset()
     grid, context = obs
 

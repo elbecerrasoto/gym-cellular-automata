@@ -7,7 +7,6 @@ from gym_cellular_automata.operator import Operator
 
 
 class Move(Operator):
-
     grid_dependant = (
         False  # If a constant size grid is used (that is usually the case).
     )
@@ -17,7 +16,6 @@ class Move(Operator):
     deterministic = True
 
     def __init__(self, directions_sets: Dict[str, Set], *args, **kwargs):
-
         super().__init__(*args, **kwargs)
 
         # fmt: off
@@ -37,7 +35,6 @@ class Move(Operator):
         )
 
     def update(self, grid, action, context):
-
         # A common input is a scalar of type ndarray
         action = int(action)
 
@@ -80,7 +77,6 @@ class Modify(Operator):
     deterministic = True
 
     def __init__(self, effects: dict, *args, **kwargs):
-
         super().__init__(*args, **kwargs)
 
         self.effects = effects
@@ -91,9 +87,7 @@ class Modify(Operator):
         row, col = context
 
         if action:
-
             if grid[row, col] in self.effects:
-
                 grid[row, col] = self.effects[grid[row, col]]
                 self.hit = True
 
@@ -101,7 +95,6 @@ class Modify(Operator):
 
 
 class MoveModify(Operator):
-
     grid_dependant = True
     action_dependant = True
     context_dependant = True
@@ -109,7 +102,6 @@ class MoveModify(Operator):
     deterministic = True
 
     def __init__(self, move, modify, *args, **kwargs):
-
         super().__init__(*args, **kwargs)
         self.suboperators = move, modify
 

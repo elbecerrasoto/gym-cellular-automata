@@ -26,9 +26,7 @@ class ForestFireHelicopterEnv(CAEnv):
 
     @property
     def initial_state(self):
-
         if self._resample_initial:
-
             self.grid = self.grid_space.sample()
 
             ca_params = np.array([self._p_fire, self._p_tree], dtype=TYPE_BOX)
@@ -45,7 +43,6 @@ class ForestFireHelicopterEnv(CAEnv):
     def __init__(
         self, nrows, ncols, speed: float = 0.5, freeze: Optional[int] = None, **kwargs
     ):
-
         # Sets defaults and runs seed method
         super().__init__(nrows, ncols, **kwargs)
 
@@ -207,7 +204,6 @@ class MDP(Operator):
     deterministic = False
 
     def __init__(self, cellular_automaton, move_modify, max_freeze, *args, **kwargs):
-
         super().__init__(*args, **kwargs)
 
         self.move_modify = move_modify
@@ -219,18 +215,15 @@ class MDP(Operator):
         self.freeze_space = spaces.Discrete(max_freeze + 1)
 
     def update(self, grid, action, context):
-
         ca_params, position, freeze = context
 
         if freeze == 0:
-
             grid, ca_params = self.ca(grid, None, ca_params)
             grid, position = self.move_modify(grid, (action, True), position)
 
             freeze = np.array(self.max_freeze)
 
         else:
-
             grid, position = self.move_modify(grid, (action, True), position)
 
             freeze = np.array(freeze - 1)

@@ -6,7 +6,6 @@ from gym_cellular_automata.operator import Operator
 
 
 class ForestFire(Operator):
-
     grid_dependant = True
     action_dependant = False
     context_dependant = True
@@ -14,7 +13,6 @@ class ForestFire(Operator):
     deterministic = False
 
     def __init__(self, empty, tree, fire, *args, **kwargs):
-
         super().__init__(*args, **kwargs)
 
         self.empty = empty
@@ -31,7 +29,6 @@ class ForestFire(Operator):
 
         for row, cells in enumerate(grid):
             for col, cell in enumerate(cells):
-
                 neighbors = neighborhood_at(grid, (row, col), invariant=self.empty)
 
                 if cell == self.tree and self.fire in neighbors:

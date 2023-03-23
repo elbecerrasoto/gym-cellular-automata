@@ -4,7 +4,6 @@ import gym_cellular_automata as gymca
 
 
 def test_gymca():
-
     assert isinstance(gymca.envs, tuple) and isinstance(gymca.prototypes, tuple)
 
     # From a design perspective this is not necessarily true

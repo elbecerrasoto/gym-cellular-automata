@@ -3,7 +3,7 @@
 import argparse
 import re
 import sys
-from os import getcwd, path, remove
+from os import path, remove
 from pathlib import Path
 from shutil import copymode, move
 from tempfile import mkstemp
@@ -83,30 +83,24 @@ def get_new_version(sem_version, order):
         return version
 
     if order == "major_up":
-
         sem_version[0] += 1
         sem_version[1] = 0
         sem_version[2] = 0
 
     elif order == "major_down":
-
         sem_version[0] = versionate_down(sem_version[0], "Major")
 
     elif order == "minor_up":
-
         sem_version[1] += 1
         sem_version[2] = 0
 
     elif order == "minor_down":
-
         sem_version[1] = versionate_down(sem_version[1], "Minor")
 
     elif order == "patch_up":
-
         sem_version[2] += 1
 
     elif order == "patch_down":
-
         sem_version[2] = versionate_down(sem_version[2], "Patch")
 
     else:
@@ -126,11 +120,8 @@ def update_version_on_files(files, new_version):
     tmp_descriptor, tmp_path = mkstemp()
 
     for file_path in files:
-
         with open(file_path) as f_in, open(tmp_path, "w") as f_out:
-
             for line in f_in:
-
                 line = re.sub(RE_VERSION, new_version, line)
 
                 f_out.write(line)
@@ -150,9 +141,7 @@ def verbose(old_v, new_v, files):
 
 
 if __name__ == "__main__":
-
     if DO is None and SET is None and not VERBOSE:
-
         print("Check the help menu with")
         print(f"\t{PROGRAM} --help", end="\n\n")
         print(f"{VERSION} gym_cellular_automata version")
@@ -160,7 +149,6 @@ if __name__ == "__main__":
     new_version = VERSION
 
     if SET:
-
         if re.match(RE_VERSION, SET):
             new_version = SET
             update_version_on_files(FILES, new_version)

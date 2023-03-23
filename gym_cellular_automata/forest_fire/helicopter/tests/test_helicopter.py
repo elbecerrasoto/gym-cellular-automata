@@ -154,7 +154,6 @@ def test_forest_fire_env_with_random_policy(env, reward_space):
     env.reset()
 
     for step in range(RANDOM_POLICY_ITERATIONS):
-
         action = env.action_space.sample()
         obs, reward, done, info = env.step(action)
 
@@ -194,7 +193,6 @@ def manual_assesment(verbose=False):
     env.render()
 
     for i in range(64):
-
         action = env.action_space.sample()
         if verbose:
             print(f"\n\nAction Selected: {action}")

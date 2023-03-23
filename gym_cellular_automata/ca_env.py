@@ -27,9 +27,7 @@ class CAEnv(ABC, gym.Env):
             print("Perhaps you forgot to do env.reset()")
 
     def step(self, action):
-
         if not self.done:
-
             # MDP Transition
             self.state = self.grid, self.context = self.MDP(
                 self.grid, action, self.context
@@ -51,9 +49,7 @@ class CAEnv(ABC, gym.Env):
             return obs, reward, done, info
 
         else:
-
             if self.steps_beyond_done == 0:
-
                 logger.warn(
                     "You are calling 'step()' even though this "
                     "environment has already returned done = True. You "
@@ -67,7 +63,6 @@ class CAEnv(ABC, gym.Env):
             return self.state, 0.0, True, self._report()
 
     def reset(self):
-
         self.done = False
         self.steps_elapsed = 0
         self.reward_accumulated = 0.0

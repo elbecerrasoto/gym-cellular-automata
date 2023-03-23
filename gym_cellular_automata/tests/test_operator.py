@@ -18,7 +18,6 @@ def assert_operator(op, strict=False):
         Asserting Optional Types
         """
         for att in atts:
-
             gatt = getattr(op, att)
             assert isinstance(gatt, optional) or gatt is None
 
@@ -39,11 +38,9 @@ def assert_operator(op, strict=False):
             assert op.context_space.contains(context)
 
         if strict:
-
             block()
 
         else:
-
             try:
                 block()
             except AttributeError:

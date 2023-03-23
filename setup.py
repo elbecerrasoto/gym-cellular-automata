@@ -1,5 +1,6 @@
-import sys
 import os
+import sys
+
 from setuptools import setup
 
 # Don't import gym_cellular_automata module here, since deps may not be installed

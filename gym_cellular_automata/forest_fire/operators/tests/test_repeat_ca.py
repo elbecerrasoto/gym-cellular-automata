@@ -65,7 +65,6 @@ def test_repeat_ca_is_operator(repeat_ca):
 
 
 def test_repeat_ca(ca, repeat_ca):
-
     grid = ca.grid_space.sample()
     grid02 = copy(grid)
 

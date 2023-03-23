@@ -6,13 +6,11 @@ from gym_cellular_automata.tests import Identity
 
 
 class MockCAEnv(CAEnv):
-
     _nrows = 8
     _ncols = 8
     _states = 8
 
     def __init__(self, nrows=_nrows, ncols=_ncols, **kwargs):
-
         super().__init__(nrows, ncols, **kwargs)
 
         self._set_spaces()
@@ -26,9 +24,7 @@ class MockCAEnv(CAEnv):
 
     @property
     def initial_state(self):
-
         if self._resample_initial:
-
             self.grid = self.grid_space.sample()
             self.context = self.context_space.sample()
 

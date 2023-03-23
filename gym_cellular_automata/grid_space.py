@@ -3,7 +3,7 @@ from operator import mul
 from typing import Optional, Sequence
 
 import numpy as np
-from gym.spaces import Space
+from gymnasium.spaces import Space
 
 
 class GridSpace(Space):
@@ -26,20 +26,17 @@ class GridSpace(Space):
         probs: Optional[Sequence[float]] = None,
         dtype: np.intc = np.int32,
     ):
-
         super().__init__(shape, dtype)
 
         assert shape, "Shape must be a non-empty tuple."
 
         if values is not None:
-
             self._from_values = True
 
             self.values = np.unique(np.array(values, dtype=dtype))
             self.n = len(self.values)
 
         elif n is not None:
-
             self._from_values = False
 
             assert n is not None and n > 0, "'n' must be a positive integer."
@@ -48,7 +45,6 @@ class GridSpace(Space):
             self.values = np.arange(self.n, dtype=dtype)
 
         else:
-
             raise ValueError("'n' or 'values' must be provided.")
 
         uniform = np.repeat(1.0, self.n) / self.n
@@ -61,13 +57,11 @@ class GridSpace(Space):
         self.size = reduce(mul, self.shape)
 
     def sample(self) -> np.ndarray:
-
         return self.np_random.choice(
             a=self.values, size=self.size, p=self.probs
         ).reshape(self.shape)
 
     def contains(self, x) -> bool:
-
         if isinstance(x, list):
             x = np.array(x, dtype=self.dtype)
 
@@ -75,11 +69,9 @@ class GridSpace(Space):
 
     def __repr__(self):
         if self._from_values:
-
             return f"GridSpace(values={self.values}, shape={self.shape})"
 
         else:
-
             return f"GridSpace(n={self.n}, shape={self.shape})"
 
     def __eq__(self, other):

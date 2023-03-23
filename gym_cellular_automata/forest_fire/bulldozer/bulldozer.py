@@ -27,9 +27,7 @@ class ForestFireBulldozerEnv(CAEnv):
 
     @property
     def initial_state(self):
-
         if self._resample_initial:
-
             self.grid = self._initial_grid_distribution()
             self.context = self._initial_context_distribution()
 
@@ -64,7 +62,6 @@ class ForestFireBulldozerEnv(CAEnv):
         },
         **kwargs
     ):
-
         super().__init__(nrows, ncols, **kwargs)
 
         self.title = "ForestFireBulldozer" + str(nrows) + "x" + str(ncols)
@@ -274,7 +271,6 @@ class ForestFireBulldozerEnv(CAEnv):
         return init_context
 
     def _init_time_mappings(self):
-
         self._movement_timings = {
             move: self._t_act_move for move in self._moves.values()
         }
@@ -375,7 +371,6 @@ class ForestFireBulldozerEnv(CAEnv):
 
 
 class MDP(Operator):
-
     grid_dependant = True
     action_dependant = True
     context_dependant = True
@@ -383,7 +378,6 @@ class MDP(Operator):
     deterministic = False
 
     def __init__(self, repeat_ca, move_modify, *args, **kwargs):
-
         super().__init__(*args, **kwargs)
 
         self.repeat_ca = repeat_ca
@@ -392,7 +386,6 @@ class MDP(Operator):
         self.suboperators = self.repeat_ca, self.move_modify
 
     def update(self, grid, action, context):
-
         amove, ashoot = action
         ca_params, position, time = context
 

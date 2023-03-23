@@ -57,7 +57,6 @@ def test_move_is_operator(move):
 
 @pytest.mark.repeat(TEST_REPETITIONS)
 def test_move(move, grid_space, action_space, position_space, directions_sets):
-
     up_set = directions_sets["up"]
     down_set = directions_sets["down"]
     left_set = directions_sets["left"]
@@ -108,9 +107,7 @@ def test_modify_is_operator(modify):
 
 @pytest.mark.repeat(TEST_REPETITIONS)
 def test_modify_cell_at_position(modify, effects, grid_space, position_space):
-
     for action in {True, False}:
-
         random_grid = grid_space.sample()
         random_position = position_space.sample()
 
