@@ -1,8 +1,8 @@
-import gym
+import gymnasium as gym
 import matplotlib
 import numpy as np
 import pytest
-from gym import spaces
+from gymnasium import spaces
 
 from gym_cellular_automata._config import TYPE_BOX
 from gym_cellular_automata.forest_fire.helicopter import ForestFireHelicopterEnv

@@ -1,4 +1,4 @@
-import gym
+import gymnasium as gym
 
 import gym_cellular_automata as gymca
 

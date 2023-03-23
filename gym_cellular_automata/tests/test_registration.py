@@ -1,7 +1,7 @@
-import gym
+import gymnasium as gym
 import matplotlib
 import pytest
-from gym.spaces import Space
+from gymnasium.spaces import Space
 from matplotlib import pyplot as plt
 
 from gym_cellular_automata.registration import GYM_MAKE, REGISTERED_CA_ENVS

@@ -13,7 +13,7 @@ in a attempt to drive the emergent properties
 of its grid.
 
 ```python
-import gym
+import gymnasium as gym
 import gym_cellular_automata as gymca
 
 # benchmark mode
@@ -27,7 +27,7 @@ env = ProtoEnv(nrows=42, ncols=42)
 
 See https://github.com/elbecerrasoto/gym-cellular-automata for documentation.
 """
-from gym.error import Error as GymError
+from gymnasium.error import Error as GymError
 
 from gym_cellular_automata.ca_env import CAEnv
 from gym_cellular_automata.grid_space import GridSpace

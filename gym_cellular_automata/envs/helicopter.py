@@ -1,7 +1,7 @@
 from typing import Optional
 
 import numpy as np
-from gym import logger, spaces
+from gymnasium import logger, spaces
 
 from gym_cellular_automata._config import TYPE_BOX
 from gym_cellular_automata.ca_env import CAEnv

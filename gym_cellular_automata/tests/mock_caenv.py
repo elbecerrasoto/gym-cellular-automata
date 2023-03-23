@@ -1,4 +1,4 @@
-from gym import spaces
+from gymnasium import spaces
 
 from gym_cellular_automata.ca_env import CAEnv
 from gym_cellular_automata.grid_space import GridSpace

@@ -1,7 +1,7 @@
 from collections import namedtuple
 
 import numpy as np
-from gym import spaces
+from gymnasium import spaces
 from scipy.signal import convolve2d
 
 from gym_cellular_automata.operator import Operator

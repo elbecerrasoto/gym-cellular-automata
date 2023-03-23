@@ -33,7 +33,7 @@ pip install -e gym-cellular-automata
 > Prototype & Benchmark, the two modes of _gymca_...
 
 ```python
-import gym
+import gymnasium as gym
 import gym_cellular_automata as gymca
 
 # benchmark mode
@@ -63,7 +63,7 @@ Grid size (_nrows, ncols_) is one of the most changed parameters so it is requir
 ### Random Policy
 
 ```python
-import gym
+import gymnasium as gym
 import gym_cellular_automata as gymca
 
 env_id = gymca.envs[0]

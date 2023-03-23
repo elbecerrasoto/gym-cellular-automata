@@ -7,7 +7,7 @@ def test_operator():
 
 
 def assert_operator(op, strict=False):
-    from gym.spaces import Space
+    from gymnasium.spaces import Space
 
     # ToDo:
     # + Take advange of "depends" attributes

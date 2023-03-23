@@ -1,7 +1,7 @@
 from typing import Dict, Set
 
 import numpy as np
-from gym import logger, spaces
+from gymnasium import logger, spaces
 
 from gym_cellular_automata.operator import Operator
 

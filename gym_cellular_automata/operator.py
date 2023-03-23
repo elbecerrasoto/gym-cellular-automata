@@ -3,8 +3,8 @@ from copy import copy
 from typing import Any, Optional, Tuple
 
 import numpy as np
-from gym.spaces import Space
-from gym.utils import seeding
+from gymnasium.spaces import Space
+from gymnasium.utils import seeding
 
 
 class Operator(ABC):

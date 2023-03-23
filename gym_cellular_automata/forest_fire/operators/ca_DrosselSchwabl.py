@@ -1,5 +1,5 @@
 import numpy as np
-from gym import spaces
+from gymnasium import spaces
 
 from gym_cellular_automata.forest_fire.utils.neighbors import neighborhood_at
 from gym_cellular_automata.operator import Operator

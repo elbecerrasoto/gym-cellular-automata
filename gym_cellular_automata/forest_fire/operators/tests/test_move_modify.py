@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from gym import spaces
+from gymnasium import spaces
 
 from gym_cellular_automata.forest_fire.operators import Modify, Move
 from gym_cellular_automata.grid_space import GridSpace

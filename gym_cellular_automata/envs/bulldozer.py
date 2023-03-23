@@ -1,7 +1,7 @@
 from typing import Optional, Tuple
 
 import numpy as np
-from gym import spaces
+from gymnasium import spaces
 
 from gym_cellular_automata._config import TYPE_BOX
 from gym_cellular_automata.ca_env import CAEnv
@@ -293,7 +293,7 @@ class ForestFireBulldozerEnv(CAEnv):
         self.time_per_state = lambda s: self._t_env_any
 
     def _parse_wind(self, windD: dict) -> np.ndarray:
-        from gym import spaces
+        from gymnasium import spaces
 
         # fmt: off
         wind = np.array(

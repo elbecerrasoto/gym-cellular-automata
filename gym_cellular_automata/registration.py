@@ -1,4 +1,4 @@
-from gym.envs.registration import register
+from gymnasium.envs.registration import register
 
 from gym_cellular_automata.forest_fire.bulldozer import ForestFireBulldozerEnv
 from gym_cellular_automata.forest_fire.helicopter import ForestFireHelicopterEnv

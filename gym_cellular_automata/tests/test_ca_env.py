@@ -1,7 +1,7 @@
-import gym
+import gymnasium as gym
 import numpy as np
 import pytest
-from gym.spaces import Space
+from gymnasium.spaces import Space
 
 from gym_cellular_automata.tests import MockCAEnv
 

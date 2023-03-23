@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
-import gym
-from gym import logger
-from gym.utils import seeding
+import gymnasium as gym
+from gymnasium import logger
+from gymnasium.utils import seeding
 
 
 class CAEnv(ABC, gym.Env):
