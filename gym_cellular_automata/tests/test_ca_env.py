@@ -22,7 +22,6 @@ def test_gym_api(env):
     assert hasattr(env, "step")
     assert hasattr(env, "render")
     assert hasattr(env, "close")
-    assert hasattr(env, "seed")
 
 
 def test_step_reset(env):
@@ -38,10 +37,11 @@ def test_step_reset(env):
 
 
 def assert_step(env, step_out):
-    obs, reward, done, info = step_out
+    obs, reward, terminated, truncated, info = step_out
     assert env.observation_space.contains(obs)
     assert isinstance(reward, float)
-    assert isinstance(done, bool)
+    assert isinstance(terminated, bool)
+    assert isinstance(truncated, bool)
     assert isinstance(info, dict)
 
 
@@ -52,7 +52,7 @@ def test_gym_if_done_behave_gracefully(env):
     action = env.action_space.sample()
 
     with pytest.warns(UserWarning):
-        step_out = obs, reward, done, info = env.step(action)
+        step_out = obs, reward, terminated, truncated, info = env.step(action)
 
     assert_step(env, step_out)
     assert env.done

@@ -19,9 +19,6 @@ class CAEnv(ABC, gym.Env):
     def __init__(self, nrows, ncols, debug=False, **kwargs):
         self.nrows, self.ncols = nrows, ncols  # nrows & ncols is API
 
-        # Gym spec method
-        self.seed()
-
         self._debug = debug
         if self._debug:
             print("Perhaps you forgot to do env.reset()")
@@ -39,14 +36,15 @@ class CAEnv(ABC, gym.Env):
             # Gym API Formatting
             obs = self.state
             reward = self._award()
-            done = self.done
+            terminated = self.done
+            truncated = False
             info = self._report()
 
             # Status method
             self.steps_elapsed += 1
             self.reward_accumulated += reward
 
-            return obs, reward, done, info
+            return obs, reward, terminated, truncated, info
 
         else:
             if self.steps_beyond_done == 0:
@@ -60,7 +58,7 @@ class CAEnv(ABC, gym.Env):
             self.steps_beyond_done += 1
 
             # Graceful after termination
-            return self.state, 0.0, True, self._report()
+            return self.state, 0.0, True, False, self._report()
 
     def reset(self):
         self.done = False
@@ -71,10 +69,6 @@ class CAEnv(ABC, gym.Env):
         obs = self.state = self.grid, self.context = self.initial_state
 
         return obs
-
-    def seed(self, seed=None):
-        self.np_random, seed = seeding.np_random(seed)
-        return [seed]
 
     def status(self):
         return {
