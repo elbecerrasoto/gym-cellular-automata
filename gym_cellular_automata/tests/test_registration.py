@@ -41,7 +41,6 @@ def assert_gym_api(envs, resets, steps, plot_each):
         assert hasattr(env, "step")
         assert hasattr(env, "render")
         assert hasattr(env, "close")
-        assert hasattr(env, "seed")
 
         for reset in range(resets):
             # Reset test
@@ -64,7 +63,7 @@ def assert_gym_api(envs, resets, steps, plot_each):
                 action = env.action_space.sample()
                 assert env.action_space.contains(action)
 
-                obs, reward, done, info = env.step(action)
+                obs, reward, terminated, truncated, info = env.step(action)
                 # Render test
                 if step % plot_each == 0 or step <= 1:  # At least a couple of renders
                     assert isinstance(env.render(), matplotlib.figure.Figure)
@@ -72,7 +71,8 @@ def assert_gym_api(envs, resets, steps, plot_each):
 
                 assert env.observation_space.contains(obs)
                 assert isinstance(reward, float)
-                assert isinstance(done, bool)
+                assert isinstance(terminated, bool)
+                assert isinstance(truncated, bool)
                 assert isinstance(info, dict)
 
         env.close()
