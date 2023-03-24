@@ -31,7 +31,7 @@ def test_termination_behavior(env):
     action = env.action_space.sample()
 
     # Acting on an non-fire grid causes termination
-    obs, reward, done, info = env.step(action)
+    obs, reward, terminated, truncated, info = env.step(action)
     grid, context = obs
 
     # Assert termination

@@ -23,8 +23,10 @@ def play_random_policy(env, steps, verbose=False):
             if step % 64 == 0:
                 print(".", end="")
         action = env.action_space.sample()  # Your agent goes here!
-        obs, reward, done, info = env.step(action)
+        obs, reward, terminated, truncated, info = env.step(action)
+        done = terminated or truncated
         step += 1
+
 
     if verbose:
         print()

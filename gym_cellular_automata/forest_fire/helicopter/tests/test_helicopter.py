@@ -111,11 +111,11 @@ def test_forest_fire_env_step_output(env):
     gym_api_out = env.step(action)
 
     assert isinstance(gym_api_out, tuple)
-    assert len(gym_api_out) == 4
+    assert len(gym_api_out) == 5
 
     assert isinstance(gym_api_out[1], float)
     assert isinstance(gym_api_out[2], bool)
-    assert isinstance(gym_api_out[3], dict)
+    assert isinstance(gym_api_out[4], dict)
 
 
 def test_forest_fire_env_output_spaces(env, reward_space):
@@ -155,22 +155,22 @@ def test_forest_fire_env_with_random_policy(env, reward_space):
 
     for step in range(RANDOM_POLICY_ITERATIONS):
         action = env.action_space.sample()
-        obs, reward, done, info = env.step(action)
+        obs, reward, terminated, truncated, info = env.step(action)
 
         assert_observation_and_reward_spaces(env, obs, reward, reward_space)
 
 
 def test_forest_fire_env_hit_info(env, all_fire_grid):
     def assert_hit_right_notmove_down():
-        obs, reward, done, info = env.action(ACTION_RIGHT)
+        obs, reward, terminated, truncated, info = env.action(ACTION_RIGHT)
 
         assert info["hit"] is True
 
-        obs, reward, done, info = env.action(ACTION_NOT_MOVE)
+        obs, reward, terminated, truncated, info = env.action(ACTION_NOT_MOVE)
 
         assert info["hit"] is False
 
-        obs, reward, done, info = env.action(ACTION_DOWN)
+        obs, reward, terminated, truncated, info = env.action(ACTION_DOWN)
 
         assert info["hit"] is True
 

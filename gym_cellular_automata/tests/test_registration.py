@@ -64,6 +64,8 @@ def assert_gym_api(envs, resets, steps, plot_each):
                 assert env.action_space.contains(action)
 
                 obs, reward, terminated, truncated, info = env.step(action)
+                done = terminated or truncated
+
                 # Render test
                 if step % plot_each == 0 or step <= 1:  # At least a couple of renders
                     assert isinstance(env.render(), matplotlib.figure.Figure)

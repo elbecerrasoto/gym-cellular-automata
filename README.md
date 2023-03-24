@@ -79,7 +79,8 @@ threshold = 12
 # Random Policy for at most "threshold" steps
 while not done and step < threshold:
     action = env.action_space.sample()  # Your agent goes here!
-    obs, reward, done, info = env.step(action)
+    obs, reward, terminated, truncated, info = env.step(action)
+    done = terminated or truncated
     total_reward += reward
     step += 1
 
