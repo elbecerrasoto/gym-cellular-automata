@@ -32,6 +32,7 @@ def test_termination_behavior(env):
 
     # Acting on an non-fire grid causes termination
     obs, reward, terminated, truncated, info = env.step(action)
+    done = terminated or truncated
     grid, context = obs
 
     # Assert termination
@@ -49,8 +50,3 @@ def test_starting_conditions_seed(env):
 
     # Single fire seed
     assert len(grid[grid == env._fire]) == 1
-
-
-# def test_env_render(env):
-# env.reset()
-# assert isinstance(env.render(), matplotlib.figure.Figure)
