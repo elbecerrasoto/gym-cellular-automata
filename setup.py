@@ -16,7 +16,7 @@ setup(
     author_email="elbecerrasoto@gmail.com",
     license="MIT",
     install_requires=[
-        "gym",
+        "gym~=0.23.1",
         "numpy",
         "matplotlib",
         "scipy",
