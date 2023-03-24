@@ -29,7 +29,7 @@ from . import svg_paths
 
 # Figure Globals
 FIGSIZE = (15, 12)
-FIGSTYLE = "seaborn-whitegrid"
+FIGSTYLE = "seaborn-v0_8-whitegrid"
 
 TITLE_SIZE = 42
 TITLE_POS = {"x": 0.121, "y": 0.96}

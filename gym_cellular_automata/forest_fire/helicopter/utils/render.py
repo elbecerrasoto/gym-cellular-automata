@@ -25,7 +25,7 @@ def render(env):
     __, pos, __ = env.context
     row, col = pos
 
-    plt.style.use("seaborn-whitegrid")
+    plt.style.use("seaborn-v0_8-whitegrid")
     fig, ax = plt.subplots(figsize=(15, 12))
 
     NROWS = env.nrows
