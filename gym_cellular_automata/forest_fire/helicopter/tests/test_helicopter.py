@@ -119,11 +119,11 @@ def test_forest_fire_env_step_output(env):
 
 
 def test_forest_fire_env_output_spaces(env, reward_space):
-    obs0 = env.reset()
+    obs, info = env.reset()
 
-    assert env.observation_space.contains(obs0)
+    assert env.observation_space.contains(obs)
 
-    grid, (ca_params, pos, freeze) = obs0
+    grid, (ca_params, pos, freeze) = obs
     assert env.grid_space.contains(grid)
     assert env.ca_params_space.contains(ca_params)
     assert env.position_space.contains(pos)
@@ -185,7 +185,7 @@ def manual_assesment(verbose=False):
 
     env = ForestFireHelicopterEnv()
 
-    obs = env.reset()
+    obs, info = env.reset()
 
     if verbose:
         print(f"\n\nThe FIRST obs is {obs}")

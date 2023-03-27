@@ -11,7 +11,7 @@ from gym_cellular_automata.registration import GYM_MAKE
 
 
 def play_random_policy(env, steps, verbose=False):
-    obs = env.reset()
+    obs, info = env.reset()
 
     done = False
     step = 0

@@ -68,7 +68,7 @@ class CAEnv(ABC, gym.Env):
         self._resample_initial = True
         obs = self.state = self.grid, self.context = self.initial_state
 
-        return obs
+        return obs, self._report()
 
     def status(self):
         return {

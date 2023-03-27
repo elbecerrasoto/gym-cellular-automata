@@ -69,7 +69,7 @@ import gym_cellular_automata as gymca
 env_id = gymca.envs[0]
 gym.make(env_id)
 
-obs = env.reset()
+obs, info = env.reset()
 
 total_reward = 0.0
 done = False

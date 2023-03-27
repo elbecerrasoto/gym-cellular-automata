@@ -26,7 +26,7 @@ def test_gym_api(env):
 
 def test_step_reset(env):
     for reset in range(RESETS):
-        obs = env.reset()
+        obs, info = env.reset()
         assert env.observation_space.contains(obs)
 
         for step in range(STEPS):
@@ -60,7 +60,7 @@ def test_gym_if_done_behave_gracefully(env):
 
 
 def test_counts(env):
-    obs = env.reset()
+    obs, info = env.reset()
     grid, context = obs
 
     def get_dict_of_counts(grid):

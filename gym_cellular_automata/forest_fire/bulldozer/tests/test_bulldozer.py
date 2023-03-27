@@ -40,7 +40,7 @@ def test_termination_behavior(env):
 
 
 def test_starting_conditions_seed(env):
-    obs = env.reset()
+    obs, info = env.reset()
 
     grid, context = obs
     ca_params, mod_params, time_params = context
