@@ -80,3 +80,8 @@ class GridSpace(Space):
             and (self.shape == other.shape)
             and np.all(self.values == other.values)
         )
+
+    @property
+    def is_np_flattenable(self):
+        """Checks whether this space can be flattened to a :class:`spaces.Box`."""
+        return True
