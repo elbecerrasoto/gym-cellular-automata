@@ -25,8 +25,9 @@ class GridSpace(Space):
         shape: tuple = tuple(),
         probs: Optional[Sequence[float]] = None,
         dtype: np.intc = np.int32,
+        seed: int = None,
     ):
-        super().__init__(shape, dtype)
+        super().__init__(shape, dtype, seed)
 
         assert shape, "Shape must be a non-empty tuple."
 
