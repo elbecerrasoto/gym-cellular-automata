@@ -3,8 +3,8 @@ channels:
   - conda-forge
 dependencies:
 # Dependencies
-  - python=3.9
-  - gym
+  - python
+  - gymnasium
   - numpy
   - matplotlib
   - scipy

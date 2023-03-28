@@ -1,7 +1,12 @@
-from gym.envs.registration import register
+from typing import Any
+
+from gymnasium.envs.registration import register
+from gymnasium.spaces import flatten
+from numpy.typing import NDArray
 
 from gym_cellular_automata.forest_fire.bulldozer import ForestFireBulldozerEnv
 from gym_cellular_automata.forest_fire.helicopter import ForestFireHelicopterEnv
+from gym_cellular_automata.grid_space import GridSpace
 
 FFDIR = "gym_cellular_automata.forest_fire"
 
@@ -43,3 +48,8 @@ def _register_caenvs():
             kwargs=REGISTERED_CA_ENVS[ca_env]["kwargs"],
             entry_point=REGISTERED_CA_ENVS[ca_env]["entry_point"],
         )
+
+
+@flatten.register(GridSpace)
+def _flatten_grid_space(space: GridSpace, x: NDArray[Any]) -> NDArray[Any]:
+    return np.asarray(x, dtype=space.dtype).flatten()

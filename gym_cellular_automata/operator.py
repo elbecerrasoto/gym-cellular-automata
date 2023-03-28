@@ -3,12 +3,11 @@ from copy import copy
 from typing import Any, Optional, Tuple
 
 import numpy as np
-from gym.spaces import Space
-from gym.utils import seeding
+from gymnasium.spaces import Space
+from gymnasium.utils import seeding
 
 
 class Operator(ABC):
-
     # Set these in ALL subclasses
     suboperators: Tuple = tuple()
 
@@ -25,7 +24,6 @@ class Operator(ABC):
         action_space: Optional[Space] = None,
         context_space: Optional[Space] = None,
     ) -> None:
-
         # fmt: off
         self.grid_space    = grid_space
         self.action_space  = action_space
@@ -38,7 +36,6 @@ class Operator(ABC):
     def update(
         self, grid: np.ndarray, action: Any, context: Any
     ) -> Tuple[np.ndarray, Any]:
-
         """Update a Cellular Automaton's Lattice (Grid) by using a provided action and context.
 
         Parameters

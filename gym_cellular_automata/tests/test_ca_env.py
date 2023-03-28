@@ -1,7 +1,7 @@
-import gym
+import gymnasium as gym
 import numpy as np
 import pytest
-from gym.spaces import Space
+from gymnasium.spaces import Space
 
 from gym_cellular_automata.tests import MockCAEnv
 
@@ -22,12 +22,11 @@ def test_gym_api(env):
     assert hasattr(env, "step")
     assert hasattr(env, "render")
     assert hasattr(env, "close")
-    assert hasattr(env, "seed")
 
 
 def test_step_reset(env):
     for reset in range(RESETS):
-        obs = env.reset()
+        obs, info = env.reset()
         assert env.observation_space.contains(obs)
 
         for step in range(STEPS):
@@ -38,22 +37,22 @@ def test_step_reset(env):
 
 
 def assert_step(env, step_out):
-    obs, reward, done, info = step_out
+    obs, reward, terminated, truncated, info = step_out
     assert env.observation_space.contains(obs)
     assert isinstance(reward, float)
-    assert isinstance(done, bool)
+    assert isinstance(terminated, bool)
+    assert isinstance(truncated, bool)
     assert isinstance(info, dict)
 
 
 def test_gym_if_done_behave_gracefully(env):
-
     env.reset()
     env.done = True
 
     action = env.action_space.sample()
 
     with pytest.warns(UserWarning):
-        step_out = obs, reward, done, info = env.step(action)
+        step_out = obs, reward, terminated, truncated, info = env.step(action)
 
     assert_step(env, step_out)
     assert env.done
@@ -61,8 +60,7 @@ def test_gym_if_done_behave_gracefully(env):
 
 
 def test_counts(env):
-
-    obs = env.reset()
+    obs, info = env.reset()
     grid, context = obs
 
     def get_dict_of_counts(grid):

@@ -33,7 +33,7 @@ pip install -e gym-cellular-automata
 > Prototype & Benchmark, the two modes of _gymca_...
 
 ```python
-import gym
+import gymnasium as gym
 import gym_cellular_automata as gymca
 
 # benchmark mode
@@ -63,13 +63,13 @@ Grid size (_nrows, ncols_) is one of the most changed parameters so it is requir
 ### Random Policy
 
 ```python
-import gym
+import gymnasium as gym
 import gym_cellular_automata as gymca
 
 env_id = gymca.envs[0]
-gym.make(env_id)
+gym.make(env_id, render_mode="human")
 
-obs = env.reset()
+obs, info = env.reset()
 
 total_reward = 0.0
 done = False
@@ -79,7 +79,8 @@ threshold = 12
 # Random Policy for at most "threshold" steps
 while not done and step < threshold:
     action = env.action_space.sample()  # Your agent goes here!
-    obs, reward, done, info = env.step(action)
+    obs, reward, terminated, truncated, info = env.step(action)
+    done = terminated or truncated
     total_reward += reward
     step += 1
 
