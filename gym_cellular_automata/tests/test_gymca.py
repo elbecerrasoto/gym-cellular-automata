@@ -12,7 +12,7 @@ def test_gymca():
 
     # Benchmark mode
     for env in gymca.envs:
-        env = gym.make(env)
+        env = gym.make(env, render_mode="human")
         assert isinstance(env, gym.Env)
 
     # Prototype mode

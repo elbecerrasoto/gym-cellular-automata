@@ -67,7 +67,7 @@ import gymnasium as gym
 import gym_cellular_automata as gymca
 
 env_id = gymca.envs[0]
-gym.make(env_id)
+gym.make(env_id, render_mode="human")
 
 obs, info = env.reset()
 

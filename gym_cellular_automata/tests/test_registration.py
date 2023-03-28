@@ -17,7 +17,7 @@ PLOT_EACH = 256
 
 @pytest.fixture
 def envs():
-    return (gym.make(env_call) for env_call in GYM_MAKE)
+    return (gym.make(env_call, render_mode="human") for env_call in GYM_MAKE)
 
 
 def test_gym_api_light(envs):

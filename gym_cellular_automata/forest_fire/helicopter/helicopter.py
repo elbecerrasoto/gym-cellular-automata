@@ -18,7 +18,7 @@ from .utils.render import render
 
 
 class ForestFireHelicopterEnv(CAEnv):
-    metadata = {"render.modes": ["human"]}
+    metadata = {"render_modes": ["human"]}
 
     @property
     def MDP(self):

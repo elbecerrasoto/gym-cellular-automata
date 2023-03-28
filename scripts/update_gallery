@@ -182,7 +182,7 @@ if __name__ == "__main__":
 
         if ACTIONS[kenv]["do"]:
 
-            env = gym.make(CALLS[kenv])
+            env = gym.make(CALLS[kenv], render_mode="human")
             ofile = ACTIONS[kenv]["out"]
             steps = ACTIONS[kenv]["steps"]
 

@@ -18,7 +18,7 @@ import gym_cellular_automata as gymca
 
 # benchmark mode
 env_id = gymca.envs[0]
-env = gym.make(env_id)
+env = gym.make(env_id, render_mode="human")
 
 # prototype mode
 ProtoEnv = gymca.prototypes[0]

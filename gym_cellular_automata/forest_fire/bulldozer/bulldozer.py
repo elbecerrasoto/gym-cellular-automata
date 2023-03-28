@@ -19,7 +19,7 @@ from .utils.render import render
 
 
 class ForestFireBulldozerEnv(CAEnv):
-    metadata = {"render.modes": ["human"]}
+    metadata = {"render_modes": ["human"]}
 
     @property
     def MDP(self):
