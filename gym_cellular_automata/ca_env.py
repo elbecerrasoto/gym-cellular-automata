@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+from typing import Optional
 import gymnasium as gym
 from gymnasium import logger
 from gymnasium.utils import seeding
@@ -60,7 +61,9 @@ class CAEnv(ABC, gym.Env):
             # Graceful after termination
             return self.state, 0.0, True, False, self._report()
 
-    def reset(self):
+    def reset(self, *, seed: Optional[int] = None, options: Optional[dict] = None):
+        super().reset(seed=seed)
+
         self.done = False
         self.steps_elapsed = 0
         self.reward_accumulated = 0.0
