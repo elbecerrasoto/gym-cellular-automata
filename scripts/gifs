@@ -1,0 +1,101 @@
+#!/usr/bin/env python3
+from pathlib import Path
+from typing import Union
+
+import argparse
+import gif
+import warnings
+
+from matplotlib._api.deprecation import MatplotlibDeprecationWarning
+
+from gym import Env, make
+from gym.error import NameNotFound
+
+import gym_cellular_automata as gymca
+
+DEFAULT_UPDATES = 40
+DEFAULT_MILISECOND_FRAME = 80
+
+
+def get_make_frame(env: Env):
+    env.reset()
+
+    warnings.filterwarnings("ignore", category=MatplotlibDeprecationWarning)
+
+    @gif.frame
+    def make_frame():
+        env.render()
+        step_tuple = env.step(env.action_space.sample())
+
+        if done := step_tuple[2]:
+            env.reset()
+
+    return make_frame
+
+
+def generate_gif(
+    env: Env,
+    name: Union[str, Path],
+    each: int = 1,
+    updates: int = 50,
+    duration_between: int = 50,
+):
+    make_frame = get_make_frame(env)
+    frames = []
+
+    for i in range(updates):
+        if i % each == 0:
+            frames.append(make_frame())
+
+    if isinstance(name, str):
+        folder = Path().cwd() / "gifs"
+        folder.mkdir(exist_ok=True)
+        path = folder / f"{name}.gif"
+
+    gif.save(frames, str(path), duration=duration_between)
+
+
+def generate_gif_envs(updates: int, duration_frame: int):
+    for env_name in gymca.envs:
+        try:
+            env = make(env_name)
+        except NameNotFound:
+            env = make(env_name.split(":")[1])
+        finally:
+            generate_gif(
+                env,
+                env_name.replace(":", "_"),
+                updates=updates,
+                duration_between=duration_frame,
+            )
+
+
+# CLI args
+parser = argparse.ArgumentParser()
+parser.description = (
+    "Generate gif files sample for each of the gym_cellular_automata library"
+)
+
+
+parser.add_argument(
+    "--steps",
+    "-s",
+    type=int,
+    default=DEFAULT_UPDATES,
+    help=f"Steps to play on the environment. {DEFAULT_UPDATES}",
+)
+
+parser.add_argument(
+    "--duration",
+    "-d",
+    type=float,
+    default=DEFAULT_MILISECOND_FRAME,
+    help=f"Time elapsed in miliseconds between each frame of the animation. {DEFAULT_MILISECOND_FRAME}",
+)
+
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+
+    gif.options.matplotlib["dpi"] = 200
+    generate_gif_envs(args.steps, args.duration)

@@ -81,4 +81,8 @@ count :
 	# Counts lines of code
 	find ./ -name '*.py' -print | xargs cat | sed '/^$$/ d' | perl -ne 'if(not /^ *?#/){print $$_}' | wc -l
 
+generate_gifs:
+	# Create gifs for the environments registered at gymca.envs
+	./scripts/gifs
+
 .PHONY : help install install-develop build git-aliases conda_env conda_env_rm hooks hooks-dry hooks-update style test test-debug test-coverage test-slow test-visual linter patch gallery clean count
