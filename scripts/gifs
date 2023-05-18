@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 from pathlib import Path
 from typing import Union
 
@@ -8,8 +8,8 @@ import warnings
 
 from matplotlib._api.deprecation import MatplotlibDeprecationWarning
 
-from gym import Env, make
-from gym.error import NameNotFound
+from gymnasium import Env, make
+from gymnasium.error import NameNotFound
 
 import gym_cellular_automata as gymca
 
