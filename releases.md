@@ -2,6 +2,20 @@
 
 :drum:
 
+
+## 0.6.0
+
+> Theme: New API, gymnasium compatibility
+
++ New API
+  + `reset` now returns `obs, info`
+  + `step` now returns `obs, reward, terminated, truncated, info`
+  + Rename of some attributes for the new API
+  + Deletion of old API unused code
++ __Work In Progress_, make the seed for RNG functional
++ Fix `matplotlib` warnings
+
+
 ## 0.5.6
 
 > Theme: Remove YAML globals

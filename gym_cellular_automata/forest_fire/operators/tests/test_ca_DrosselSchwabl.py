@@ -1,5 +1,5 @@
 import pytest
-from gym import spaces
+from gymnasium import spaces
 
 from gym_cellular_automata.forest_fire.operators.ca_DrosselSchwabl import ForestFire
 from gym_cellular_automata.forest_fire.utils.neighbors import neighborhood_at
@@ -60,16 +60,13 @@ def test_drosselSchwabl_is_operator(ca):
 
 @pytest.mark.repeat(TESTS)
 def test_forest_fire_update(ca, grid_space, ca_params_space, position_space):
-
     grid = grid_space.sample()
     ca_params = ca_params_space.sample()
 
     for step in range(STEPS):
-
         new_grid, __ = ca(grid, None, ca_params)
 
         for check in range(CHECKS_PER_STEP):
-
             row, col = position_space.sample()
 
             assert_forest_fire_update_at_positionrows_col(grid, new_grid, row, col)
@@ -91,7 +88,6 @@ def assert_forest_fire_update_at_positionrows_col(grid, new_grid, row, col):
     neighborhood = neighborhood_at(grid, (row, col), invariant=EMPTY)
 
     if old_cell_value == TREE:
-
         # TREE -> FIRE (propagate)
         if FIRE in neighborhood:
             assert new_cell_value == FIRE, "TREE -> FIRE (failed)" + log_error

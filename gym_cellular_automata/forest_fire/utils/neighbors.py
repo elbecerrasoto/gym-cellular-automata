@@ -16,7 +16,6 @@ def moore_n(
     ofle, ofri = col + np.array([-n, +n])
 
     try:
-
         if ofup < 0 or ofle < 0 or ofdo + 1 > nrows or ofri + 1 > ncols:
             raise IndexError
 
@@ -24,7 +23,6 @@ def moore_n(
         return grid[ofup : ofdo + 1, ofle : ofri + 1]
 
     except IndexError:
-
         invariant = np.array(invariant, dtype=grid.dtype)
 
         # 1. Generate extended grid.
@@ -51,13 +49,11 @@ def moore_n(
 
         # 3. Populate Up-Left Corner
         if is_legal["up"] and is_legal["left"]:
-
             egrid[mid - n : mid + 1, mid - n : mid + 1] = grid[
                 row - n : row + 1, col - n : col + 1
             ]
 
         elif not is_legal["up"] and not is_legal["left"]:  # Both ilegal
-
             br = d(row, 0)
             bc = d(col, 0)
             egrid[mid - br : mid + 1, mid - bc : mid + 1] = grid[
@@ -65,13 +61,11 @@ def moore_n(
             ]
 
         elif not is_legal["up"]:
-
             br = d(row, 0)  # Distance to the border
             egrid[mid - br : mid + 1, mid - n : mid + 1] = grid[
                 row - br : row + 1, col - n : col + 1
             ]
         elif not is_legal["left"]:
-
             bc = d(col, 0)
             egrid[mid - n : mid + 1, mid - bc : mid + 1] = grid[
                 row - n : row + 1, col - bc : col + 1
@@ -79,13 +73,11 @@ def moore_n(
 
         # 4. Populate Up-Right Corner
         if is_legal["up"] and is_legal["right"]:
-
             egrid[mid - n : mid + 1, mid : mid + n + 1] = grid[
                 row - n : row + 1, col : col + n + 1
             ]
 
         elif not is_legal["up"] and not is_legal["right"]:
-
             br = d(row, 0)
             bc = d(col, ncols)
             egrid[mid - br : mid + 1, mid : mid + bc] = grid[
@@ -93,14 +85,12 @@ def moore_n(
             ]
 
         elif not is_legal["up"]:
-
             br = d(row, 0)
             egrid[mid - br : mid + 1, mid : mid + n + 1] = grid[
                 row - br : row + 1, col : col + n + 1
             ]
 
         elif not is_legal["right"]:
-
             bc = d(col, ncols)
             egrid[mid - n : mid + 1, mid : mid + bc] = grid[
                 row - n : row + 1, col : col + bc
@@ -108,13 +98,11 @@ def moore_n(
 
         # 5. Populate Down-Left Corner
         if is_legal["down"] and is_legal["left"]:
-
             egrid[mid : mid + n + 1, mid - n : mid + 1] = grid[
                 row : row + n + 1, col - n : col + 1
             ]
 
         elif not is_legal["down"] and not is_legal["left"]:
-
             br = d(row, nrows)
             bc = d(col, 0)
             egrid[mid : mid + br, mid - bc : mid + 1] = grid[
@@ -122,14 +110,12 @@ def moore_n(
             ]
 
         elif not is_legal["down"]:
-
             br = d(row, nrows)
             egrid[mid : mid + br, mid - n : mid + 1] = grid[
                 row : row + br, col - n : col + 1
             ]
 
         elif not is_legal["left"]:
-
             bc = d(col, 0)
             egrid[mid : mid + n + 1, mid - bc : mid + 1] = grid[
                 row : row + n + 1, col - bc : col + 1
@@ -137,26 +123,22 @@ def moore_n(
 
         # 6. Populate Down-Right Corner
         if is_legal["down"] and is_legal["right"]:
-
             egrid[mid : mid + n + 1, mid : mid + n + 1] = grid[
                 row : row + n + 1, col : col + n + 1
             ]
 
         elif not is_legal["down"] and not is_legal["right"]:
-
             br = d(row, nrows)
             bc = d(col, ncols)
             egrid[mid : mid + br, mid : mid + bc] = grid[row : row + br, col : col + bc]
 
         elif not is_legal["down"]:
-
             br = d(row, nrows)
             egrid[mid : mid + br, mid : mid + n + 1] = grid[
                 row : row + br, col : col + n + 1
             ]
 
         elif not is_legal["right"]:
-
             bc = d(col, ncols)
             egrid[mid : mid + n + 1, mid : mid + bc] = grid[
                 row : row + n + 1, col : col + bc

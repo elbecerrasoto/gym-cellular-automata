@@ -8,7 +8,6 @@ from gym_cellular_automata.operator import Operator
 
 
 class RepeatCA(Operator):
-
     grid_dependant = True
     action_dependant = True
     context_dependant = True
@@ -21,7 +20,6 @@ class RepeatCA(Operator):
         *args,
         **kwargs
     ):
-
         super().__init__(*args, **kwargs)
 
         self.t_acting = t_acting

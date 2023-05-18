@@ -1,14 +1,13 @@
 from collections import namedtuple
 
 import numpy as np
-from gym import spaces
+from gymnasium import spaces
 from scipy.signal import convolve2d
 
 from gym_cellular_automata.operator import Operator
 
 
 class WindyForestFire(Operator):
-
     grid_dependant = True
     action_dependant = False
     context_dependant = True
@@ -16,15 +15,14 @@ class WindyForestFire(Operator):
     deterministic = False
 
     # Convolution Weights, magic variables
-    _identity = 2 ** 11
-    _propagation = 2 ** 3
+    _identity = 2**11
+    _propagation = 2**3
 
     # Kernel Size
     _row_k = 3
     _col_k = 3
 
     def __init__(self, empty=0, tree=3, fire=25, *args, **kwargs):
-
         super().__init__(*args, **kwargs)
 
         # Cell Values
@@ -40,7 +38,6 @@ class WindyForestFire(Operator):
             self.context_space = spaces.Box(0.0, 1.0, shape=(3, 3))
 
     def update(self, grid, action, wind):
-
         # Sample which FIREs fail to propagate this update
         fail_to_propagate = self._get_failed_propagations_mask(wind)
 
@@ -139,7 +136,6 @@ class WindyForestFire(Operator):
         return new_grid
 
     def _assert_correctness(self):
-
         assert self._row_k == 3, "Only Moore's neighborhood"
         assert self._col_k == 3, "Only Moore's neighborhood"
 

@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from gym import spaces
+from gymnasium import spaces
 
 from gym_cellular_automata.forest_fire.utils.neighbors import moore_n, neighborhood_at
 from gym_cellular_automata.grid_space import GridSpace
@@ -145,14 +145,12 @@ def neighborhood_at2(grid, pos, invariant=0):
         trow, tcol = row + roffset, col + coffset
 
         try:
-
             if trow < 0 or tcol < 0:
                 raise IndexError
 
             return grid[trow, tcol]
 
         except IndexError:
-
             return invariant
 
     row, col = pos

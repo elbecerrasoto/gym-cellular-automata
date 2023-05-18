@@ -1,5 +1,5 @@
 import pytest
-from gym import spaces
+from gymnasium import spaces
 
 from gym_cellular_automata.forest_fire.operators.ca_windy import WindyForestFire
 from gym_cellular_automata.forest_fire.utils.neighbors import neighborhood_at
@@ -56,15 +56,12 @@ def test_CAwindy_is_operator(ca):
 
 @pytest.mark.repeat(TESTS)
 def test_windy_forest_fire_update(ca, grid_space, wind, position_space):
-
     grid = grid_space.sample()
 
     for step in range(STEPS):
-
         new_grid, __ = ca(grid, None, wind)
 
         for check in range(CHECKS_PER_STEP):
-
             row, col = position_space.sample()
 
             assert_forest_fire_update_at_positionrows_col(grid, new_grid, row, col)
@@ -88,7 +85,6 @@ def assert_forest_fire_update_at_positionrows_col(grid, new_grid, row, col):
     # Explicit rules
 
     if old_cell_value == TREE:
-
         # TREE -> FIRE (propagate)
         if FIRE in neighborhood:
             assert new_cell_value == FIRE, "FIRE Propagation (failed)" + log_error

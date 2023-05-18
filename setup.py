@@ -1,5 +1,6 @@
-import sys
 import os
+import sys
+
 from setuptools import setup
 
 # Don't import gym_cellular_automata module here, since deps may not be installed
@@ -16,7 +17,7 @@ setup(
     author_email="elbecerrasoto@gmail.com",
     license="MIT",
     install_requires=[
-        "gym~=0.23.1",
+        "gymnasium",
         "numpy",
         "matplotlib",
         "scipy",

@@ -4,14 +4,14 @@ import random
 import re
 from pathlib import Path
 
-import gym
+import gymnasium as gym
 
 from gym_cellular_automata._config import PROJECT_PATH
 from gym_cellular_automata.registration import GYM_MAKE
 
 
 def play_random_policy(env, steps, verbose=False):
-    obs = env.reset()
+    obs, info = env.reset()
 
     done = False
     step = 0
@@ -23,8 +23,10 @@ def play_random_policy(env, steps, verbose=False):
             if step % 64 == 0:
                 print(".", end="")
         action = env.action_space.sample()  # Your agent goes here!
-        obs, reward, done, info = env.step(action)
+        obs, reward, terminated, truncated, info = env.step(action)
+        done = terminated or truncated
         step += 1
+
 
     if verbose:
         print()
@@ -180,7 +182,7 @@ if __name__ == "__main__":
 
         if ACTIONS[kenv]["do"]:
 
-            env = gym.make(CALLS[kenv])
+            env = gym.make(CALLS[kenv], render_mode="human")
             ofile = ACTIONS[kenv]["out"]
             steps = ACTIONS[kenv]["steps"]
 

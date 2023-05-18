@@ -29,7 +29,7 @@ from . import svg_paths
 
 # Figure Globals
 FIGSIZE = (15, 12)
-FIGSTYLE = "seaborn-whitegrid"
+FIGSTYLE = "seaborn-v0_8-whitegrid"
 
 TITLE_SIZE = 42
 TITLE_POS = {"x": 0.121, "y": 0.96}
@@ -64,7 +64,6 @@ filterwarnings("ignore", message="Glyph 112")
 
 
 def render(env):
-
     NROWS = env.nrows
     NCOLS = env.ncols
 
@@ -89,7 +88,6 @@ def render(env):
     TITLE = env.spec.id if env.spec is not None else env.title
 
     def main():
-
         plt.style.use(FIGSTYLE)
         fig_shape = (12, 14)
         fig = plt.figure(figsize=FIGSIZE)
@@ -187,7 +185,6 @@ def render(env):
         clear_ax(ax, yticks=False)
 
     def plot_counts(ax, counts_empty, counts_tree, counts_fire):
-
         counts_total = sum((counts_empty, counts_tree, counts_fire))
 
         commons = {"x": [0, 1], "width": 0.1}

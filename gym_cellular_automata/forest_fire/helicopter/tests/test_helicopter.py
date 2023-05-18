@@ -1,8 +1,8 @@
-import gym
+import gymnasium as gym
 import matplotlib
 import numpy as np
 import pytest
-from gym import spaces
+from gymnasium import spaces
 
 from gym_cellular_automata._config import TYPE_BOX
 from gym_cellular_automata.forest_fire.helicopter import ForestFireHelicopterEnv
@@ -111,19 +111,19 @@ def test_forest_fire_env_step_output(env):
     gym_api_out = env.step(action)
 
     assert isinstance(gym_api_out, tuple)
-    assert len(gym_api_out) == 4
+    assert len(gym_api_out) == 5
 
     assert isinstance(gym_api_out[1], float)
     assert isinstance(gym_api_out[2], bool)
-    assert isinstance(gym_api_out[3], dict)
+    assert isinstance(gym_api_out[4], dict)
 
 
 def test_forest_fire_env_output_spaces(env, reward_space):
-    obs0 = env.reset()
+    obs, info = env.reset()
 
-    assert env.observation_space.contains(obs0)
+    assert env.observation_space.contains(obs)
 
-    grid, (ca_params, pos, freeze) = obs0
+    grid, (ca_params, pos, freeze) = obs
     assert env.grid_space.contains(grid)
     assert env.ca_params_space.contains(ca_params)
     assert env.position_space.contains(pos)
@@ -154,24 +154,23 @@ def test_forest_fire_env_with_random_policy(env, reward_space):
     env.reset()
 
     for step in range(RANDOM_POLICY_ITERATIONS):
-
         action = env.action_space.sample()
-        obs, reward, done, info = env.step(action)
+        obs, reward, terminated, truncated, info = env.step(action)
 
         assert_observation_and_reward_spaces(env, obs, reward, reward_space)
 
 
 def test_forest_fire_env_hit_info(env, all_fire_grid):
     def assert_hit_right_notmove_down():
-        obs, reward, done, info = env.action(ACTION_RIGHT)
+        obs, reward, terminated, truncated, info = env.action(ACTION_RIGHT)
 
         assert info["hit"] is True
 
-        obs, reward, done, info = env.action(ACTION_NOT_MOVE)
+        obs, reward, terminated, truncated, info = env.action(ACTION_NOT_MOVE)
 
         assert info["hit"] is False
 
-        obs, reward, done, info = env.action(ACTION_DOWN)
+        obs, reward, terminated, truncated, info = env.action(ACTION_DOWN)
 
         assert info["hit"] is True
 
@@ -186,7 +185,7 @@ def manual_assesment(verbose=False):
 
     env = ForestFireHelicopterEnv()
 
-    obs = env.reset()
+    obs, info = env.reset()
 
     if verbose:
         print(f"\n\nThe FIRST obs is {obs}")
@@ -194,7 +193,6 @@ def manual_assesment(verbose=False):
     env.render()
 
     for i in range(64):
-
         action = env.action_space.sample()
         if verbose:
             print(f"\n\nAction Selected: {action}")

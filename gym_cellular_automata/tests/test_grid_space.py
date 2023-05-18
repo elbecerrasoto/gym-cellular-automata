@@ -54,3 +54,16 @@ def test_copy(space):
     space1 = space
     space2 = copy(space)
     assert space1 == space2, f"Expected {space1} to equal {space2}"
+
+
+SEEDS = 4
+@pytest.mark.repeat(SEEDS)
+def test_seed():
+    SEED = np.random.choice(2048)
+    space1 = GridSpace(12, shape=(6, 6, 6), seed=SEED)
+    space2 = GridSpace(12, shape=(6, 6, 6), seed=SEED)
+
+    grid1 = space1.sample()
+    grid2 = space2.sample()
+
+    assert np.all(grid1 == grid2), f"Not equal with SEED {SEED}"
