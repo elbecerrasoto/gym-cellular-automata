@@ -32,11 +32,6 @@ repos:
     rev: 23.1.0
     hooks:
     -   id: black
--   repo: https://github.com/asottile/pyupgrade
-    rev: v2.19.4
-    hooks:
-    -   id: pyupgrade
-        args: [--py36-plus]
 -   repo: https://github.com/asottile/blacken-docs
     rev: v1.10.0
     hooks:

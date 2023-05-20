@@ -1,15 +1,13 @@
 #!/usr/bin/env python
+import argparse
+import warnings
 from pathlib import Path
 from typing import Union
 
-import argparse
 import gif
-import warnings
-
-from matplotlib._api.deprecation import MatplotlibDeprecationWarning
-
 from gymnasium import Env, make
 from gymnasium.error import NameNotFound
+from matplotlib._api.deprecation import MatplotlibDeprecationWarning
 
 import gym_cellular_automata as gymca
 

@@ -93,13 +93,13 @@ print(f"Total Reward: {total_reward}")
 
 ### Helicopter ###
 
-![Forest Fire Helicopter](./pics/render_helicopter.svg)
+![Forest Fire Helicopter](./gifs/gym_cellular_automata_ForestFireHelicopter5x5-v1.gif)
 
 + [Forest Fire Helicopter](./gym_cellular_automata/forest_fire/helicopter/README.md)
 
 ### Bulldozer ###
 
-![Forest Fire Bulldozer](./pics/render_bulldozer.svg)
+![Forest Fire Bulldozer](./gifs/gym_cellular_automata_ForestFireBulldozer256x256-v3.gif)
 
 + [Forest Fire Bulldozer](./gym_cellular_automata/forest_fire/bulldozer/README.md)
 
