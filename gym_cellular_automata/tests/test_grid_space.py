@@ -57,6 +57,8 @@ def test_copy(space):
 
 
 SEEDS = 4
+
+
 @pytest.mark.repeat(SEEDS)
 def test_seed():
     SEED = np.random.choice(2048)
