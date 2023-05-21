@@ -12,7 +12,7 @@
   + `step` now returns `obs, reward, terminated, truncated, info`
   + Rename of some attributes for the new API
   + Deletion of old API unused code
-+ __Work In Progress_, make the seed for RNG functional
++ _Work In Progress_, make the seed for RNG functional
 + Fix `matplotlib` warnings
 
 
