@@ -52,7 +52,7 @@ test:
 .PHONY: test-debug
 test-debug:
 	# Depends on pip install pytest-ipdb
-	pytest -m "not slow" --ipdb ./gym_cellular_automata
+	pytest -m "not slow" --pdb ./gym_cellular_automata
 
 
 .PHONY: test-coverage

@@ -19,7 +19,6 @@ dependencies:
   - pytest-repeat
   - pytest-cov
   - gif
-  - ipdb
   - objprint
   - pytest-randomly
   - icecream
