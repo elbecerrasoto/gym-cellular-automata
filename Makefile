@@ -25,12 +25,13 @@ build:
 	python -m build
 
 
-.PHONY: git-aliases
-git-aliases:
+.PHONY: git-config
+git-config:
 	# `git br` shows branchs descriptions `git root` prints the project root
 	git config --global alias.br !git-br # git branch --edit-description
 	git config --global alias.br-describe 'branch --edit-description'
 	git config --global alias.root 'rev-parse --show-toplevel'
+	git config push.autoSetupRemote true
 
 
 .PHONY: conda_env
