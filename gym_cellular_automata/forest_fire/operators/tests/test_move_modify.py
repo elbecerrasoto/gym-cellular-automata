@@ -157,17 +157,13 @@ def new_position(row, col, action, grid, up_set, down_set, left_set, right_set):
     new_row = (
         row - 1
         if not is_boundary.up and int(action) in up_set
-        else row + 1
-        if not is_boundary.down and int(action) in down_set
-        else row
+        else row + 1 if not is_boundary.down and int(action) in down_set else row
     )
 
     new_col = (
         col - 1
         if not is_boundary.left and int(action) in left_set
-        else col + 1
-        if not is_boundary.right and int(action) in right_set
-        else col
+        else col + 1 if not is_boundary.right and int(action) in right_set else col
     )
 
     return new_row, new_col

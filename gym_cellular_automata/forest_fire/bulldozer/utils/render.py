@@ -9,6 +9,7 @@ The render of the bulldozer consists of four subplots:
 4. Counts
     + Shows Forest vs No Forest cell counts. Translates on how well the agent is doing.
 """
+
 from warnings import filterwarnings
 
 import matplotlib.pyplot as plt

@@ -18,7 +18,7 @@ dependencies:
   - pytest
   - pytest-repeat
   - pytest-cov
-  - pre-commit
+  - gif
   - ipdb
   - objprint
   - pytest-randomly

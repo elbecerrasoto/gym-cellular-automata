@@ -10,9 +10,14 @@ install:
 
 .PHONY: install-develop
 install-develop:
-	# sudo make install-develop
+	@printf "Probably run: sudo make install-develop\n"
 	npm i -g gitmoji-cli
 	npm install git-br -g
+
+
+.PHONY: hooks
+hooks:
+	gitmoji -i
 
 
 .PHONY: build
@@ -30,28 +35,12 @@ git-aliases:
 
 .PHONY: conda_env
 conda_env:
-	conda env create --file "environment.yaml"
+	mamba env create --file "environment.yaml"
 
 
 .PHONY: conda_env_rm
 conda_env_rm:
-	conda remove --name gymca --all
-
-
-.PHONY: hooks
-hooks:
-	pre-commit install
-	gitmoji -i
-
-
-.PHONY: hooks-dry
-hooks-dry:
-	pre-commit run --all-files
-
-
-.PHONY: hooks-update
-hooks-update:
-	pre-commit autoupdate
+	mamba remove --name gymca --all
 
 
 .PHONY: stye
@@ -98,29 +87,21 @@ patch:
 	./scripts/versionate -v --do "patch_up"
 
 
-.PHONY: gallery
-gallery:
-	# Depends on GNU parallel
-	time yes 1624 | head -12 | parallel ./scripts/update_gallery "bulldozer" -v --steps {}
-	time yes 0 | head -6 | parallel ./scripts/update_gallery "helicopter" -v --steps {}
-
-
 .PHONY: clean
 clean:
-	# Depends on trash-cli  https://github.com/andreafrancia/trash-cli
-	find ./ -type d -name '__pycache__' | xargs -I{} trash {}
-	find ./ -type d -name '*.egg-info' | xargs -I{} trash {}
-	find ./ -type f -name '*~' | xargs -I{} trash {}
-	find ./ -type f -name 'monkeytype.sqlite3' | xargs -I{} trash {}
-	find ./ -type d -name '.pytest_cache' | xargs -I{} trash {}
-	find ./ -type d -name '.mypy_cache' | xargs -I{} trash {}
-	find ./ -name 'TMP*' | xargs -I{} trash {}
-	git clean -d -n # To remove them change -n to -f
-	echo "\n\nTo remove git untracked files run:\ngit clean -d -f"
+	find ./ -type d -name '__pycache__'        | xargs -I{} rm -r {}
+	find ./ -type d -name '*.egg-info'         | xargs -I{} rm -r {}
+	find ./ -type f -name '*~'                 | xargs -I{} rm    {}
+	find ./ -type f -name 'monkeytype.sqlite3' | xargs -I{} rm    {}
+	find ./ -type d -name '.pytest_cache'      | xargs -I{} rm -r {}
+	find ./ -type d -name '.mypy_cache'        | xargs -I{} rm -r {}
+	find ./ -type f -name 'TMP*'               | xargs -I{} rm    {}
+	@git clean -d -n # To remove them change -n to -f
+	@printf "\n\nTo remove git untracked files run:\ngit clean -d -f\n"
 
 
-.PHONY: trailing-spaces
-trailing-spaces:
+.PHONY: trailing-rm
+trailing-rm:
 	find gym_cellular_automata -name "*.py" -exec perl -pi -e 's/[ \t]*$$//' {} \;
 
 
@@ -130,7 +111,7 @@ count:
 	find ./ -name '*.py' -print | xargs cat | sed '/^$$/ d' | perl -ne 'if(not /^ *?#/){print $$_}' | wc -l
 
 
-.PHONY: generate_gifs
-generate_gifs:
+.PHONY: gifs
+gifs:
 	# Create gifs for the environments registered at gymca.envs
 	./scripts/gifs

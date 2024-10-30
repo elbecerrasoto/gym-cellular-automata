@@ -16,38 +16,31 @@ Steps
 
 + Set-up the development environment
   + Requires [anaconda](https://www.anaconda.com/) for managing the virtual environment
+  + I recommend using the following distribution [mini-forge](https://github.com/conda-forge/miniforge/#download)
 
 ```bash
   cd gym-cellular-automata
-  make conda_env
-  conda activate gymca
+  mamba env create --file "environment.yaml"
+  mamba activate gymca
 ```
 
-+ Install
++ Install gym-cellular-automata
 
 ```bash
-make install
-```
-
-+ Create hooks for `git`
-  + This requires [gitmoji](https://github.com/carloscuesta/gitmoji)
-  + It can be installed via `npm` with the following command
-  + `npm i -g gitmoji-cli`
-
-```bash
-make hooks
+pip install -e .
 ```
 
 + Check that everything is fine
 
 ```bash
-  make test
+pytest -m "not slow" --maxfail=3 ./gym_cellular_automata
 ```
 
 + :octocat: Checkout a new development branch
 ```
 git checkout -b awesome-feat
 ```
+
 
 ## Code
 
@@ -72,3 +65,9 @@ git checkout -b awesome-feat
   + `make style`
 + Do not break the build, check it by running the test suite
   + `make test`
+
++ Optionally, use gitmoji, requires `sudo`
+```bash
+sudo npm i -g gitmoji-cli
+gitmoji -i # make hooks
+```

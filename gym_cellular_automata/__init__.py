@@ -27,6 +27,7 @@ env = ProtoEnv(nrows=42, ncols=42)
 
 See https://github.com/elbecerrasoto/gym-cellular-automata for documentation.
 """
+
 from gymnasium.error import Error as GymError
 
 from gym_cellular_automata.ca_env import CAEnv
