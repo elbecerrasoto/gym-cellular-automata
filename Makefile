@@ -11,13 +11,7 @@ install:
 .PHONY: install-develop
 install-develop:
 	@printf "Probably run: sudo make install-develop\n"
-	npm i -g gitmoji-cli
 	npm install git-br -g
-
-
-.PHONY: hooks
-hooks:
-	gitmoji -i
 
 
 .PHONY: build
@@ -44,7 +38,7 @@ conda_env_rm:
 	mamba remove --name gymca --all
 
 
-.PHONY: stye
+.PHONY: style
 style:
 	isort ./
 	black ./

@@ -65,9 +65,3 @@ git checkout -b awesome-feat
   + `make style`
 + Do not break the build, check it by running the test suite
   + `make test`
-
-+ Optionally, use gitmoji, requires `sudo`
-```bash
-sudo npm i -g gitmoji-cli
-gitmoji -i # make hooks
-```
