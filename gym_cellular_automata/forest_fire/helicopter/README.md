@@ -14,16 +14,16 @@ The reward is $+1$ per tree cell and $-1$ per *fire* cell.
 
 The system has no termination state.
 
-The actions are the natural numbers from 1 to 9, each representing a direction:
-1. Left-Up
-2. Up
-3. Right-Up
-4. Right
-5. Don't move
-6. Left
-7. Left-Down
-8. Down
-9. Right-Down
+The actions are the natural numbers from 0 to 8, each representing a direction:
+0. Left-Up
+1. Up
+2. Right-Up
+3. Right
+4. Don't move
+5. Left
+6. Left-Down
+7. Down
+8. Right-Down
 
 ## Cellular Automaton ##
 

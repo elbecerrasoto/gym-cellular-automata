@@ -2,6 +2,23 @@
 
 :drum:
 
+## 0.6.2
+
+> Theme: Fix Errors: numpy & gymnasium, make it easier to contribute
+
++ Normalization of probabilities of `np.random.choice` to sum 1.
+  + _numpy_ is more strict with its definition of what is 1.
++ Make it easier to contribute by:
+  + Removing _precommit hooks_.
+    + For a project of this size are more of a hassle, than a boon.
+  + _gitmoji_ hook is now optional.
++ The following warnings were fixed:
+  + _numpy_
+    + `Conversion to scalars for arrays with ndim>0: NumPy 1.25 deprecation (Python 3.9–3.11)`
+  + _gymnasium_
+  + `UserWarning: WARN: Box high's precision lowered by casting to float32, current high.dtype=float64`
++ Forcing the use of _gymnasium>=1.0.0_ to fix numpy typing errors.
+  + The change was added to `environment.yaml`
 
 ## 0.6.0
 
