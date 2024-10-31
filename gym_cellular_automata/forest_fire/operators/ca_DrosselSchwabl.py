@@ -1,6 +1,7 @@
 import numpy as np
 from gymnasium import spaces
 
+from gym_cellular_automata._config import TYPE_BOX
 from gym_cellular_automata.forest_fire.utils.neighbors import neighborhood_at
 from gym_cellular_automata.operator import Operator
 
@@ -26,7 +27,7 @@ class ForestFire(Operator):
         self.fire = fire
 
         if self.context_space is None:
-            self.context_space = spaces.Box(0.0, 1.0, shape=(2,))
+            self.context_space = spaces.Box(0.0, 1.0, shape=(2,), dtype=TYPE_BOX)
 
     def update(self, grid, action, context):
         # A copy is needed for the sequential update of a CA

@@ -141,7 +141,7 @@ class ForestFireHelicopterEnv(CAEnv):
         return {"hit": self.modify.hit}
 
     def _set_spaces(self):
-        self.ca_params_space = spaces.Box(0.0, 1.0, shape=(2,))
+        self.ca_params_space = spaces.Box(0.0, 1.0, shape=(2,), dtype=TYPE_BOX)
         self.position_space = spaces.MultiDiscrete([self.nrows, self.ncols])
         self.freeze_space = spaces.Discrete(self._max_freeze + 1)
 

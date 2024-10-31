@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 from gymnasium import spaces
 
+from gym_cellular_automata._config import TYPE_BOX
 from gym_cellular_automata.forest_fire.operators import RepeatCA, WindyForestFire
 from gym_cellular_automata.grid_space import GridSpace
 
@@ -36,7 +37,7 @@ def ca(grid_space, dummy_space):
 
 @pytest.fixture
 def context_space(ca):
-    accu_time_space = spaces.Box(np.array(0.0), np.array(1.0))
+    accu_time_space = spaces.Box(np.array(0.0), np.array(1.0), dtype=TYPE_BOX)
     return spaces.Tuple((ca.context_space, accu_time_space))
 
 

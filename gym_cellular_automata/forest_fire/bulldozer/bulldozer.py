@@ -305,7 +305,7 @@ class ForestFireBulldozerEnv(CAEnv):
         )
 
         # fmt: on
-        wind_space = spaces.Box(0.0, 1.0, shape=(3, 3))
+        wind_space = spaces.Box(0.0, 1.0, shape=(3, 3), dtype=TYPE_BOX)
 
         assert wind_space.contains(wind), "Bad Wind Data, check ranges [0.0, 1.0]"
 
@@ -317,9 +317,9 @@ class ForestFireBulldozerEnv(CAEnv):
             shape=(self.nrows, self.ncols),
         )
 
-        self.ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3))
+        self.ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3), dtype=TYPE_BOX)
         self.position_space = spaces.MultiDiscrete([self.nrows, self.ncols])
-        self.time_space = spaces.Box(0.0, float("inf"), shape=tuple())
+        self.time_space = spaces.Box(0.0, float("inf"), shape=tuple(), dtype=TYPE_BOX)
 
         self.context_space = spaces.Tuple(
             (self.ca_params_space, self.position_space, self.time_space)

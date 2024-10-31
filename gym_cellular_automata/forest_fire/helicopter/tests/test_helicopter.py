@@ -73,10 +73,10 @@ def reward_space():
     max_weight = np.max(reward_weights)
     min_weight = np.min(reward_weights)
 
-    lower_bound = np.array(ROW * COL * min_weight, dtype=REWARD_TYPE)
-    upper_bound = np.array(ROW * COL * max_weight, dtype=REWARD_TYPE)
+    lower_bound = np.array(ROW * COL * min_weight)
+    upper_bound = np.array(ROW * COL * max_weight)
 
-    return spaces.Box(lower_bound, upper_bound)
+    return spaces.Box(lower_bound, upper_bound, dtype=TYPE_BOX)
 
 
 def test_forest_fire_env_is_a_gym_env(env):

@@ -4,6 +4,7 @@ import numpy as np
 from gymnasium import spaces
 from scipy.signal import convolve2d
 
+from gym_cellular_automata._config import TYPE_BOX
 from gym_cellular_automata.operator import Operator
 
 
@@ -35,7 +36,7 @@ class WindyForestFire(Operator):
         self.breaks = self._get_breaks()
 
         if self.context_space is None:
-            self.context_space = spaces.Box(0.0, 1.0, shape=(3, 3))
+            self.context_space = spaces.Box(0.0, 1.0, shape=(3, 3), dtype=TYPE_BOX)
 
     def update(self, grid, action, wind):
         # Sample which FIREs fail to propagate this update
@@ -53,7 +54,9 @@ class WindyForestFire(Operator):
         """
         Here goes the only sampling of the step.
         """
-        uniform_space = spaces.Box(low=0.0, high=1.0, shape=(self._row_k, self._col_k))
+        uniform_space = spaces.Box(
+            low=0.0, high=1.0, shape=(self._row_k, self._col_k), dtype=TYPE_BOX
+        )
         uniform_roll = uniform_space.sample()
 
         failed_propagations = np.repeat(False, self._row_k * self._col_k).reshape(
