@@ -38,7 +38,7 @@ def wind(ca):
 
 @pytest.fixture
 def grid_space():
-    return GridSpace(values=[EMPTY, TREE, FIRE], shape=(ROW, COL), dtype=TYPE_INT)
+    return GridSpace(values=[EMPTY, TREE, FIRE], shape=(ROW, COL))
 
 
 @pytest.fixture

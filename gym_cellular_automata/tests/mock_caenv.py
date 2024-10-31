@@ -44,9 +44,7 @@ class MockCAEnv(CAEnv):
         return {}
 
     def _set_spaces(self):
-        self.grid_space = GridSpace(
-            n=self._states, shape=(self._nrows, self._ncols), dtype=TYPE_INT
-        )
+        self.grid_space = GridSpace(n=self._states, shape=(self._nrows, self._ncols))
         self.action_space = spaces.Discrete(self._states)
         self.context_space = spaces.Discrete(self._states)
 

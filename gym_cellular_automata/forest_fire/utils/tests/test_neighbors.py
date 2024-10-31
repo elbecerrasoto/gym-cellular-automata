@@ -16,7 +16,7 @@ REPEATS = 24
 
 @pytest.fixture
 def grid_space():
-    return GridSpace(values=VALUES, shape=(ROW, COL), dtype=TYPE_INT)
+    return GridSpace(values=VALUES, shape=(ROW, COL))
 
 
 @pytest.fixture
@@ -76,7 +76,7 @@ def test_moore_n(grid_space, position_space, n_space):
 def test_neighborhood_at(grid_space):
     empty, tree, fire = range(3)
 
-    singleton_2d = GridSpace(values=[fire], shape=(1, 1), dtype=TYPE_INT).sample()
+    singleton_2d = GridSpace(values=[fire], shape=(1, 1)).sample()
     neighbors = neighborhood_at(grid=singleton_2d, pos=(0, 0), invariant=empty)
 
     neighbors2 = neighborhood_at2(singleton_2d, (0, 0), empty)

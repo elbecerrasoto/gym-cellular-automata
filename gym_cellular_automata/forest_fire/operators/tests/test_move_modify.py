@@ -39,7 +39,7 @@ def move(directions_sets):
 
 @pytest.fixture
 def grid_space():
-    return GridSpace(n=3, shape=(ROW, COL), dtype=TYPE_INT)
+    return GridSpace(n=3, shape=(ROW, COL))
 
 
 @pytest.fixture
