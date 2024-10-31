@@ -145,7 +145,7 @@ class ForestFireHelicopterEnv(CAEnv):
         self.position_space = spaces.MultiDiscrete(
             [self.nrows, self.ncols], dtype=TYPE_INT
         )
-        self.freeze_space = spaces.Discrete(self._max_freeze + 1, dtype=TYPE_INT)
+        self.freeze_space = spaces.Discrete(self._max_freeze + 1)
 
         self.context_space = spaces.Tuple(
             (self.ca_params_space, self.position_space, self.freeze_space)
@@ -159,10 +159,8 @@ class ForestFireHelicopterEnv(CAEnv):
 
         # RL spaces
 
-        self.action_space = spaces.Discrete(self._n_actions, dtype=TYPE_INT)
-        self.observation_space = spaces.Tuple(
-            (self.grid_space, self.context_space), dtype=TYPE_INT
-        )
+        self.action_space = spaces.Discrete(self._n_actions)
+        self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
 
         # Suboperators Spaces
 
@@ -180,15 +178,13 @@ class ForestFireHelicopterEnv(CAEnv):
 
         self.modify_space = {
             "grid_space": self.grid_space,
-            "action_space": spaces.Discrete(2, dtype=TYPE_INT),
+            "action_space": spaces.Discrete(2),
             "context_space": self.position_space,
         }
 
         self.move_modify_space = {
             "grid_space": self.grid_space,
-            "action_space": spaces.Tuple(
-                (self.action_space, spaces.Discrete(2, dtype=TYPE_INT))
-            ),
+            "action_space": spaces.Tuple((self.action_space, spaces.Discrete(2))),
             "context_space": self.position_space,
         }
 
@@ -219,7 +215,7 @@ class MDP(Operator):
         self.suboperators = self.Suboperators(cellular_automaton, move_modify)
 
         self.max_freeze = max_freeze
-        self.freeze_space = spaces.Discrete(max_freeze + 1, dtype=TYPE_INT)
+        self.freeze_space = spaces.Discrete(max_freeze + 1)
 
     def update(self, grid, action, context):
         ca_params, position, freeze = context

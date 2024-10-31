@@ -25,7 +25,7 @@ def grid_space():
 
 @pytest.fixture
 def dummy_space():
-    return spaces.Discrete(1, dtype=TYPE_INT)
+    return spaces.Discrete(1)
 
 
 @pytest.fixture

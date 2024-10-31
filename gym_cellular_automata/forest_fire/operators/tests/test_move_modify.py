@@ -44,7 +44,7 @@ def grid_space():
 
 @pytest.fixture
 def action_space():
-    return spaces.Discrete(ACTIONS, dtype=TYPE_INT)
+    return spaces.Discrete(ACTIONS)
 
 
 @pytest.fixture

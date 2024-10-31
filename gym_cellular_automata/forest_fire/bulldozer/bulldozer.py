@@ -342,13 +342,13 @@ class ForestFireBulldozerEnv(CAEnv):
 
         self.move_space = {
             "grid_space": self.grid_space,
-            "action_space": spaces.Discrete(m, dtype=TYPE_INT),
+            "action_space": spaces.Discrete(m),
             "context_space": self.position_space,
         }
 
         self.modify_space = {
             "grid_space": self.grid_space,
-            "action_space": spaces.Discrete(n, dtype=TYPE_INT),
+            "action_space": spaces.Discrete(n),
             "context_space": self.position_space,
         }
 

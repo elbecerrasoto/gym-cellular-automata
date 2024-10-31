@@ -47,8 +47,8 @@ class MockCAEnv(CAEnv):
         self.grid_space = GridSpace(
             n=self._states, shape=(self._nrows, self._ncols), dtype=TYPE_INT
         )
-        self.action_space = spaces.Discrete(self._states, dtype=TYPE_INT)
-        self.context_space = spaces.Discrete(self._states, dtype=TYPE_INT)
+        self.action_space = spaces.Discrete(self._states)
+        self.context_space = spaces.Discrete(self._states)
 
         self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
 

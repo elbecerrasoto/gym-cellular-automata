@@ -26,7 +26,7 @@ def position_space():
 
 @pytest.fixture
 def n_space():
-    return spaces.Discrete(MAX_N + 1, dtype=TYPE_INT)
+    return spaces.Discrete(MAX_N + 1)
 
 
 @pytest.mark.repeat(REPEATS)
