@@ -4,7 +4,7 @@ channels:
 dependencies:
 # Dependencies
   - python
-  - gymnasium
+  - gymnasium>=1.0.0
   - numpy
   - matplotlib
   - scipy
@@ -12,6 +12,7 @@ dependencies:
   - pyyaml
   - svgpath2mpl
 # Development
+  - ipython
   - black
   - isort
   - mypy

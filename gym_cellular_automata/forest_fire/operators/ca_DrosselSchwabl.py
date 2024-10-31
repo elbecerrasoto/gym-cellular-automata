@@ -5,6 +5,12 @@ from gym_cellular_automata.forest_fire.utils.neighbors import neighborhood_at
 from gym_cellular_automata.operator import Operator
 
 
+def normalize_p(p):
+    p = np.asarray(p).astype("float64")
+    p = p / np.sum(p)
+    return p
+
+
 class ForestFire(Operator):
     grid_dependant = True
     action_dependant = False
@@ -37,8 +43,9 @@ class ForestFire(Operator):
 
                 elif cell == self.tree:
                     # Sample for lightning strike
+
                     strike = self.np_random.choice(
-                        [True, False], p=[p_fire, 1 - p_fire]
+                        [True, False], p=normalize_p([p_fire, 1 - p_fire])
                     )
 
                     new_grid[row][col] = self.fire if strike else cell
@@ -46,7 +53,7 @@ class ForestFire(Operator):
                 elif cell == self.empty:
                     # Sample to grow a tree
                     growth = self.np_random.choice(
-                        [True, False], p=[p_tree, 1 - p_tree]
+                        [True, False], p=normalize_p([p_tree, 1 - p_tree])
                     )
 
                     new_grid[row][col] = self.tree if growth else cell

@@ -28,13 +28,13 @@ git-config:
 	git config push.autoSetupRemote true
 
 
-.PHONY: conda_env
-conda_env:
+.PHONY: mamba_env
+mamba_env:
 	mamba env create --file "environment.yaml"
 
 
-.PHONY: conda_env_rm
-conda_env_rm:
+.PHONY: mamba_env_rm
+mamba_env_rm:
 	mamba remove --name gymca --all
 
 
