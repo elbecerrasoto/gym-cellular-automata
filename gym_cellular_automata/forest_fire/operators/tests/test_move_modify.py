@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 from gymnasium import spaces
 
+from gym_cellular_automata._config import TYPE_INT
 from gym_cellular_automata.forest_fire.operators import Modify, Move
 from gym_cellular_automata.grid_space import GridSpace
 from gym_cellular_automata.tests import assert_operator
@@ -38,17 +39,17 @@ def move(directions_sets):
 
 @pytest.fixture
 def grid_space():
-    return GridSpace(n=3, shape=(ROW, COL))
+    return GridSpace(n=3, shape=(ROW, COL), dtype=TYPE_INT)
 
 
 @pytest.fixture
 def action_space():
-    return spaces.Discrete(ACTIONS)
+    return spaces.Discrete(ACTIONS, dtype=TYPE_INT)
 
 
 @pytest.fixture
 def position_space():
-    return spaces.MultiDiscrete([ROW, COL])
+    return spaces.MultiDiscrete([ROW, COL], dtype=TYPE_INT)
 
 
 def test_move_is_operator(move):

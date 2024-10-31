@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 from gymnasium import spaces
 
+from gym_cellular_automata._config import TYPE_INT
 from gym_cellular_automata.forest_fire.utils.neighbors import moore_n, neighborhood_at
 from gym_cellular_automata.grid_space import GridSpace
 
@@ -15,17 +16,17 @@ REPEATS = 24
 
 @pytest.fixture
 def grid_space():
-    return GridSpace(values=VALUES, shape=(ROW, COL))
+    return GridSpace(values=VALUES, shape=(ROW, COL), dtype=TYPE_INT)
 
 
 @pytest.fixture
 def position_space():
-    return spaces.MultiDiscrete([ROW, COL])
+    return spaces.MultiDiscrete([ROW, COL], dtype=TYPE_INT)
 
 
 @pytest.fixture
 def n_space():
-    return spaces.Discrete(MAX_N + 1)
+    return spaces.Discrete(MAX_N + 1, dtype=TYPE_INT)
 
 
 @pytest.mark.repeat(REPEATS)
@@ -75,7 +76,7 @@ def test_moore_n(grid_space, position_space, n_space):
 def test_neighborhood_at(grid_space):
     empty, tree, fire = range(3)
 
-    singleton_2d = GridSpace(values=[fire], shape=(1, 1)).sample()
+    singleton_2d = GridSpace(values=[fire], shape=(1, 1), dtype=TYPE_INT).sample()
     neighbors = neighborhood_at(grid=singleton_2d, pos=(0, 0), invariant=empty)
 
     neighbors2 = neighborhood_at2(singleton_2d, (0, 0), empty)

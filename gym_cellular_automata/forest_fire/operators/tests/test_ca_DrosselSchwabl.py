@@ -1,7 +1,7 @@
 import pytest
 from gymnasium import spaces
 
-from gym_cellular_automata._config import TYPE_BOX
+from gym_cellular_automata._config import TYPE_BOX, TYPE_INT
 from gym_cellular_automata.forest_fire.operators.ca_DrosselSchwabl import ForestFire
 from gym_cellular_automata.forest_fire.utils.neighbors import neighborhood_at
 from gym_cellular_automata.grid_space import GridSpace
@@ -37,7 +37,7 @@ def ca_params_space():
 
 @pytest.fixture
 def position_space():
-    return spaces.MultiDiscrete([ROW, COL])
+    return spaces.MultiDiscrete([ROW, COL], dtype=TYPE_INT)
 
 
 @pytest.fixture

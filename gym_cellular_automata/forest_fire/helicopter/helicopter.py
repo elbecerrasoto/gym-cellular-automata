@@ -3,7 +3,7 @@ from typing import Optional
 import numpy as np
 from gymnasium import logger, spaces
 
-from gym_cellular_automata._config import TYPE_BOX
+from gym_cellular_automata._config import TYPE_BOX, TYPE_INT
 from gym_cellular_automata.ca_env import CAEnv
 from gym_cellular_automata.forest_fire.operators import (
     ForestFire,
@@ -142,8 +142,10 @@ class ForestFireHelicopterEnv(CAEnv):
 
     def _set_spaces(self):
         self.ca_params_space = spaces.Box(0.0, 1.0, shape=(2,), dtype=TYPE_BOX)
-        self.position_space = spaces.MultiDiscrete([self.nrows, self.ncols])
-        self.freeze_space = spaces.Discrete(self._max_freeze + 1)
+        self.position_space = spaces.MultiDiscrete(
+            [self.nrows, self.ncols], dtype=TYPE_INT
+        )
+        self.freeze_space = spaces.Discrete(self._max_freeze + 1, dtype=TYPE_INT)
 
         self.context_space = spaces.Tuple(
             (self.ca_params_space, self.position_space, self.freeze_space)
@@ -152,12 +154,15 @@ class ForestFireHelicopterEnv(CAEnv):
         self.grid_space = GridSpace(
             values=[self._empty, self._tree, self._fire],
             shape=(self.nrows, self.ncols),
+            dtype=TYPE_INT,
         )
 
         # RL spaces
 
-        self.action_space = spaces.Discrete(self._n_actions)
-        self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
+        self.action_space = spaces.Discrete(self._n_actions, dtype=TYPE_INT)
+        self.observation_space = spaces.Tuple(
+            (self.grid_space, self.context_space), dtype=TYPE_INT
+        )
 
         # Suboperators Spaces
 
@@ -175,13 +180,15 @@ class ForestFireHelicopterEnv(CAEnv):
 
         self.modify_space = {
             "grid_space": self.grid_space,
-            "action_space": spaces.Discrete(2),
+            "action_space": spaces.Discrete(2, dtype=TYPE_INT),
             "context_space": self.position_space,
         }
 
         self.move_modify_space = {
             "grid_space": self.grid_space,
-            "action_space": spaces.Tuple((self.action_space, spaces.Discrete(2))),
+            "action_space": spaces.Tuple(
+                (self.action_space, spaces.Discrete(2, dtype=TYPE_INT))
+            ),
             "context_space": self.position_space,
         }
 
@@ -212,7 +219,7 @@ class MDP(Operator):
         self.suboperators = self.Suboperators(cellular_automaton, move_modify)
 
         self.max_freeze = max_freeze
-        self.freeze_space = spaces.Discrete(max_freeze + 1)
+        self.freeze_space = spaces.Discrete(max_freeze + 1, dtype=TYPE_INT)
 
     def update(self, grid, action, context):
         ca_params, position, freeze = context

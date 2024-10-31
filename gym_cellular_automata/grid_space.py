@@ -5,6 +5,8 @@ from typing import Optional, Sequence
 import numpy as np
 from gymnasium.spaces import Space
 
+from gym_cellular_automata._config import TYPE_INT
+
 
 class GridSpace(Space):
     r"""
@@ -24,7 +26,7 @@ class GridSpace(Space):
         values: Optional[Sequence[int]] = None,
         shape: tuple = tuple(),
         probs: Optional[Sequence[float]] = None,
-        dtype: np.intc = np.int32,
+        dtype: np.intc = TYPE_INT,
         seed: int = None,
     ):
         super().__init__(shape, dtype, seed)

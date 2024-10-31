@@ -3,7 +3,7 @@ from typing import Optional, Tuple
 import numpy as np
 from gymnasium import spaces
 
-from gym_cellular_automata._config import TYPE_BOX
+from gym_cellular_automata._config import TYPE_BOX, TYPE_INT
 from gym_cellular_automata.ca_env import CAEnv
 from gym_cellular_automata.forest_fire.operators import (
     Modify,
@@ -313,12 +313,13 @@ class ForestFireBulldozerEnv(CAEnv):
 
     def _set_spaces(self):
         self.grid_space = GridSpace(
-            values=[self._empty, self._tree, self._fire],
-            shape=(self.nrows, self.ncols),
+            values=[self._empty, self._tree, self._fire], shape=(self.nrows, self.ncols)
         )
 
         self.ca_params_space = spaces.Box(0.0, 1.0, shape=(3, 3), dtype=TYPE_BOX)
-        self.position_space = spaces.MultiDiscrete([self.nrows, self.ncols])
+        self.position_space = spaces.MultiDiscrete(
+            [self.nrows, self.ncols], dtype=TYPE_INT
+        )
         self.time_space = spaces.Box(0.0, float("inf"), shape=tuple(), dtype=TYPE_BOX)
 
         self.context_space = spaces.Tuple(
@@ -328,7 +329,7 @@ class ForestFireBulldozerEnv(CAEnv):
         # RL spaces
 
         m, n = len(self._moves), len(self._shoots)
-        self.action_space = spaces.MultiDiscrete([m, n])
+        self.action_space = spaces.MultiDiscrete([m, n], dtype=TYPE_INT)
         self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
 
         # Suboperators Spaces
@@ -341,13 +342,13 @@ class ForestFireBulldozerEnv(CAEnv):
 
         self.move_space = {
             "grid_space": self.grid_space,
-            "action_space": spaces.Discrete(m),
+            "action_space": spaces.Discrete(m, dtype=TYPE_INT),
             "context_space": self.position_space,
         }
 
         self.modify_space = {
             "grid_space": self.grid_space,
-            "action_space": spaces.Discrete(n),
+            "action_space": spaces.Discrete(n, dtype=TYPE_INT),
             "context_space": self.position_space,
         }
 

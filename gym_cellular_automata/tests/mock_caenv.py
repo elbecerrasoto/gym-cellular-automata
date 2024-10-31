@@ -1,5 +1,6 @@
 from gymnasium import spaces
 
+from gym_cellular_automata._config import TYPE_INT
 from gym_cellular_automata.ca_env import CAEnv
 from gym_cellular_automata.grid_space import GridSpace
 from gym_cellular_automata.tests import Identity
@@ -43,9 +44,11 @@ class MockCAEnv(CAEnv):
         return {}
 
     def _set_spaces(self):
-        self.grid_space = GridSpace(n=self._states, shape=(self._nrows, self._ncols))
-        self.action_space = spaces.Discrete(self._states)
-        self.context_space = spaces.Discrete(self._states)
+        self.grid_space = GridSpace(
+            n=self._states, shape=(self._nrows, self._ncols), dtype=TYPE_INT
+        )
+        self.action_space = spaces.Discrete(self._states, dtype=TYPE_INT)
+        self.context_space = spaces.Discrete(self._states, dtype=TYPE_INT)
 
         self.observation_space = spaces.Tuple((self.grid_space, self.context_space))
 

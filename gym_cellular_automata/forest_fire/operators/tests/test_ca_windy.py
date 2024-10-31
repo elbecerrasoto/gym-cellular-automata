@@ -1,6 +1,7 @@
 import pytest
 from gymnasium import spaces
 
+from gym_cellular_automata._config import TYPE_INT
 from gym_cellular_automata.forest_fire.operators.ca_windy import WindyForestFire
 from gym_cellular_automata.forest_fire.utils.neighbors import neighborhood_at
 from gym_cellular_automata.grid_space import GridSpace
@@ -37,15 +38,12 @@ def wind(ca):
 
 @pytest.fixture
 def grid_space():
-    return GridSpace(
-        values=[EMPTY, TREE, FIRE],
-        shape=(ROW, COL),
-    )
+    return GridSpace(values=[EMPTY, TREE, FIRE], shape=(ROW, COL), dtype=TYPE_INT)
 
 
 @pytest.fixture
 def position_space():
-    return spaces.MultiDiscrete([ROW, COL])
+    return spaces.MultiDiscrete([ROW, COL], dtype=TYPE_INT)
 
 
 def test_CAwindy_is_operator(ca):
