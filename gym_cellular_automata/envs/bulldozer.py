@@ -226,7 +226,7 @@ class ForestFireBulldozerEnv(CAEnv):
         upper = int(ax_len * AX_PERCENT)
 
         if upper > 0:
-            return int(self.np_random.choice(range(upper), size=1))
+            return self.np_random.choice(range(upper), size=1).item(0)
         else:
             return 0
 
