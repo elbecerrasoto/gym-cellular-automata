@@ -122,32 +122,61 @@ class Network(nn.Module):
 
     @nn.compact
     def __call__(self, grid):
-        x = nn.Conv(
-            32,
-            kernel_size=(8, 8),
-            strides=(4, 4),
-            padding="VALID",
-            kernel_init=orthogonal(np.sqrt(2)),
-            bias_init=constant(0.0),
-        )(grid)
-        x = nn.relu(x)
-        x = nn.Conv(
-            64,
-            kernel_size=(4, 4),
-            strides=(2, 2),
-            padding="VALID",
-            kernel_init=orthogonal(np.sqrt(2)),
-            bias_init=constant(0.0),
-        )(x)
-        x = nn.relu(x)
-        x = nn.Conv(
-            64,
-            kernel_size=(3, 3),
-            strides=(1, 1),
-            padding="VALID",
-            kernel_init=orthogonal(np.sqrt(2)),
-            bias_init=constant(0.0),
-        )(x)
+        if grid.shape[1] <= 16:
+            # For small grids, use smaller strides
+            x = nn.Conv(
+                32,
+                kernel_size=(3, 3),
+                strides=(1, 1),  # Reduced stride
+                padding="VALID",
+                kernel_init=orthogonal(np.sqrt(2)),
+                bias_init=constant(0.0),
+            )(grid)
+            x = nn.relu(x)
+            x = nn.Conv(
+                64,
+                kernel_size=(3, 3),
+                strides=(1, 1),  # Reduced stride
+                padding="VALID",
+                kernel_init=orthogonal(np.sqrt(2)),
+                bias_init=constant(0.0),
+            )(x)
+            x = nn.relu(x)
+            x = nn.Conv(
+                64,
+                kernel_size=(2, 2),
+                strides=(1, 1),  # Reduced stride
+                padding="VALID",
+                kernel_init=orthogonal(np.sqrt(2)),
+                bias_init=constant(0.0),
+            )(x)
+        else:
+            x = nn.Conv(
+                32,
+                kernel_size=(8, 8),
+                strides=(4, 4),
+                padding="VALID",
+                kernel_init=orthogonal(np.sqrt(2)),
+                bias_init=constant(0.0),
+            )(grid)
+            x = nn.relu(x)
+            x = nn.Conv(
+                64,
+                kernel_size=(4, 4),
+                strides=(2, 2),
+                padding="VALID",
+                kernel_init=orthogonal(np.sqrt(2)),
+                bias_init=constant(0.0),
+            )(x)
+            x = nn.relu(x)
+            x = nn.Conv(
+                64,
+                kernel_size=(3, 3),
+                strides=(1, 1),
+                padding="VALID",
+                kernel_init=orthogonal(np.sqrt(2)),
+                bias_init=constant(0.0),
+            )(x)
         x = nn.relu(x)
         x = x.reshape((x.shape[0], -1))
         x = nn.Dense(512, kernel_init=orthogonal(np.sqrt(2)), bias_init=constant(0.0))(
@@ -537,7 +566,7 @@ def run_rollout_loop(
                     NamedSharding(mesh, P("devices", None)),
                 ),
                 logprobs=jax.device_put(
-                    jnp.zeros((args.num_steps, env.total_action_space.shape[1])),
+                    jnp.zeros((args.num_steps, *env.total_action_space.shape)),
                     NamedSharding(mesh, P("devices", None)),
                 ),
                 dones=jax.device_put(
@@ -581,7 +610,7 @@ def run_rollout_loop(
                 (args.num_steps,) + env.total_action_space.shape,
                 dtype=jnp.int32,
             ),
-            logprobs=jnp.zeros((args.num_steps, env.total_action_space.shape[1])),
+            logprobs=jnp.zeros((args.num_steps, *env.total_action_space.shape)),
             dones=jnp.zeros((args.num_steps, num_envs)),
             values=jnp.zeros((args.num_steps, num_envs)),
             advantages=jnp.zeros((args.num_steps, num_envs)),
@@ -740,191 +769,122 @@ def run_rollout_loop(
         return storage
 
     @jax.jit
+    def ppo_loss(params, x, a, logp, mb_advantages, mb_returns, mb_values):
+        newlogprob, entropy, newvalue = get_action_and_value2(params, x, a)
+        logratio = newlogprob - logp
+        ratio = jnp.exp(logratio)
+
+        # Calculate approx_kl per action and take mean
+        approx_kl = ((ratio - 1) - logratio).mean()
+
+        if args.norm_adv:
+            mb_advantages = (mb_advantages - mb_advantages.mean()) / (
+                mb_advantages.std() + 1e-8
+            )
+
+        # Policy loss calculated per action
+        pg_loss1 = -mb_advantages * ratio
+        pg_loss2 = -mb_advantages * jnp.clip(
+            ratio, 1 - args.clip_coef, 1 + args.clip_coef
+        )
+
+        # Take mean across both batch and action dimensions
+        pg_loss = jnp.maximum(pg_loss1, pg_loss2).mean()
+
+        # Value loss
+        if args.clip_vloss:
+            v_loss_unclipped = 0.5 * ((newvalue - mb_returns) ** 2).mean()
+            v_clipped = mb_values + jnp.clip(
+                newvalue - mb_values,
+                -args.clip_coef,
+                args.clip_coef,
+            )
+            v_loss_clipped = (v_clipped - mb_returns) ** 2
+            v_loss_max = jnp.maximum(v_loss_unclipped, v_loss_clipped)
+            v_loss = 0.5 * v_loss_max.mean()
+        else:
+            v_loss = 0.5 * ((newvalue - mb_returns) ** 2).mean()
+
+        entropy_loss = entropy.mean()
+        loss = pg_loss - args.ent_coef * entropy_loss + v_loss * args.vf_coef
+        return loss, (
+            pg_loss,
+            v_loss,
+            entropy_loss,
+            jax.lax.stop_gradient(approx_kl),
+        )
+
+    ppo_loss_grad_fn = jax.value_and_grad(ppo_loss, has_aux=True)
+
+    @jax.jit
     def update_ppo(
         agent_state: TrainState,
         storage: Storage,
         key: jax.random.PRNGKey,
     ):
-        b_grid_obs = storage.grid_obs.reshape(
-            (-1,) + env.observation_space[0].shape[1:]
-        )
-        b_position_obs = storage.position_obs.reshape(
-            (-1,) + env.observation_space[1]["position"].shape[1:]
-        )
-        b_logprobs = storage.logprobs.reshape(
-            (-1,) + (env.total_action_space.shape[-1],)
-        )
-        b_actions = storage.actions.reshape((-1,) + (env.total_action_space.shape[-1],))
-        b_advantages = storage.advantages.reshape(-1)
-        # Repeat advantages for each action
-        b_advantages = jnp.repeat(
-            b_advantages[:, None], env.total_action_space.shape[-1], axis=1
-        )
-        b_returns = storage.returns.reshape(-1)
-        b_values = storage.values.reshape(-1)
-        # Generate keys for all epochs
-        keys = jax.random.split(key, args.update_epochs + 1)
-        key = keys[0]
-        permutation_keys = keys[1:]
+        def update_epoch(carry, unused_inp):
+            agent_state, key = carry
+            key, subkey = jax.random.split(key)
 
-        num_minibatches = args.batch_size // args.minibatch_size
-        # vmap the permutation generation over epoch keys
-        permutations = jax.vmap(
-            lambda k: jax.random.permutation(
-                k, args.batch_size, independent=True
-            ).reshape((num_minibatches, args.minibatch_size))
-        )(permutation_keys)
+            def flatten(x):
+                return x.reshape((-1,) + x.shape[2:])
 
-        if len(jax.devices()) >= 4 and not SHARD_STORAGE and SHOULD_SHARD:
-            # print("Sharding visualization grid shape", b_grid_obs.shape)
-            # flattened = b_grid_obs.reshape(
-            #     -1, b_grid_obs.shape[-2] * b_grid_obs.shape[-1]
-            # )
-            # print("Sharding visualization flattened grid shape", flattened.shape)
-            # jax.debug.visualize_array_sharding(flattened)
+            # taken from: https://github.com/google/brax/blob/main/brax/training/agents/ppo/train.py
+            def convert_data(x: jnp.ndarray):
+                x = jax.random.permutation(subkey, x)
+                x = jnp.reshape(x, (args.num_minibatches, -1) + x.shape[1:])
+                return x
 
-            mesh = jax.make_mesh((4,), ("devices"))
-            batch_sharding = NamedSharding(mesh, P("devices"))
-            b_grid_obs = jax.lax.with_sharding_constraint(b_grid_obs, batch_sharding)
-            b_position_obs = jax.lax.with_sharding_constraint(
-                b_position_obs, batch_sharding
-            )
-            b_logprobs = jax.lax.with_sharding_constraint(b_logprobs, batch_sharding)
-            b_actions = jax.lax.with_sharding_constraint(b_actions, batch_sharding)
-            b_advantages = jax.lax.with_sharding_constraint(
-                b_advantages, batch_sharding
-            )
-            b_returns = jax.lax.with_sharding_constraint(b_returns, batch_sharding)
-
-            permutations = jax.lax.with_sharding_constraint(
-                permutations,
-                NamedSharding(
-                    mesh, P(None, None, "devices")
-                ),  # Shard minibatch dimension
+            flatten_storage = jax.tree_map(flatten, storage)
+            shuffled_storage = jax.tree_map(convert_data, flatten_storage)
+            shuffled_storage = shuffled_storage.replace(
+                advantages=jnp.repeat(
+                    jnp.expand_dims(shuffled_storage.advantages, axis=2),
+                    env.total_action_space.shape[-1],
+                    axis=2,
+                )
             )
 
-        @jax.jit
-        def ppo_loss(params, x, a, logp, mb_advantages, mb_returns, mb_values):
-            newlogprob, entropy, newvalue = get_action_and_value2(params, x, a)
-            logratio = newlogprob - logp
-            ratio = jnp.exp(logratio)
-
-            # Calculate approx_kl per action and take mean
-            approx_kl = ((ratio - 1) - logratio).mean()
-
-            if args.norm_adv:
-                mb_advantages = (mb_advantages - mb_advantages.mean()) / (
-                    mb_advantages.std() + 1e-8
+            def update_minibatch(agent_state, minibatch):
+                (loss, (pg_loss, v_loss, entropy_loss, approx_kl)), grads = (
+                    ppo_loss_grad_fn(
+                        agent_state.params,
+                        (minibatch.grid_obs, minibatch.position_obs),
+                        minibatch.actions,
+                        minibatch.logprobs,
+                        minibatch.advantages,
+                        minibatch.returns,
+                        minibatch.values,
+                    )
+                )
+                agent_state = agent_state.apply_gradients(grads=grads)
+                return agent_state, (
+                    loss,
+                    pg_loss,
+                    v_loss,
+                    entropy_loss,
+                    approx_kl,
+                    grads,
                 )
 
-            # Policy loss calculated per action
-            pg_loss1 = -mb_advantages * ratio
-            pg_loss2 = -mb_advantages * jnp.clip(
-                ratio, 1 - args.clip_coef, 1 + args.clip_coef
+            agent_state, (loss, pg_loss, v_loss, entropy_loss, approx_kl, grads) = (
+                jax.lax.scan(update_minibatch, agent_state, shuffled_storage)
             )
-
-            # Take mean across both batch and action dimensions
-            pg_loss = jnp.maximum(pg_loss1, pg_loss2).mean()
-
-            # Value loss
-            if args.clip_vloss:
-                v_loss_unclipped = 0.5 * ((newvalue - mb_returns) ** 2).mean()
-                v_clipped = mb_values + jnp.clip(
-                    newvalue - mb_values,
-                    -args.clip_coef,
-                    args.clip_coef,
-                )
-                v_loss_clipped = (v_clipped - mb_returns) ** 2
-                v_loss_max = jnp.maximum(v_loss_unclipped, v_loss_clipped)
-                v_loss = 0.5 * v_loss_max.mean()
-            else:
-                v_loss = 0.5 * ((newvalue - mb_returns) ** 2).mean()
-
-            entropy_loss = entropy.mean()
-            loss = pg_loss - args.ent_coef * entropy_loss + v_loss * args.vf_coef
-            return loss, (
+            return (agent_state, key), (
+                loss,
                 pg_loss,
                 v_loss,
                 entropy_loss,
-                jax.lax.stop_gradient(approx_kl),
+                approx_kl,
+                grads,
             )
 
-        ppo_loss_grad_fn = jax.value_and_grad(ppo_loss, has_aux=True)
-
-        def update_epoch(carry, scan_inputs):
-            agent_state = carry
-            epoch_idx, epoch_permutation = scan_inputs
-            # permutation = jax.random.permutation(
-            #     subkey, args.batch_size, independent=True
-            # ).reshape((num_minibatches, args.minibatch_size))
-
-            def update_minibatch(carry, perm_indices):
-                agent_state, loss, pg_loss, v_loss, entropy_loss, approx_kl = carry
-                (
-                    new_loss,
-                    (new_pg_loss, new_v_loss, new_entropy_loss, new_approx_kl),
-                ), grads = ppo_loss_grad_fn(
-                    agent_state.params,
-                    (b_grid_obs[perm_indices], b_position_obs[perm_indices]),
-                    b_actions[perm_indices],
-                    b_logprobs[perm_indices],
-                    b_advantages[perm_indices],
-                    b_returns[perm_indices],
-                    b_values[perm_indices],
-                )
-                # print("grads", grads.shape)
-                # jax.debug.visualize_array_sharding(
-                #     new_loss.reshape(new_loss.shape[:-2] + (-1,))
-                # )
-                agent_state = agent_state.apply_gradients(grads=grads)
-                return (
-                    agent_state,
-                    loss + new_loss,
-                    pg_loss + new_pg_loss,
-                    v_loss + new_v_loss,
-                    entropy_loss + new_entropy_loss,
-                    approx_kl + new_approx_kl,
-                ), None
-
-            # Initialize with dummy values for losses since they'll be overwritten
-            init_carry = (agent_state, 0.0, 0.0, 0.0, 0.0, 0.0)
-            (agent_state, loss, pg_loss, v_loss, entropy_loss, approx_kl), _ = (
-                jax.lax.scan(update_minibatch, init_carry, epoch_permutation)
+        (agent_state, key), (loss, pg_loss, v_loss, entropy_loss, approx_kl, grads) = (
+            jax.lax.scan(
+                update_epoch, (agent_state, key), (), length=args.update_epochs
             )
-            return (agent_state), (
-                loss / num_minibatches,
-                pg_loss / num_minibatches,
-                v_loss / num_minibatches,
-                entropy_loss / num_minibatches,
-                approx_kl / num_minibatches,
-            )
-
-        init_carry = agent_state
-        (final_agent_state), (
-            loss,
-            pg_loss,
-            v_loss,
-            entropy_loss,
-            approx_kl,
-        ) = jax.lax.scan(
-            update_epoch, init_carry, (jnp.arange(args.update_epochs), permutations)
         )
-
-        # Take the mean across epochs
-        loss = loss.mean()
-        pg_loss = pg_loss.mean()
-        v_loss = v_loss.mean()
-        entropy_loss = entropy_loss.mean()
-        approx_kl = approx_kl.mean()
-        return (
-            final_agent_state,
-            loss,
-            pg_loss,
-            v_loss,
-            entropy_loss,
-            approx_kl,
-            key,
-        )
+        return agent_state, loss, pg_loss, v_loss, entropy_loss, approx_kl, key
 
     # TRY NOT TO MODIFY: start the game
     global_step = 0
@@ -1130,11 +1090,13 @@ def run_rollout_loop(
                 agent_state.opt_state[1].hyperparams["learning_rate"].item(),
                 global_step,
             )
-            writer.add_scalar("losses/value_loss", v_loss.item(), global_step)
-            writer.add_scalar("losses/policy_loss", pg_loss.item(), global_step)
-            writer.add_scalar("losses/entropy", entropy_loss.item(), global_step)
-            writer.add_scalar("losses/approx_kl", approx_kl.item(), global_step)
-            writer.add_scalar("losses/loss", loss.item(), global_step)
+            writer.add_scalar("losses/value_loss", v_loss[-1, -1].item(), global_step)
+            writer.add_scalar("losses/policy_loss", pg_loss[-1, -1].item(), global_step)
+            writer.add_scalar(
+                "losses/entropy", entropy_loss[-1, -1].item(), global_step
+            )
+            writer.add_scalar("losses/approx_kl", approx_kl[-1, -1].item(), global_step)
+            writer.add_scalar("losses/loss", loss[-1, -1].item(), global_step)
 
             sps = int(global_step / (time.time() - start_time))
             writer.add_scalar("charts/SPS", sps, global_step)
@@ -1198,10 +1160,10 @@ def run_rollout_loop(
                     "recent_10_return": f"{recent_avg_return:.2f}",
                     "recent_10_length": f"{recent_avg_length:.2f}",
                     "recent_10_standard_error": f"{recent_standard_error:.2f}",
-                    "value_loss": f"{v_loss.item():.4f}",
-                    "policy_loss": f"{pg_loss.item():.4f}",
-                    "entropy_loss": f"{entropy_loss.item():.4f}",
-                    "approx_kl": f"{approx_kl.item():.4f}",
+                    "value_loss": f"{v_loss[-1, -1].item():.4f}",
+                    "policy_loss": f"{pg_loss[-1, -1].item():.4f}",
+                    "entropy_loss": f"{entropy_loss[-1, -1].item():.4f}",
+                    "approx_kl": f"{approx_kl[-1, -1].item():.4f}",
                 },
                 refresh=True,
             )
@@ -1294,7 +1256,7 @@ def load_actor(params_path: str, env):
             args=orbax.checkpoint.args.StandardRestore(abstract_state_with_sharding),
         )
 
-    @jax.jit
+    # @jax.jit
     def get_action(grid_obs, position_obs):
         """
         Get action for a single observation.
@@ -1319,6 +1281,6 @@ def load_actor(params_path: str, env):
         for logits in action_logits:
             actions.append(jnp.argmax(logits, axis=-1))
 
-        return jnp.expand_dims(jnp.concatenate(actions), axis=0)
+        return jnp.expand_dims(jnp.concatenate(actions), axis=0), action_logits
 
     return get_action
